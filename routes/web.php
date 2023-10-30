@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PersonenController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,8 @@ Route::get('/about', [PagesController::class, 'about']);
 Route::get('/services', [PagesController::class, 'services']);
 Route::get('/locateUser', [LocationController::class, 'locateUserView']);
 Route::post('/store-coordinates', [LocationController::class, 'locateUser']);
+Route::get('/test-db', [PersonenController::class, 'testDatabaseConnection']);
+Route::get('/persons', [PersonenController::class, 'index']);
 
 
 
