@@ -16,13 +16,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [PagesController::class, 'index']);
-Route::get('/about', [PagesController::class, 'about']);
-Route::get('/services', [PagesController::class, 'services']);
-Route::get('/locateUser', [LocationController::class, 'locateUserView']);
-Route::post('/store-coordinates', [LocationController::class, 'locateUser']);
-Route::get('/test-db', [PersonenController::class, 'testDatabaseConnection']);
-Route::get('/persons', [PersonenController::class, 'index']);
-
+Route::get('/{any?}', [PagesController::class, 'index']);
 
 
