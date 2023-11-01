@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Faker\Factory as Faker;
 
 class PersonsTableSeeder extends Seeder
 {
@@ -15,7 +16,7 @@ class PersonsTableSeeder extends Seeder
     {
         for ($i = 1; $i <= 10; $i++) {
             DB::table('persons')->insert([
-                'Nummer' => 'N' . str_pad($i, 5, '0', STR_PAD_LEFT),
+                'Nummer' => 'N' . str_random(125),
                 'geht' => random_int(0, 1),
                 'AtmungSuffizient' => random_int(0, 1),
                 'Blutung' => random_int(0, 1),
