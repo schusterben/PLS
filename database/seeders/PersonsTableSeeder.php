@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Faker\Factory as Faker;
 
+
 class PersonsTableSeeder extends Seeder
 {
     /**
@@ -15,8 +16,11 @@ class PersonsTableSeeder extends Seeder
     public function run(): void
     {
         for ($i = 1; $i <= 10; $i++) {
+            $latitude = mt_rand(47930, 47940) / 1000;
+            $longitude = mt_rand(13060, 13090) / 1000;
+
             DB::table('persons')->insert([
-                'Nummer' => 'N' . str_random(125),
+                'Nummer' => 'N' . \Illuminate\Support\Str::random(125),
                 'geht' => random_int(0, 1),
                 'AtmungSuffizient' => random_int(0, 1),
                 'Blutung' => random_int(0, 1),
@@ -56,6 +60,7 @@ class PersonsTableSeeder extends Seeder
                 'arttalocrursin' => random_int(0, 1),
                 'collum' => random_int(0, 1),
                 'humerussin' => random_int(0, 1),
+                'position' => DB::raw("ST_GeomFromText('POINT($longitude $latitude)')"),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
