@@ -18,6 +18,9 @@ use App\Http\Controllers\PersonenController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::post('/persons/{person}/update-triage-color', [PersonenController::class, 'update']);
+//Route::post('/persons/{id}/update-triage-color', 'PersonenController@update');
 Route::get('/persons', [PersonenController::class, 'index']);
 Route::get('/test-db', [PersonenController::class, 'testDatabaseConnection']);
+
 

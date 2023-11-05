@@ -65,4 +65,35 @@ class PersonenController extends Controller
         return response()->json(['error' => 'Keine Daten gefunden.'], 404);
     }
 }
+
+public function update(Request $request, $id)
+{
+    Log::info('Update Methode aufgerufen',['id' => $id, 'request' => $request->all()]);
+
+    // Finden der Person anhand der ID
+    $person = Person::findOrFail($id);
+
+    // Übernehmen der Triagefarbe aus der Anfrage
+    $triageColor = $request->input('triageColor');
+    if ($triageColor !== null) {
+        $person->Triagefarbe = $triageColor;
+    }
+
+     // Übernehmen der GPS-Daten aus der Anfrage
+     $lng = $request->input('lng');
+     $lat = $request->input('lat');
+     if ($lng !== null && $lat !== null) {
+         // Zuweisen der Position als Array
+         $person->position = ['lng' => $lng, 'lat' => $lat];
+     }
+
+    // Speichern der geänderten Daten
+    $person->save();
+    Log::info('Triagefarbe für Person mit ID ' . $id . ' aktualisiert.');
+
+    // Zurückgeben der aktualisierten Person als JSON
+    return response()->json($person);
+}
+
+
 }
