@@ -1,74 +1,143 @@
 :root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
-
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
-
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-text-size-adjust: 100%;
+    --primary-color: #646cff;
+    --secondary-color: #646cff;
+    --background-color: #e7e7e7; /* Light Grey */
+    --header-background-color: rgb(192, 45, 26);
 }
+
+/* Header Style */
+.header {
+    background-color: var(--header-background-color);
+    color: #fff;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: larger;
+    width: 100%;
+    height: 13%;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* Content Style */
 .content {
-    margin-top: 13%; /* Dieser Wert sollte der Höhe des .header entsprechen oder größer sein */
-    /* Weitere Stilregeln für Ihren Inhaltsbereich */
+    margin-top: 13%;
+    /* Additional style rules for your content area */
 }
+
+/* Link Style */
 a {
     font-weight: 500;
-    color: #646cff;
-    text-decoration: inherit;
-}
-a:hover {
-    color: #535bf2;
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.3s;
 }
 
+a:hover {
+    color: var(--primary-color);
+}
+
+/* Body Style */
 body {
     margin: 0;
     display: flex;
     justify-content: center;
-    place-items: center;
+    align-items: center;
     min-width: 320px;
     min-height: 100vh;
     text-align: center;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color); /* Light Grey Background */
 }
 
+/* Heading Style */
 h1 {
-    font-size: 3.2em;
-    line-height: 1.1;
+    font-size: 3em;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333333;
 }
 
+/* Button Style */
 button {
     border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    background-color: #1a1a1a;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: var(--primary-color);
+    color: #fff;
     cursor: pointer;
-    transition: border-color 0.25s;
+    transition: background-color 0.3s;
 }
+
 button:hover {
-    border-color: #646cff;
+    background-color: #1e5e12; /* Dark Green on Hover */
 }
+
+button:active {
+    background-color: #00cc00; /* Green when clicked */
+}
+
 button:focus,
 button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Dark color scheme for light mode */
 @media (prefers-color-scheme: light) {
     :root {
-        color: #213547;
-        background-color: #ffffff;
+        --primary-color: #213547;
+        --background-color: #ffffff;
     }
+
     a:hover {
         color: #747bff;
     }
+
     button {
         background-color: #f9f9f9;
+        color: #1a1a1a;
     }
+}
+
+/* Media Query for smaller screens */
+@media screen and (max-width: 768px) {
+    .content {
+        margin-top: 10%; /* Adjusting top margin for smaller screens */
+    }
+
+    h1 {
+        font-size: 2em; /* Reducing heading size for smaller screens */
+    }
+
+    button {
+        font-size: 1em; /* Reducing button font size for smaller screens */
+    }
+}
+/* Zusätzliche Stile für die Tabelle */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    font-weight: bold;
+    background-color: #6495ED; /* Hellblau für Spaltenüberschriften */
+    color: #fff;
+}
+
+th, td {
+    border: 1px solid #ddd; /* Fügt eine Trennlinie zwischen den Zellen hinzu */
+    padding: 8px;
+    text-align: center; /* Text horizontal zentriert */
+}
+
+/* Färben der geraden Zeilen */
+tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
