@@ -15,11 +15,46 @@ class PersonsTableSeeder extends Seeder
      */
     public function run(): void
     {
+
+ // Fügen Sie hier Ihre Dummy-Daten für die Patienten ein
+        DB::table('patient')->insert([
+            [
+                'atmung' => 1,
+                'blutung' => 0,
+                'radialispuls' => 'Normal',
+                'triagefarbe' => 'Grün',
+                'transport' => 1,
+                'dringend' => 0,
+                'kontaminiert' => 0,
+                'name' => 'Patient 1',
+                'location_patient' => null,
+                'user_iduser' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'atmung' => 0,
+                'blutung' => 1,
+                'radialispuls' => 'Schwach',
+                'triagefarbe' => 'Rot',
+                'transport' => 1,
+                'dringend' => 1,
+                'kontaminiert' => 1,
+                'name' => 'Patient 2',
+                'location_patient' => null,
+                'user_iduser' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            // Fügen Sie weitere Datensätze hinzu, wie benötigt
+        ]);
+
+/*
         for ($i = 1; $i <= 10; $i++) {
             $latitude = mt_rand(47930, 47940) / 1000;
             $longitude = mt_rand(13060, 13090) / 1000;
 
-            DB::table('persons')->insert([
+            DB::table('patient')->insert([
                 'Nummer' => 'N' . \Illuminate\Support\Str::random(125),
                 'geht' => random_int(0, 1),
                 'AtmungSuffizient' => random_int(0, 1),
@@ -64,6 +99,8 @@ class PersonsTableSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-        }
+
+        
+        }    */
     }
 }
