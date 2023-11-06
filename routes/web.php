@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PersonenController;
 use Illuminate\Support\Facades\Route;
 
 /*

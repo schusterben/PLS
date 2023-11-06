@@ -1,20 +1,79 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function TriagePage1() {
     const navigate = useNavigate();
     const [green, setGreen] = useState(false);
     const [black, setBlack] = useState(false);
+    const [selectedPatientId, setSelectedPatientId] = useState(null); //  ID des ausgewählten Patienten wird gespeichert
+    const [location, setLocation] = useState({
+        loaded: false,
+        coordinates: { lat: '', lng: '' },
+        error: null
+    });
+
+    useEffect(() => {
+        if (!navigator.geolocation) {
+            setLocation(prevState => ({
+                ...prevState,
+                loaded: true,
+                error: { message: "Geolocation is not supported by your browser" }
+            }));
+        } else {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setLocation({
+                        loaded: true,
+                        coordinates: {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                            
+                        },
+                        error: null
+                    });
+                },
+                (error) => {
+                    setLocation(prevState => ({
+                        ...prevState,
+                        loaded: true,
+                        error: error
+                    }));
+                }
+            );
+        }
+    }, []);
+
+    const updateTriageColor = async (color) => {
+        try {
+            if (!location.loaded || location.error) {
+                console.error('Koordinaten sind nicht verfügbar.');
+                return;
+            }
+
+            const { lat, lng } = location.coordinates;
+            console.log("Patienten ID: ", selectedPatientId);
+            //const response = await axios.post(`/api/persons/${selectedPatientId}/update-triage-color`, {
+            const response = await axios.post("/api/persons/15/update-triage-color", {
+                triageColor: color,
+                lat: lat,
+                lng: lng
+            });
+            console.log(response.data.message);
+        } catch (error) {
+            console.error('Fehler beim Aktualisieren der Triagefarbe:', error);
+        }
+    };
 
     const handleGreen = () => {
-        //TODO: fetch category green to server
         setGreen(true);
+        updateTriageColor('grün');
     };
 
     const handleBlack = () => {
-        //TODO: fetch category black to server
 
         setBlack(true);
+        updateTriageColor('schwarz');
     };
 
     const handleNextPage = () => {
@@ -28,7 +87,10 @@ export default function TriagePage1() {
         navigate("/ShowBody");
     };
 
+    
+
     handleBodyClick;
+    
 
     function renderContent() {
         if (!black && !green) {
@@ -163,6 +225,19 @@ export default function TriagePage1() {
             >
                 👤
             </button>
+            <h4>GPS Koordinaten:</h4>
+            <p>Laden: {location.loaded ? 'Erfolgreich' : 'Lädt...'}</p>
+            {location.loaded && !location.error && (
+                <div>
+                    <p>Breitengrad: {location.coordinates.lat}</p>
+                    <p>Längengrad: {location.coordinates.lng}</p>
+                </div>
+            )}
+            {location.error && (
+                <div>
+                    <p>Fehler: {location.error.message}</p>
+                </div>
+            )}
         </div>
-    );
+    );   
 }

@@ -8,6 +8,9 @@ import ScanPatient from "./pages/ScanPatient";
 import TriagePage1 from "./pages/TriagePage1";
 import TriagePage2 from "./pages/TriagePage2";
 import TriagePage3 from "./pages/TriagePage3";
+import SituationRoomTable from "./pages/SituationRoomTable"
+
+
 
 const router = createBrowserRouter([
     {
@@ -39,6 +42,14 @@ const router = createBrowserRouter([
         path: "/ScanPatient",
         element: <ScanPatient />,
     },
+    {
+        path: "/SituationRoomTable",
+        element: <SituationRoomTable />,
+    },
+    /* {
+        path: "/test-db",
+        element: <SituationRoomTable />,
+    }, */
     {
         path: "*",
         element: <NotFound />,
