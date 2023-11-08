@@ -23,7 +23,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'location_user',
+        'longitude_user',
+        'latitude_user',
         'first_login_time',
         'last_login_time',
     ];

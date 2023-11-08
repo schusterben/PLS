@@ -1,11 +1,18 @@
 <?php
 
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class QRCodePatientSeeder extends Seeder
+class QRPatientSeeder extends Seeder
 {
-    public function run()
+    /**
+     * Run the database seeds.
+     */
+   
+         public function run()
     {
         $patients = DB::table('patient')->get();
 
@@ -19,6 +26,5 @@ class QRCodePatientSeeder extends Seeder
             ]);
         }
     }
+    
 }
-
- 

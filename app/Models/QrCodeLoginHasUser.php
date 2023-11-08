@@ -12,10 +12,7 @@ class QRCodeLoginHasUser extends Model
     public $timestamps = false; // Disable default timestamps
 
     // Define the fields that are fillable (if any)
-    protected $fillable = [];
-
-    // Define the primary key (if it's not the default auto-incrementing 'id')
-    // protected $primaryKey = 'your_primary_key_field';
+    //protected $fillable = [];
 
     // Define the relationships with the QRCodeLogin and User models
     public function qrCodeLogin()

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('user', function (Blueprint $table) {
             $table->id('iduser');
-            $table->geometry('location_user')->nullable();
+            $table->float('longitude_user', 10, 6)->nullable();
+            $table->float('latitude_user', 10, 6)->nullable();
             $table->dateTime('first_login_time')->nullable();
             $table->dateTime('last_login_time')->nullable();
             $table->timestamps();
@@ -27,6 +28,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('user');
     }
-
-
 };

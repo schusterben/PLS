@@ -21,7 +21,8 @@ class Patient extends Model
         'dringend',
         'kontaminiert',
         'name',
-        'location_patient',
+        'longitude_patient',
+        'latitude_patient',
         'user_iduser', // Assuming there is a foreign key to the User model
     ];
 

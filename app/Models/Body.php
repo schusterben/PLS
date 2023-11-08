@@ -12,9 +12,6 @@ class Body extends Model
 
     protected $primaryKey = 'idbody'; // Set the primary key field
 
-    // Disable default timestamps (created_at and updated_at)
-    // public $timestamps = false; 
-
     // Define the fields that are fillable
     protected $fillable = [
         'ala',
