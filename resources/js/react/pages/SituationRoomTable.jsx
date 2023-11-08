@@ -25,30 +25,38 @@ function SituationRoomTable() {
 
     const updateMapCenter = (persons) => {
         if (persons.length === 0) return;
-
+        let personsWithKoordinates = 0;
         let latSum = 0,
             lonSum = 0;
         for (let person of persons) {
-            latSum += person.latitude;
-            lonSum += person.longitude;
+            if (person.latitude != null && person.longitude != null) {
+                latSum += parseFloat(person.latitude);
+                lonSum += parseFloat(person.longitude);
+                personsWithKoordinates++;
+            }
         }
 
-        setMapCenter([latSum / persons.length, lonSum / persons.length]);
+        setMapCenter([
+            latSum / personsWithKoordinates,
+            lonSum / personsWithKoordinates,
+        ]);
     };
     const getBackgroundColor = (triageColor) => {
-        switch (triageColor) {
-            case "gelb":
-                return "yellow";
-            case "rot":
-                return "red";
-            case "grün":
-                return "green";
-            case "blau":
-                return "blue";
-            case "schwarz":
-                return "black";
-            default:
-                return "white";
+        if (triageColor != undefined) {
+            switch (triageColor.toLowerCase()) {
+                case "gelb":
+                    return "yellow";
+                case "rot":
+                    return "red";
+                case "grün":
+                    return "green";
+                case "blau":
+                    return "blue";
+                case "schwarz":
+                    return "black";
+                default:
+                    return "white";
+            }
         }
     };
 
@@ -62,22 +70,27 @@ function SituationRoomTable() {
     };
 
     const renderMarkers = () => {
-        return persons.map((person) => (
-            <Marker
-                key={person.id}
-                position={[person.latitude, person.longitude]}
-                icon={createMarkerIcon(getBackgroundColor(person.Triagefarbe))} //zum debuggen ausgeblendet
-            >
-                <Popup>
-                    Nummer: {person.id}
-                    <br />
-                    Geht: {person.geht ? "Ja" : "Nein"}
-                    <br />
-                    Kontaminiert: {person.kontaminiert ? "Ja" : "Nein"}
-                    <br />
-                </Popup>
-            </Marker>
-        ));
+        return persons.map((person) => {
+            if (person.latitude != null && person.longitude != null) {
+                return (
+                    <Marker
+                        key={person.idpatient}
+                        position={[person.latitude, person.longitude]}
+                        icon={createMarkerIcon(
+                            getBackgroundColor(person.Triagefarbe)
+                        )}
+                    >
+                        <Popup>
+                            Nummer: {person.idpatient}
+                            <br />
+                            Kontaminiert: {person.kontaminiert ? "Ja" : "Nein"}
+                            <br />
+                        </Popup>
+                    </Marker>
+                );
+            }
+            return null; // Rückgabe von null für Personen ohne geografische Position
+        });
     };
 
     if (isLoading) {
@@ -89,61 +102,76 @@ function SituationRoomTable() {
     }
 
     return (
-        <div>
+        <div
+            style={{
+                position: "absolute",
+                top: "13%",
+                left: "0",
+                width: "100%",
+                textAlign: "center",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "0",
+                display: "flex",
+                flexDirection: "column",
+            }}
+        >
             <h2>Alle Personen:</h2>
             <table border="1">
                 <thead>
                     <tr>
                         <th>Nummer</th>
-                        <th>geht</th>
                         <th>Atmung</th>
-                        <th>stillbare Blutung</th>
-                        <th>Puls</th>
+                        <th>Blutung</th>
+                        <th>Radialispuls</th>
                         <th>Triagefarbe</th>
+                        <th>Transport</th>
                         <th>Dringend</th>
                         <th>Kontaminiert</th>
-                        <th>erfasst</th>
-                        <th>letztes update</th>
+                        <th>Name</th>
+                        <th>Position (Longitude)</th>
+                        <th>Position (Latitude)</th>
+                        <th>Erfasst</th>
+                        <th>Letztes Update</th>
                     </tr>
                 </thead>
                 <tbody>
                     {persons.map((person) => (
-                        <tr key={person.id}>
-                            <td>{person.id}</td>
-                            <td>{person.geht ? "Ja" : "Nein"}</td>
-                            <td>{person.AtmungSuffizient ? "Ja" : "Nein"}</td>
-                            <td>{person.Blutung ? "Ja" : "Nein"}</td>
-                            <td>
-                                {person.RadialispulsTastbar ? "Ja" : "Nein"}
-                            </td>
+                        <tr key={person.idpatient}>
+                            <td>{person.idpatient}</td>
+                            <td>{person.atmung ? "Ja" : "Nein"}</td>
+                            <td>{person.blutung ? "Ja" : "Nein"}</td>
+                            <td>{person.radialispuls}</td>
                             <td>
                                 <div
                                     style={{
                                         backgroundColor: getBackgroundColor(
-                                            person.Triagefarbe
+                                            person.triagefarbe
                                         ),
                                     }}
                                 >
-                                    {person.Triagefarbe}
+                                    {person.triagefarbe}
                                 </div>
                             </td>
+                            <td>{person.transport ? "Ja" : "Nein"}</td>
                             <td>{person.dringend ? "Ja" : "Nein"}</td>
                             <td>{person.kontaminiert ? "Ja" : "Nein"}</td>
+                            <td>{person.name || "N/A"}</td>
+                            <td>{person.longitude || "N/A"}</td>
+                            <td>{person.latitude || "N/A"}</td>
                             <td>{person.created_at}</td>
                             <td>{person.updated_at}</td>
-                            <td>{person.longitude}</td>
-                            <td>{person.latitude}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-            <div>
+            <div style={{ height: "400px", width: "100%" }}>
                 <h2>Karte:</h2>
                 <MapContainer
                     center={mapCenter}
                     zoom={13}
-                    style={{ height: "400px", width: "100%" }}
+                    style={{ flex: 1, height: "400px", width: "100%" }}
                 >
                     <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

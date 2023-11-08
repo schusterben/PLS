@@ -7,37 +7,38 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Models\Patient;
 
 
 
 class PersonenController extends Controller
 {
     public function index()
-    {
-        Log::info('index Methode aufgerufen');
+{
+    Log::info('index Methode aufgerufen');
 
-        // Wählt alle Felder aus der `persons` Tabelle,
-        // sowie die Längen- und Breitengrade aus dem `position` POINT-Feld.
-        
-         $persons = Person::select(
-            'id',
-            'Triagefarbe',
-            'RadialispulsTastbar',
-            'geht',
-            'dringend',
-            'created_at',
-            'updated_at',
-            'Nummer',
-            'Blutung',
-            'AtmungSuffizient',
-            'kontaminiert',
-            DB::raw('ST_X(position) as longitude'),
-            DB::raw('ST_Y(position) as latitude')
-        )->get();
-        
-        return response()->json($persons); 
-        
-    }
+    // Wählen Sie die gewünschten Spalten aus der `patient` Tabelle aus.
+    $patients = Patient::select(
+        'idpatient',
+        'atmung',
+        'blutung',
+        'radialispuls',
+        'triagefarbe',
+        'transport',
+        'dringend',
+        'kontaminiert',
+        'name',
+        'location_patient',
+        'user_iduser',
+        'created_at',
+        'updated_at',
+        DB::raw('16.24797506889166 as longitude'),
+        DB::raw('47.83895923724872  as latitude')
+    )->get();
+
+    return response()->json($patients);
+}
+
 
     public function show($id)
     {

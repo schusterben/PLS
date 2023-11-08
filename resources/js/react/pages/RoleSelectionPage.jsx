@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { useStateContext } from "../contexts/ContextProvider";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function RoleSelection() {
     const { user } = useStateContext();
@@ -8,6 +8,7 @@ export default function RoleSelection() {
     const [selectedRole, setSelectedRole] = useState("");
     const [nextPage, setNextPage] = useState("");
     const [submitted, setSubmitted] = useState("");
+    const navigate = useNavigate();
 
     const roles = [];
 
@@ -21,7 +22,18 @@ export default function RoleSelection() {
 
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
-        setSubmitted(selectedRole);
+
+        switch (selectedRole.toUpperCase()) {
+            case "TRIAGE":
+                navigate("/ScanPatient");
+                break;
+            case "LEITSTELLE":
+                navigate("/SituationRoomTable");
+                break;
+            default:
+                navigate("/NotFound");
+                break;
+        }
     };
 
     return (
@@ -66,13 +78,6 @@ export default function RoleSelection() {
             >
                 <button type="submit">Bestätigen</button>
             </form>
-            {submitted.toUpperCase() == "TRIAGE" ? (
-                <Navigate to="/ScanPatient" />
-            ) : submitted.toUpperCase() == "" ? (
-                ""
-            ) : (
-                <Navigate to="/NotFound" />
-            )}
         </div>
     );
 }
