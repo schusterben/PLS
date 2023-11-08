@@ -8,9 +8,11 @@ import ScanPatient from "./pages/ScanPatient";
 import TriagePage1 from "./pages/TriagePage1";
 import TriagePage2 from "./pages/TriagePage2";
 import TriagePage3 from "./pages/TriagePage3";
-import SituationRoomTable from "./pages/SituationRoomTable"
-
-
+import SituationRoomTable from "./pages/SituationRoomTable";
+import ShowBody from "./pages/ShowBody";
+import AdminLandingPage from "./pages/AdminLandingPage";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
+import CreatePatientQrCodes from "./pages/CreatePatientQrCodes";
 
 const router = createBrowserRouter([
     {
@@ -46,6 +48,23 @@ const router = createBrowserRouter([
         path: "/SituationRoomTable",
         element: <SituationRoomTable />,
     },
+    {
+        path: "/ShowBody",
+        element: <ShowBody />,
+    },
+    {
+        path: "/AdminLandingPage",
+        element: <AdminLandingPage />,
+    },
+    {
+        path: "/AdminSettingsPage",
+        element: <AdminSettingsPage />,
+    },
+    {
+        path: "/CreatePatientQrCodePage",
+        element: <CreatePatientQrCodes />,
+    },
+
     /* {
         path: "/test-db",
         element: <SituationRoomTable />,

@@ -1,10 +1,11 @@
 import { Html5Qrcode } from "html5-qrcode";
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function QrAuthenticator() {
     const [cameraBlocked, setCameraBlocked] = useState(false);
     const [accessGranted, setaccessGranted] = useState(false);
+    const navigate = useNavigate();
     let scanner;
     useEffect(() => {
         function onScanSuccess(decodedText, decodedResult) {
@@ -43,6 +44,10 @@ export default function QrAuthenticator() {
         }
     });
 
+    function onAdminClick() {
+        navigate("/AdminLandingPage");
+    }
+
     return (
         <div>
             <h2>Willkommen im PLS-System</h2>
@@ -57,6 +62,8 @@ export default function QrAuthenticator() {
                 ""
             )}
             {accessGranted && <Navigate to="/RoleSelection" />}
+            <br />
+            <button onClick={onAdminClick}>Anmelden als Admin</button>
         </div>
     );
 }
