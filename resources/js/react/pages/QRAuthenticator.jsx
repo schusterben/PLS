@@ -7,26 +7,14 @@ export default function QrAuthenticator() {
     const [accessGranted, setaccessGranted] = useState(false);
     const navigate = useNavigate();
     let scanner;
+
+    const csrfToken = document.getElementById("root").getAttribute("data-csrf");
+
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+        onScanSuccess(decodedText, decodedResult);
+    };
+
     useEffect(() => {
-        function onScanSuccess(decodedText, decodedResult) {
-            // TODO: here we should check the access in the DB
-            if (decodedText.toUpperCase() === "HALLO MARKO") {
-                scanner.stop();
-                setaccessGranted(true);
-            }
-            console.log(`Code matched = ${decodedText}`, decodedResult);
-        }
-
-        const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-            onScanSuccess(decodedText, decodedResult);
-        };
-
-        function onScanError(error) {
-            // handle scan failure, usually better to ignore and keep scanning.
-            // for example:
-            console.warn(`Code scan error = ${error}`);
-        }
-
         if (!scanner?.getState()) {
             const config = { fps: 5, qrbox: { width: 200, height: 200 } };
             scanner = new Html5Qrcode("reader");
@@ -46,6 +34,40 @@ export default function QrAuthenticator() {
 
     function onAdminClick() {
         navigate("/AdminLandingPage");
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+        // TODO: here we should check the access in the DB
+
+        fetch("/api/qr-login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+            body: JSON.stringify({ qr_code: decodedText }), // Send the decoded QR code
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                // Hier kannst du auf die Antwort von Laravel reagieren
+                if (data.status.toLowerCase() === "success") {
+                    scanner.stop();
+                    setaccessGranted(true);
+                } else {
+                    // Authentifizierung fehlgeschlagen
+                    console.error("Ungültiger QR-Code");
+                }
+            })
+            .catch((error) => console.error("Fetch error:", error));
+
+        var x = "";
+
+        //console.log(`Code matched = ${decodedText}`, decodedResult);
     }
 
     return (

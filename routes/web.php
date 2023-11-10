@@ -22,3 +22,4 @@ Route::get('/{any?}', [PagesController::class, 'index']);
 Route::resource('posts', 'PostsController');
 
 Route::post('/patients', 'PatientController@store');
+

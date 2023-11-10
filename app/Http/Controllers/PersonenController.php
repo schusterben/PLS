@@ -28,12 +28,11 @@ class PersonenController extends Controller
         'dringend',
         'kontaminiert',
         'name',
-        'location_patient',
         'user_iduser',
         'created_at',
         'updated_at',
-        DB::raw('16.24797506889166 as longitude'),
-        DB::raw('47.83895923724872  as latitude')
+        'longitude_patient',
+        'latitude_patient'
     )->get();
 
     return response()->json($patients);

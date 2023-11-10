@@ -79,3 +79,29 @@ button:focus-visible {
         background-color: #f9f9f9;
     }
 }
+
+/* CSS-Stil für die Tabelle 
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table thead th {
+    position: sticky;
+    top: 0;
+}
+
+table th,
+table td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ccc;
+}
+
+// CSS für den scrollbaren Bereich der Tabelle 
+table tbody {
+    max-height: 200px;
+    overflow-y: scroll;
+    display: contents;
+}
+*/

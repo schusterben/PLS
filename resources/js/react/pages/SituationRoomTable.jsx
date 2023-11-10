@@ -29,9 +29,12 @@ function SituationRoomTable() {
         let latSum = 0,
             lonSum = 0;
         for (let person of persons) {
-            if (person.latitude != null && person.longitude != null) {
-                latSum += parseFloat(person.latitude);
-                lonSum += parseFloat(person.longitude);
+            if (
+                person.latitude_patient != null &&
+                person.longitude_patient != null
+            ) {
+                latSum += parseFloat(person.latitude_patient);
+                lonSum += parseFloat(person.longitude_patient);
                 personsWithKoordinates++;
             }
         }
@@ -69,13 +72,25 @@ function SituationRoomTable() {
         });
     };
 
+    // Hole alle Header-Zellen und Body-Zellen
+    const headerCells = document.querySelectorAll("table thead th");
+    const bodyCells = document.querySelectorAll(
+        "table tbody tr:first-child td"
+    );
+
     const renderMarkers = () => {
         return persons.map((person) => {
-            if (person.latitude != null && person.longitude != null) {
+            if (
+                person.latitude_patient != null &&
+                person.longitude_patient != null
+            ) {
                 return (
                     <Marker
                         key={person.idpatient}
-                        position={[person.latitude, person.longitude]}
+                        position={[
+                            person.latitude_patient,
+                            person.longitude_patient,
+                        ]}
                         icon={createMarkerIcon(
                             getBackgroundColor(person.Triagefarbe)
                         )}
@@ -117,54 +132,64 @@ function SituationRoomTable() {
             }}
         >
             <h2>Alle Personen:</h2>
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Nummer</th>
-                        <th>Atmung</th>
-                        <th>Blutung</th>
-                        <th>Radialispuls</th>
-                        <th>Triagefarbe</th>
-                        <th>Transport</th>
-                        <th>Dringend</th>
-                        <th>Kontaminiert</th>
-                        <th>Name</th>
-                        <th>Position (Longitude)</th>
-                        <th>Position (Latitude)</th>
-                        <th>Erfasst</th>
-                        <th>Letztes Update</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {persons.map((person) => (
-                        <tr key={person.idpatient}>
-                            <td>{person.idpatient}</td>
-                            <td>{person.atmung ? "Ja" : "Nein"}</td>
-                            <td>{person.blutung ? "Ja" : "Nein"}</td>
-                            <td>{person.radialispuls}</td>
-                            <td>
-                                <div
-                                    style={{
-                                        backgroundColor: getBackgroundColor(
-                                            person.triagefarbe
-                                        ),
-                                    }}
-                                >
-                                    {person.triagefarbe}
-                                </div>
-                            </td>
-                            <td>{person.transport ? "Ja" : "Nein"}</td>
-                            <td>{person.dringend ? "Ja" : "Nein"}</td>
-                            <td>{person.kontaminiert ? "Ja" : "Nein"}</td>
-                            <td>{person.name || "N/A"}</td>
-                            <td>{person.longitude || "N/A"}</td>
-                            <td>{person.latitude || "N/A"}</td>
-                            <td>{person.created_at}</td>
-                            <td>{person.updated_at}</td>
+            <div>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Nummer</th>
+                            <th>Atmung</th>
+                            <th>Blutung</th>
+                            <th>Radialispuls</th>
+                            <th>Triagefarbe</th>
+                            <th>Transport</th>
+                            <th>Dringend</th>
+                            <th>Kontaminiert</th>
+                            <th>Name</th>
+                            <th>Position (Longitude)</th>
+                            <th>Position (Latitude)</th>
+                            <th>Erfasst</th>
+                            <th>Letztes Update</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {persons.map((person) => (
+                            <tr key={person.idpatient}>
+                                <td>{person.idpatient}</td>
+                                <td>{person.atmung ? "Ja" : "Nein"}</td>
+                                <td>{person.blutung ? "Ja" : "Nein"}</td>
+                                <td>{person.radialispuls}</td>
+                                <td>
+                                    <div
+                                        style={{
+                                            backgroundColor: getBackgroundColor(
+                                                person.triagefarbe
+                                            ),
+                                        }}
+                                    >
+                                        {person.triagefarbe}
+                                    </div>
+                                </td>
+                                <td>{person.transport ? "Ja" : "Nein"}</td>
+                                <td>{person.dringend ? "Ja" : "Nein"}</td>
+                                <td>{person.kontaminiert ? "Ja" : "Nein"}</td>
+                                <td>{person.name || "N/A"}</td>
+                                <td>{person.longitude_patient || "N/A"}</td>
+                                <td>{person.latitude_patient || "N/A"}</td>
+                                <td>{person.created_at}</td>
+                                <td>{person.updated_at}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                {
+                    // Gehe durch die Zellen und setze die Breite der Header-Zellen gleich der Breite der Body-Zellen
+                    bodyCells.forEach((bodyCell, index) => {
+                        bodyCell.style.width = window.getComputedStyle(
+                            headerCells[index]
+                        ).width;
+                    })
+                }
+            </div>
 
             <div style={{ height: "400px", width: "100%" }}>
                 <h2>Karte:</h2>
