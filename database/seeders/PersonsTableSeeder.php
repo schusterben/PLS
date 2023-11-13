@@ -21,8 +21,8 @@ class PersonsTableSeeder extends Seeder
             DB::table('patient')->insert([
                 'atmung' => rand(0, 1), // Zufälliger Wert (0 oder 1) für "atmung"
                 'blutung' => rand(0, 1), // Zufälliger Wert (0 oder 1) für "blutung"
-                'radialispuls' => 'Puls' . rand(50, 120), // Zufälliger Puls-Wert
-                'triagefarbe' => 'Farbe' . rand(1, 4), // Zufällige Triage-Farbe
+                'radialispuls' => rand(0, 1), // Zufälliger Puls-Wert
+                'triagefarbe' => collect(['rot', 'gelb', 'grün', 'blau'])->random(), // Zufällige Triage-Farbe
                 'transport' => rand(0, 1), // Zufälliger Wert (0 oder 1) für "transport"
                 'dringend' => rand(0, 1), // Zufälliger Wert (0 oder 1) für "dringend"
                 'kontaminiert' => rand(0, 1), // Zufälliger Wert (0 oder 1) für "kontaminiert"
