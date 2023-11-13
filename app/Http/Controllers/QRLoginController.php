@@ -2,37 +2,36 @@
 
 namespace App\Http\Controllers;
 
-//export XDEBUG_SESSION=xdebug_is_great
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\DB;
-use App\Models\QRCodeLogin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Models\QRCodeLogin;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Symfony\Component\HttpFoundation\Response;
+
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class QRLoginController extends Controller
 {
     public function qrLogin(Request $request)
     {
-            $jsonContent = $request->json();
-            $qrCode = $jsonContent->get('qr_code');
+        // Validate the incoming request
+        $request->validate([
+            'qr_code' => 'required|string',
+        ]);
 
-            if ($this->isValidQRCode($qrCode)) {
-        // Der QR-Code ist gültig, authentifiziere den Benutzer
-      
+        // Check if the QR code exists in the database
+        $qrCode = $request->input('qr_code');
+        $qrLogin = QRCodeLogin::where('qr_login', $qrCode)->first();
 
+        if (!$qrLogin) {
+            return response()->json(['status' => 'error', 'message' => 'Invalid QR code'], Response::HTTP_UNAUTHORIZED);
+        }
 
-            return response()->json(['status' => 'success']);
+        // Generate a JWT token for the QR code login
+         $token = JWTAuth::fromSubject($qrLogin);
+
+        return response()->json(['status' => 'success', 'token' => $token]);
     }
 
-   return response()->json(['status' => 'error', 'message' => 'Ungültiger QR-Code']);
-    }
 
-
-    private function isValidQRCode($qrCode)
-    {
-        return QRCodeLogin::where('qr_Login', $qrCode)->exists();
-
-    }
+    
 }

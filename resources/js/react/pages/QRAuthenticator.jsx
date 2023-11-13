@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 export default function QrAuthenticator() {
     const [cameraBlocked, setCameraBlocked] = useState(false);
     const [accessGranted, setaccessGranted] = useState(false);
+
     const navigate = useNavigate();
     let scanner;
 
@@ -56,6 +57,11 @@ export default function QrAuthenticator() {
             .then((data) => {
                 // Hier kannst du auf die Antwort von Laravel reagieren
                 if (data.status.toLowerCase() === "success") {
+                    if (data.token) {
+                        localStorage.setItem("ACCESS_TOKEN", data.token);
+                    } else {
+                        console.error("Authentication failed");
+                    }
                     scanner.stop();
                     setaccessGranted(true);
                 } else {

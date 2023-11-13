@@ -3,7 +3,6 @@ import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
 export default function RoleSelection() {
-    const { user } = useStateContext();
     const [selectedOption, setSelectedOption] = useState("");
     const [selectedRole, setSelectedRole] = useState("");
     const [nextPage, setNextPage] = useState("");
@@ -39,7 +38,7 @@ export default function RoleSelection() {
     return (
         <div>
             <h3>Willkommen bei der Rolenauswahl</h3>
-            <h4>User {user.name} im Einsatz für</h4>
+            <h4>Sie sind im Einsatz für</h4>
             {/* TODO: Load Operations from DB */}
             <select
                 value={selectedOption}

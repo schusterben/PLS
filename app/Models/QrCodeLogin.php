@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class QRCodeLogin extends Model
+use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+
+class QRCodeLogin extends Model implements JWTSubject
 {
     protected $table = 'qr_code_login'; // Set the table name
 
@@ -16,4 +17,16 @@ class QRCodeLogin extends Model
         'qr_login',
         'first_login',
     ];
+
+
+
+public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }
