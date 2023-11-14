@@ -39,6 +39,7 @@ const Component = () => {
           <BodyPart id="becken_rechts" onClick={handleBodyPartClick} />
           <BodyPart id="genital" onClick={handleBodyPartClick} />
           <BodyPart id="huefte_rechts" onClick={handleBodyPartClick} />
+          <BodyPart id="huefte_links" onClick={handleBodyPartClick} />
           <BodyPart id="knie_links" onClick={handleBodyPartClick} />
           <BodyPart id="knie_rechts" onClick={handleBodyPartClick} />
           <BodyPart id="ellbogen_rechts" onClick={handleBodyPartClick} />

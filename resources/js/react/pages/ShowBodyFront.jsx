@@ -17,7 +17,7 @@ const Component = () => {
 
 
   return (
-    <div className="bodyparts-container" >
+    <div className="bodyparts-container" style={{ paddingTop: '40px' }}>
       <h1>Front</h1>
       <svg className="body-svg" viewBox="0 0 105 201" preserveAspectRatio="xMidYMid meet" version="1.1" xmlns="http://www.w3.org/2000/svg" >
         {/* First Layer */}
