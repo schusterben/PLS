@@ -9,7 +9,7 @@ import TriagePage1 from "./pages/TriagePage1";
 import TriagePage2 from "./pages/TriagePage2";
 import TriagePage3 from "./pages/TriagePage3";
 import SituationRoomTable from "./pages/SituationRoomTable";
-import ShowBody from "./pages/ShowBody";
+
 import AdminLandingPage from "./pages/AdminLandingPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import CreatePatientQrCodes from "./pages/CreatePatientQrCodes";
@@ -52,10 +52,6 @@ const router = createBrowserRouter([
         element: <ProtectedRoute element={<SituationRoomTable />} />,
     },
     {
-        path: "/ShowBody",
-        element: <ProtectedRoute element={<ShowBody />} />,
-    },
-    {
         path: "/AdminLandingPage",
         element: <ProtectedRoute element={<AdminLandingPage />} />,
     },
@@ -67,7 +63,14 @@ const router = createBrowserRouter([
         path: "/CreatePatientQrCodePage",
         element: <ProtectedRoute element={<CreatePatientQrCodes />} />,
     },
-
+    {
+        path: "/ShowBodyFront",
+        element: <ProtectedRoute element={<ShowBodyFront />} />,
+    },
+    {
+        path: "/ShowBodyBack",
+        element: <ProtectedRoute element={<ShowBodyBack />} />,
+    },
     /* {
         path: "/test-db",
         element: <SituationRoomTable />,
@@ -75,14 +78,6 @@ const router = createBrowserRouter([
     {
         path: "*",
         element: <NotFound />,
-    },
-    {
-        path: "/ShowBodyFront",
-        element: <ShowBodyFront />,
-    },
-    {
-        path: "/ShowBodyBack",
-        element: <ShowBodyBack />,
     },
 ]);
 

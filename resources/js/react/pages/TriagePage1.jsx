@@ -9,16 +9,18 @@ export default function TriagePage1() {
     const [selectedPatientId, setSelectedPatientId] = useState(null); //  ID des ausgewählten Patienten wird gespeichert
     const [location, setLocation] = useState({
         loaded: false,
-        coordinates: { lat: '', lng: '' },
-        error: null
+        coordinates: { lat: "", lng: "" },
+        error: null,
     });
 
     useEffect(() => {
         if (!navigator.geolocation) {
-            setLocation(prevState => ({
+            setLocation((prevState) => ({
                 ...prevState,
                 loaded: true,
-                error: { message: "Geolocation is not supported by your browser" }
+                error: {
+                    message: "Geolocation is not supported by your browser",
+                },
             }));
         } else {
             navigator.geolocation.getCurrentPosition(
@@ -28,16 +30,15 @@ export default function TriagePage1() {
                         coordinates: {
                             lat: position.coords.latitude,
                             lng: position.coords.longitude,
-                            
                         },
-                        error: null
+                        error: null,
                     });
                 },
                 (error) => {
-                    setLocation(prevState => ({
+                    setLocation((prevState) => ({
                         ...prevState,
                         loaded: true,
-                        error: error
+                        error: error,
                     }));
                 }
             );
@@ -47,33 +48,35 @@ export default function TriagePage1() {
     const updateTriageColor = async (color) => {
         try {
             if (!location.loaded || location.error) {
-                console.error('Koordinaten sind nicht verfügbar.');
+                console.error("Koordinaten sind nicht verfügbar.");
                 return;
             }
 
             const { lat, lng } = location.coordinates;
             console.log("Patienten ID: ", selectedPatientId);
             //const response = await axios.post(`/api/persons/${selectedPatientId}/update-triage-color`, {
-            const response = await axios.post("/api/persons/15/update-triage-color", {
-                triageColor: color,
-                lat: lat,
-                lng: lng
-            });
+            const response = await axios.post(
+                "/api/persons/15/update-triage-color",
+                {
+                    triageColor: color,
+                    lat: lat,
+                    lng: lng,
+                }
+            );
             console.log(response.data.message);
         } catch (error) {
-            console.error('Fehler beim Aktualisieren der Triagefarbe:', error);
+            console.error("Fehler beim Aktualisieren der Triagefarbe:", error);
         }
     };
 
     const handleGreen = () => {
         setGreen(true);
-        updateTriageColor('grün');
+        updateTriageColor("grün");
     };
 
     const handleBlack = () => {
-
         setBlack(true);
-        updateTriageColor('schwarz');
+        updateTriageColor("schwarz");
     };
 
     const handleNextPage = () => {
@@ -84,13 +87,10 @@ export default function TriagePage1() {
     };
 
     const handleBodyClick = () => {
-        navigate("/ShowBody");
+        navigate("/ShowBodyFront");
     };
 
-    
-
     handleBodyClick;
-    
 
     function renderContent() {
         if (!black && !green) {
@@ -226,7 +226,7 @@ export default function TriagePage1() {
                 👤
             </button>
             <h4>GPS Koordinaten:</h4>
-            <p>Laden: {location.loaded ? 'Erfolgreich' : 'Lädt...'}</p>
+            <p>Laden: {location.loaded ? "Erfolgreich" : "Lädt..."}</p>
             {location.loaded && !location.error && (
                 <div>
                     <p>Breitengrad: {location.coordinates.lat}</p>
@@ -239,5 +239,5 @@ export default function TriagePage1() {
                 </div>
             )}
         </div>
-    );   
+    );
 }
