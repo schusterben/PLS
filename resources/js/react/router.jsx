@@ -8,6 +8,8 @@ import ScanPatient from "./pages/ScanPatient";
 import TriagePage1 from "./pages/TriagePage1";
 import TriagePage2 from "./pages/TriagePage2";
 import TriagePage3 from "./pages/TriagePage3";
+import ShowBodyFront from "./pages/ShowBodyFront";
+import ShowBodyBack from "./pages/ShowBodyBack";
 
 const router = createBrowserRouter([
     {
@@ -42,6 +44,14 @@ const router = createBrowserRouter([
     {
         path: "*",
         element: <NotFound />,
+    },
+    {
+        path: "/ShowBodyFront",
+        element: <ShowBodyFront />,
+    },
+    {
+        path: "/ShowBodyBack",
+        element: <ShowBodyBack />,
     },
 ]);
 
