@@ -14,6 +14,8 @@ import AdminLandingPage from "./pages/AdminLandingPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import CreatePatientQrCodes from "./pages/CreatePatientQrCodes";
 import ProtectedRoute from "./components/ProtctedRoute";
+import ShowBodyFront from "./pages/ShowBodyFront";
+import ShowBodyBack from "./pages/ShowBodyBack";
 
 const router = createBrowserRouter([
     {
@@ -73,6 +75,14 @@ const router = createBrowserRouter([
     {
         path: "*",
         element: <NotFound />,
+    },
+    {
+        path: "/ShowBodyFront",
+        element: <ShowBodyFront />,
+    },
+    {
+        path: "/ShowBodyBack",
+        element: <ShowBodyBack />,
     },
 ]);
 
