@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonenController;
 
 use App\Http\Controllers\QRLoginController;
+use App\Http\Controllers\TokenValidationController;
+use Tymon\JWTAuth\Validators\TokenValidator;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +23,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware(['jwt'])->group(function () {
+    // Your protected routes go here
+  Route::get('/persons', [PersonenController::class, 'index']);
+  Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
+
+});
+
+
 
 //POST-Routes
 
@@ -31,7 +41,7 @@ Route::post('/qr-login', [QRLoginController::class,'qrLogin']);
 
 //Get-Routes
 
-Route::get('/persons', [PersonenController::class, 'index']);
+//Route::get('/persons', [PersonenController::class, 'index']);
 Route::get('/test-db', [PersonenController::class, 'testDatabaseConnection']);
 
 

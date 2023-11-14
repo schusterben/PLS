@@ -17,7 +17,7 @@
     "src": "resources/css/app.css"
   },
   "resources/js/app.css": {
-    "file": "assets/app-9085d471.css",
+    "file": "assets/app-1a3e17ef.css",
     "src": "resources/js/app.css"
   },
   "resources/js/app.js": {
@@ -27,9 +27,9 @@
       "assets/marker-icon-574c3a5c.png"
     ],
     "css": [
-      "assets/app-9085d471.css"
+      "assets/app-1a3e17ef.css"
     ],
-    "file": "assets/app-96252fd8.js",
+    "file": "assets/app-7ae2fa8f.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   }

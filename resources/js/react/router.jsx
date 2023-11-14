@@ -13,56 +13,57 @@ import ShowBody from "./pages/ShowBody";
 import AdminLandingPage from "./pages/AdminLandingPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import CreatePatientQrCodes from "./pages/CreatePatientQrCodes";
+import ProtectedRoute from "./components/ProtctedRoute";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <LandingPage />,
+        element: <ProtectedRoute element={<LandingPage />} />,
     },
     {
         path: "/qrAuthenticator",
-        element: <QrAuthenticator />,
+        element: <ProtectedRoute element={<QrAuthenticator />} />,
     },
     {
         path: "/TriagePage1",
-        element: <TriagePage1 />,
+        element: <ProtectedRoute element={<TriagePage1 />} />,
     },
     {
         path: "/TriagePage2",
-        element: <TriagePage2 />,
+        element: <ProtectedRoute element={<TriagePage2 />} />,
     },
     {
         path: "/TriagePage3",
-        element: <TriagePage3 />,
+        element: <ProtectedRoute element={<TriagePage3 />} />,
     },
     {
         path: "/RoleSelection",
-        element: <RoleSelection />,
+        element: <ProtectedRoute element={<RoleSelection />} />,
     },
 
     {
         path: "/ScanPatient",
-        element: <ScanPatient />,
+        element: <ProtectedRoute element={<ScanPatient />} />,
     },
     {
         path: "/SituationRoomTable",
-        element: <SituationRoomTable />,
+        element: <ProtectedRoute element={<SituationRoomTable />} />,
     },
     {
         path: "/ShowBody",
-        element: <ShowBody />,
+        element: <ProtectedRoute element={<ShowBody />} />,
     },
     {
         path: "/AdminLandingPage",
-        element: <AdminLandingPage />,
+        element: <ProtectedRoute element={<AdminLandingPage />} />,
     },
     {
         path: "/AdminSettingsPage",
-        element: <AdminSettingsPage />,
+        element: <ProtectedRoute element={<AdminSettingsPage />} />,
     },
     {
         path: "/CreatePatientQrCodePage",
-        element: <CreatePatientQrCodes />,
+        element: <ProtectedRoute element={<CreatePatientQrCodes />} />,
     },
 
     /* {

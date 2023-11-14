@@ -3,14 +3,22 @@ import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "../../../css/MarkerStyles.css";
+import { useStateContext } from "../contexts/ContextProvider";
 
 function SituationRoomTable() {
     const [persons, setPersons] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [mapCenter, setMapCenter] = useState([48.2715, 16.403]);
+    const { token } = useStateContext();
 
     useEffect(() => {
-        fetch("/api/persons")
+        fetch("/api/persons", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        })
             .then((response) => response.json())
             .then((data) => {
                 setPersons(data);

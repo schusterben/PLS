@@ -1,10 +1,12 @@
 import { Html5Qrcode } from "html5-qrcode";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { useStateContext } from "./../contexts/ContextProvider";
 
 export default function QrAuthenticator() {
     const [cameraBlocked, setCameraBlocked] = useState(false);
     const [accessGranted, setaccessGranted] = useState(false);
+    const { token, setToken } = useStateContext();
 
     const navigate = useNavigate();
     let scanner;
@@ -58,7 +60,7 @@ export default function QrAuthenticator() {
                 // Hier kannst du auf die Antwort von Laravel reagieren
                 if (data.status.toLowerCase() === "success") {
                     if (data.token) {
-                        localStorage.setItem("ACCESS_TOKEN", data.token);
+                        setToken(data.token);
                     } else {
                         console.error("Authentication failed");
                     }

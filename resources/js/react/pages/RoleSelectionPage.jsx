@@ -7,6 +7,7 @@ export default function RoleSelection() {
     const [selectedRole, setSelectedRole] = useState("");
     const [nextPage, setNextPage] = useState("");
     const [submitted, setSubmitted] = useState("");
+    const { token, setToken } = useStateContext();
     const navigate = useNavigate();
 
     const roles = [];

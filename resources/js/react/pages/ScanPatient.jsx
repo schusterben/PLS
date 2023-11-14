@@ -1,10 +1,12 @@
 import { Html5Qrcode } from "html5-qrcode";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { useStateContext } from "../contexts/ContextProvider";
 
 export default function ScanPatient() {
     const [cameraBlocked, setCameraBlocked] = useState(false);
     const [accessGranted, setaccessGranted] = useState(false);
+    const { token, setToken } = useStateContext();
     let scanner;
     useEffect(() => {
         function onScanSuccess(decodedText, decodedResult) {
