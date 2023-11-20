@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import QrAuthenticator from "../pages/QRAuthenticator";
 import { useStateContext } from "../contexts/ContextProvider";
+import AdminLandingPage from "../pages/AdminLandingPage";
 
 const ProtectedAdminRoute = ({ element }) => {
     const { adminToken, validateToken } = useStateContext();
@@ -23,7 +24,7 @@ const ProtectedAdminRoute = ({ element }) => {
         checkTokenValidity();
     }, [adminToken, validateToken]);
 
-    return isTokenValid ? <>{element}</> : <QrAuthenticator />;
+    return isTokenValid ? <>{element}</> : <AdminLandingPage />;
 };
 
 export default ProtectedAdminRoute;

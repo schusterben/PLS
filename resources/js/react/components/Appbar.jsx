@@ -3,8 +3,11 @@ import "../../../css/title.css";
 
 export default function Appbar() {
     return (
-        <div className="header">
-            <h2>PLS</h2>
+        <div class="header">
+            <div class="logo">PLS</div>
+            <a href="/AdminSettingsPage" class="admin-text">
+                Admin
+            </a>
         </div>
     );
 }
