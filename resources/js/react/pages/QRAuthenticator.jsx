@@ -35,6 +35,18 @@ export default function QrAuthenticator() {
         }
     });
 
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            scanner.stop();
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
+
     function onAdminClick() {
         navigate("/AdminLandingPage");
     }

@@ -5,7 +5,7 @@ export default function CreatePatientQrCodes() {
 
     function handleNumberChange(event) {
         // Hier wird überprüft, ob die Eingabe eine gültige Zahl ist
-        if (!isNaN(event.target.value)) {
+        if (!isNaN(event.target.value) && event.target.value >= 0) {
             setNumber(event.target.value);
         }
     }
