@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/persons/{person}/update-triage-color', [PersonenController::class, 'update']);
 //Route::post('/persons/{id}/update-triage-color', 'PersonenController@update');
 Route::post('/qr-login', [QRLoginController::class,'qrLogin']);
+Route::post('/verify-patient-qr-code',[PersonenController::class, 'verifyPatientQrCode']);
 
 
 //Get-Routes

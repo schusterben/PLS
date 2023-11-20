@@ -54,7 +54,7 @@ export default function TriagePage1() {
             const { lat, lng } = location.coordinates;
             console.log("Patienten ID: ", selectedPatientId);
             //const response = await axios.post(`/api/persons/${selectedPatientId}/update-triage-color`, {
-            const response = await axios.post("/api/persons/15/update-triage-color", {
+            const response = await axios.post("/api/persons/25/update-triage-color", {
                 triageColor: color,
                 lat: lat,
                 lng: lng

@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Patient;
+use App\Models\QRCodePatient;
 
 
 
@@ -94,6 +95,28 @@ public function update(Request $request, $id)
     // Zurückgeben der aktualisierten Person als JSON
     return response()->json($person);
 }
+
+public function verifyPatientQrCode(Request $request)
+    {
+        
+        $qrCode = $request->input('qr_code');
+            Log::info('qr_code: ', $qrCode);
+        // Überprüfen, ob der QR-Code in der qr_code_patient Tabelle existiert
+        $qrCodeExists = QRCodePatient::where('qr_login', $qrCode)->exists();
+
+        if ($qrCodeExists) {
+            // Erstellen eines neuen Patienteneintrags
+            $patient = new Patient;
+            // Hierweitere notwendige Daten für den Patienten hinzufügen
+            $patient->save();
+
+            // Zurückgeben der ID des neu erstellten Patienteneintrags
+            return response()->json(['patientId' => $patient->id]);
+        } else {
+            // Zurückgeben einer Fehlermeldung, falls der QR-Code nicht gefunden wurde
+            return response()->json(['message' => 'Ungültiger QR-Code'], 404);
+        }
+    }
 
 
 }
