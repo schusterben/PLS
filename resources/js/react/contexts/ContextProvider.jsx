@@ -2,7 +2,9 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 
 const StateContext = createContext({
     token: null,
+    adminToken: null,
     setToken: () => {},
+    setAdminToken: () => {},
     validateToken: () => {},
 });
 
@@ -34,21 +36,9 @@ export const ContextProvider = ({ children }) => {
     const [token, setTokenInternal] = useState(
         localStorage.getItem("ACCESS_TOKEN")
     );
-    /*
-    // Check token validity on mount
-    useEffect(() => {
-        const checkTokenValidity = async () => {
-            if (token) {
-                const isValid = await validateToken(token);
-                if (!isValid) {
-                    //need to be implemented
-                }
-            }
-        };
-
-        checkTokenValidity();
-    }, [token]);
-    */
+    const [adminToken, setAdminTokenInternal] = useState(
+        localStorage.getItem("ACCESS_ADMIN_TOKEN")
+    );
 
     const setToken = (newToken) => {
         setTokenInternal(newToken);
@@ -60,11 +50,23 @@ export const ContextProvider = ({ children }) => {
         }
     };
 
+    const setAdminToken = (newToken) => {
+        setAdminTokenInternal(newToken);
+
+        if (newToken) {
+            localStorage.setItem("ACCESS_ADMIN_TOKEN", newToken);
+        } else {
+            localStorage.removeItem("ACCESS_ADMIN_TOKEN");
+        }
+    };
+
     return (
         <StateContext.Provider
             value={{
                 token,
+                adminToken,
                 setToken,
+                setAdminToken,
                 validateToken,
             }}
         >

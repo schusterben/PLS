@@ -72,10 +72,6 @@ export default function QrAuthenticator() {
                 }
             })
             .catch((error) => console.error("Fetch error:", error));
-
-        var x = "";
-
-        //console.log(`Code matched = ${decodedText}`, decodedResult);
     }
 
     return (

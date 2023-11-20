@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonenController;
 
-use App\Http\Controllers\QRLoginController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\TokenValidationController;
 use Tymon\JWTAuth\Validators\TokenValidator;
 
@@ -36,7 +36,8 @@ Route::middleware(['jwt'])->group(function () {
 
 Route::post('/persons/{person}/update-triage-color', [PersonenController::class, 'update']);
 //Route::post('/persons/{id}/update-triage-color', 'PersonenController@update');
-Route::post('/qr-login', [QRLoginController::class,'qrLogin']);
+Route::post('/qr-login', [LoginController::class,'qrLogin']);
+Route::post('/adminLogin', [LoginController::class,'adminLogin']);
 
 
 //Get-Routes
