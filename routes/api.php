@@ -7,6 +7,7 @@ use App\Http\Controllers\PersonenController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PatientQrCodeController;
 use App\Http\Controllers\TokenValidationController;
+use App\Http\Controllers\UserController;
 use Tymon\JWTAuth\Validators\TokenValidator;
 
 /*
@@ -27,9 +28,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware(['jwt'])->group(function () {
   // Your protected routes go here
   Route::get('/persons', [PersonenController::class, 'index']);
-  Route::get('/qrCodePatientExists', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
+  Route::get('/getUnusedPatientQrCodes', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
-  Route::post('/qrCodePatientExists', [PatientQrCodeController::class, 'checkIfQrCodeExists']);
+  Route::post('/generateQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
+  Route::post('/createAdminUser', [UserController::class, 'createNewAdminUser']);
 });
 
 

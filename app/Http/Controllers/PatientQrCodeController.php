@@ -8,26 +8,47 @@ use Illuminate\Http\Response;
 
 class PatientQrCodeController extends Controller
 {
-    public function checkIfQrCodeExists(Request $request)
+
+
+    function generateRandomQR($length = 64)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $randomString = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+
+        return $randomString;
+    }
+
+    public function generateQRCodeForPatients(Request $request)
     {
 
         // Validate the incoming request
         $request->validate([
-            'qr_code' => 'required|string',
+            'number' => 'required|integer',
         ]);
 
 
         // Check if the QR code exists in the database
-        $qrCode = $request->input('qr_code');
-        $qrPatient = QRCodePatient::where('qr_login', $qrCode)->exists();
+        $number = $request->input('number');
+        $qrCodes = [];
 
-        if (!$qrPatient) {
+        for ($i = 0; $i < $number; $i++) {
+            $tempQR = $this->generateRandomQR(64);
+
+            while (QRCodePatient::where('qr_login', $tempQR)->exists()) {
+                $tempQR = $this->generateRandomQR(64);
+            }
+
+            $qrCodes[] = $tempQR;
             QRCodePatient::create([
-                'qr_login' => $qrCode,
+                'qr_login' => $tempQR,
             ]);
-            return response()->json(['status' => 'success']);
         }
-        return response()->json(['status' => 'error', 'message' => 'QRCode Exists']);
+
+        return response()->json(['status' => 'success', 'qrcodes' => $qrCodes]);
     }
 
 

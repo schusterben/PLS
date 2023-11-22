@@ -6,108 +6,91 @@ import { useNavigate } from "react-router-dom";
 
 export default function CreatePatientQrCodes() {
     const { adminToken } = useStateContext();
-    const [number, setNumber] = useState(0);
+    const [requestedQrCount, setRequestedQrCount] = useState(0);
     const [qrCodes, setQRCodes] = useState([]);
+    const [buttonClicked, setButtonClicked] = useState(false);
     const navigate = useNavigate();
 
-    function handleNumberChange(event) {
+    function handleRequestedQrCountChange(event) {
         if (!isNaN(event.target.value) && event.target.value >= 0) {
-            setNumber(event.target.value);
+            setRequestedQrCount(event.target.value);
         }
     }
 
     useEffect(() => {
-        if (number > 0) {
-            const codes = Array.from({ length: number }, () =>
-                generateRandomString(64)
-            );
+        if (requestedQrCount > 0 && buttonClicked) {
             const fetchQRCodes = async () => {
-                const updatedCodes = await Promise.all(
-                    codes.map(async (qr) => {
-                        try {
-                            const response = await fetch(
-                                "/api/qrCodePatientExists",
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                        Authorization: `Bearer ${adminToken}`,
-                                    },
-                                    body: JSON.stringify({ qr_code: qr }),
-                                }
-                            );
+                try {
+                    const response = await fetch("/api/generateQRCodes", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${adminToken}`,
+                        },
+                        body: JSON.stringify({ number: requestedQrCount }),
+                    });
 
-                            if (!response.ok) {
-                                throw new Error("Network response was not ok");
-                            }
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
 
-                            const data = await response.json();
+                    const data = await response.json();
 
-                            if (
-                                data.error &&
-                                data.error.toUpperCase() === "UNAUTHORIZED"
-                            ) {
-                                navigate("/AdminLandingPage");
-                            }
+                    if (
+                        data.error &&
+                        data.error.toUpperCase() === "UNAUTHORIZED"
+                    ) {
+                        navigate("/AdminLandingPage");
+                        return;
+                    }
 
-                            if (
-                                data.status &&
-                                data.status.toUpperCase() === "SUCCESS"
-                            ) {
-                                return qr;
-                            }
-
-                            return null; // Return null for codes that already exist
-                        } catch (error) {
-                            console.error("Error fetching QR codes:", error);
-                            return null; // Return null for failed fetches
-                        }
-                    })
-                );
-
-                setQRCodes(updatedCodes.filter((code) => code !== null));
+                    if (data.qrcodes && Array.isArray(data.qrcodes)) {
+                        setQRCodes(data.qrcodes);
+                    }
+                } catch (error) {
+                    console.error("Error fetching QR codes:", error);
+                }
             };
 
             fetchQRCodes();
+            setButtonClicked(false);
         }
-    }, [number, adminToken, navigate]);
+    }, [buttonClicked, adminToken, navigate, requestedQrCount]);
 
-    function generateRandomString(length) {
-        const charset =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let result = "";
-        const charsetLength = charset.length;
+    async function printQrCodesToPDF() {
+        async function printQrCodesToPDF() {
+            const x = 50;
+            const y = 50;
+            const size = 100;
+            const doc = new jsPDF();
 
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * charsetLength);
-            result += charset[randomIndex];
+            const qrCodeElements = document.querySelectorAll("[id^='qrcode-']");
+
+            qrCodeElements.forEach((element, index) => {
+                if (index !== 0) {
+                    doc.addPage();
+                }
+
+                const qrCodeDataURL = element.toDataURL("image/png");
+                doc.addImage(qrCodeDataURL, "PNG", x, y, size, size);
+            });
+
+            doc.save("qrcode_pdf.pdf");
         }
-
-        return result;
     }
 
-    async function generateQrCodes() {
-        const x = 50;
-        const y = 50;
-        const size = 100;
-        const doc = new jsPDF();
-
-        const qrCodeElements = document.querySelectorAll("[id^='qrcode-']");
-
-        qrCodeElements.forEach((element, index) => {
-            if (index !== 0) {
-                doc.addPage();
-            }
-
-            const qrCodeDataURL = element.toDataURL("image/png");
-            doc.addImage(qrCodeDataURL, "PNG", x, y, size, size);
-        });
-
-        doc.save("qrcode_pdf.pdf");
+    function generateQrCodes() {
+        setButtonClicked(true);
     }
 
     return (
-        <div>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+            }}
+        >
             <h2>Patienten QR-Codes generieren</h2>
             <p>
                 Bitte auswählen, wie viele Patienten QR-Codes generiert werden
@@ -116,12 +99,13 @@ export default function CreatePatientQrCodes() {
             <input
                 style={{ width: "300px" }}
                 type="number"
-                id="numberInput"
-                value={number}
-                onChange={handleNumberChange}
+                id="requestedQrCountInput"
+                value={requestedQrCount}
+                onChange={handleRequestedQrCountChange}
                 placeholder="Bitte hier die Anzahl eingeben"
             />
-            <button onClick={generateQrCodes}>Als PDF drucken</button>
+            <button onClick={generateQrCodes}>QR-Codes generieren</button>
+            <button onClick={printQrCodesToPDF}>Als PDF drucken</button>
 
             <div>
                 {qrCodes.map((code, index) => (

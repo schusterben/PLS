@@ -12,7 +12,7 @@ export default function ShowUnusedQrCodesPage() {
     useEffect(() => {
         const fetchQRCodes = async () => {
             try {
-                const response = await fetch("/api/qrCodePatientExists", {
+                const response = await fetch("/api/getUnusedPatientQrCodes", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -56,7 +56,17 @@ export default function ShowUnusedQrCodesPage() {
     }
 
     return (
-        <div>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+            }}
+        >
+            <h2>
+                Folgende QR-Codes wurden bis jetzt noch bei keinem Patienten
+                verwendet
+            </h2>
             <button onClick={generateQrCodes}>Als PDF drucken</button>
             <div>
                 {qrCodes.map((code, index) => (

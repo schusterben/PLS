@@ -18,6 +18,7 @@ import ShowBodyFront from "./pages/ShowBodyFront";
 import ShowBodyBack from "./pages/ShowBodyBack";
 import ProtectedAdminRoute from "./components/ProtctedAdminRoute";
 import ShowUnusedQrCodesPage from "./pages/ShowUnusedQrCodesPage";
+import CreateNewAdminUserPage from "./pages/CreateNewAdminUserPage";
 
 const router = createBrowserRouter([
     {
@@ -80,6 +81,10 @@ const router = createBrowserRouter([
     {
         path: "/ShowUnusedQrCodesPage",
         element: <ProtectedAdminRoute element={<ShowUnusedQrCodesPage />} />,
+    },
+    {
+        path: "/CreateNewAdminUserPage",
+        element: <ProtectedAdminRoute element={<CreateNewAdminUserPage />} />,
     },
 
     {
