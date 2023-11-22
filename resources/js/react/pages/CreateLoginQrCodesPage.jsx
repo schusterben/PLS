@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
-export default function CreatePatientQrCodes() {
+export default function CreateLoginQrCodesPage() {
     const { adminToken } = useStateContext();
     const [requestedQrCount, setRequestedQrCount] = useState(0);
     const [qrCodes, setQRCodes] = useState([]);
@@ -21,17 +21,14 @@ export default function CreatePatientQrCodes() {
         if (requestedQrCount > 0 && buttonClicked) {
             const fetchQRCodes = async () => {
                 try {
-                    const response = await fetch(
-                        "/api/generatePatientQRCodes",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Bearer ${adminToken}`,
-                            },
-                            body: JSON.stringify({ number: requestedQrCount }),
-                        }
-                    );
+                    const response = await fetch("/api/generateLoginQRCodes", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${adminToken}`,
+                        },
+                        body: JSON.stringify({ number: requestedQrCount }),
+                    });
 
                     if (!response.ok) {
                         throw new Error("Network response was not ok");
@@ -61,25 +58,24 @@ export default function CreatePatientQrCodes() {
     }, [buttonClicked, adminToken, navigate, requestedQrCount]);
 
     async function printQrCodesToPDF() {
-        async function printQrCodesToPDF() {
-            const x = 50;
-            const y = 50;
-            const size = 100;
-            const doc = new jsPDF();
+        const x = 50;
+        const y = 50;
+        const size = 100;
+        const doc = new jsPDF();
 
-            const qrCodeElements = document.querySelectorAll("[id^='qrcode-']");
+        const qrCodeElements = document.querySelectorAll("[id^='qrcode-']");
 
-            qrCodeElements.forEach((element, index) => {
-                if (index !== 0) {
-                    doc.addPage();
-                }
+        qrCodeElements.forEach((element, index) => {
+            if (index !== 0) {
+                doc.addPage();
+            }
+            doc.setFontSize(25);
+            doc.text("Login", x + 40, y - 10);
+            const qrCodeDataURL = element.toDataURL("image/png");
+            doc.addImage(qrCodeDataURL, "PNG", x, y, size, size);
+        });
 
-                const qrCodeDataURL = element.toDataURL("image/png");
-                doc.addImage(qrCodeDataURL, "PNG", x, y, size, size);
-            });
-
-            doc.save("qrcode_pdf.pdf");
-        }
+        doc.save("qrcode_pdf.pdf");
     }
 
     function generatePatientQRCodes() {
@@ -94,11 +90,8 @@ export default function CreatePatientQrCodes() {
                 alignItems: "center",
             }}
         >
-            <h2>Patienten QR-Codes generieren</h2>
-            <p>
-                Bitte auswählen, wie viele Patienten QR-Codes generiert werden
-                sollen
-            </p>
+            <h2>QR-Codes für die Authentifizierung generieren</h2>
+            <p>Bitte auswählen, wie viele QR-Codes generiert werden sollen</p>
             <input
                 style={{ width: "300px" }}
                 type="number"

@@ -13,18 +13,20 @@ return new class extends Migration
     {
         Schema::create('patient', function (Blueprint $table) {
             $table->id('idpatient');
-            $table->tinyInteger('atmung');
-            $table->tinyInteger('blutung');
-            $table->string('radialispuls');
-            $table->string('triagefarbe');
-            $table->tinyInteger('transport');
-            $table->tinyInteger('dringend');
-            $table->tinyInteger('kontaminiert');
+            $table->tinyInteger('gehfaehig')->nullable();
+            $table->tinyInteger('atmung')->nullable();
+            $table->tinyInteger('blutung')->nullable();
+            $table->tinyInteger('radialispuls')->nullable();
+            $table->string('triagefarbe')->nullable();
+            $table->tinyInteger('transport')->nullable();
+            $table->tinyInteger('dringend')->nullable();
+            $table->tinyInteger('kontaminiert')->nullable();
             $table->string('name')->nullable();
             $table->float('longitude_patient', 10, 6)->nullable();
             $table->float('latitude_patient', 10, 6)->nullable();
-            $table->unsignedBigInteger('user_iduser');
-            $table->foreign('user_iduser')->references('iduser')->on('user');
+            $table->unsignedBigInteger('qr_code_patient_id')->nullable();
+            $table->foreign('qr_code_patient_id')->references('idqr_code_login')->on('qr_code_patient');
+
             $table->timestamps();
         });
     }

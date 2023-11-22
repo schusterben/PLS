@@ -13,7 +13,7 @@ export default function AdminSettingsPage() {
     }
 
     function onClickShowUnusedQrCodes() {
-        navigate("/ShowUnusedQrCodesPage");
+        navigate("/ShowUnusedPatientQrCodesPage");
     }
 
     function onClickCreateNewAdminUser() {
@@ -25,6 +25,13 @@ export default function AdminSettingsPage() {
         window.location.reload();
     }
 
+    function onClickLoginQrCreate() {
+        navigate("/CreateLoginQrCodesPage");
+    }
+
+    function onClickShowUnusedLoginQrCodes() {
+        navigate("/ShowUnusedLoginQrCodesPage");
+    }
     function onClickChangePassword() {
         navigate("/ChangeAdminPasswordPage", {
             state: { username: localStorage.getItem("Username") },
@@ -50,13 +57,44 @@ export default function AdminSettingsPage() {
                     <FaKey /> Passwort ändern
                 </button>
             </div>
-
-            <button onClick={onClickQrCreate}>
-                Patienten QR-Codes erzeugen
-            </button>
-            <button onClick={onClickShowUnusedQrCodes}>
-                Nicht verwendete QR-Codes
-            </button>
+            <fieldset
+                style={{
+                    borderColor: "white",
+                    border: "1px solid black",
+                    margin: "10px",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
+                <legend>Authorizierungs Qr-Codes</legend>
+                <button onClick={onClickLoginQrCreate}>
+                    QR-Codes für Authorizierung erzeugen
+                </button>
+                <button onClick={onClickShowUnusedLoginQrCodes}>
+                    Nicht verwendete QR-Codes
+                </button>
+            </fieldset>
+            <fieldset
+                style={{
+                    borderColor: "white",
+                    border: "1px solid black",
+                    margin: "10px",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
+                <legend>Patienten Qr-Codes</legend>
+                <button onClick={onClickQrCreate}>
+                    Patienten QR-Codes erzeugen
+                </button>
+                <button onClick={onClickShowUnusedQrCodes}>
+                    Nicht verwendete QR-Codes
+                </button>
+            </fieldset>
             <button onClick={onClickCreateNewAdminUser}>
                 Admin-User erstellen
             </button>

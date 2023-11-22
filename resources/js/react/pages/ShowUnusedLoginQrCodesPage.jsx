@@ -4,15 +4,14 @@ import QRCode from "qrcode.react";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
-export default function ShowUnusedQrCodesPage() {
+export default function ShowUnusedLoginQrCodesPage() {
     const { adminToken } = useStateContext();
     const navigate = useNavigate();
     const [qrCodes, setQRCodes] = useState([]);
-
     useEffect(() => {
         const fetchQRCodes = async () => {
             try {
-                const response = await fetch("/api/getUnusedPatientQrCodes", {
+                const response = await fetch("/api/getLoginQrCodes", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -35,7 +34,7 @@ export default function ShowUnusedQrCodesPage() {
         fetchQRCodes();
     }, [adminToken, navigate]);
 
-    async function generateQrCodes() {
+    async function generateLoginQRCodes() {
         const x = 50;
         const y = 50;
         const size = 100;
@@ -47,7 +46,8 @@ export default function ShowUnusedQrCodesPage() {
             if (index !== 0) {
                 doc.addPage();
             }
-
+            doc.setFontSize(25);
+            doc.text("Login", x + 40, y - 10);
             const qrCodeDataURL = element.toDataURL("image/png");
             doc.addImage(qrCodeDataURL, "PNG", x, y, size, size);
         });
@@ -63,11 +63,8 @@ export default function ShowUnusedQrCodesPage() {
                 alignItems: "center",
             }}
         >
-            <h2>
-                Folgende QR-Codes wurden bis jetzt noch bei keinem Patienten
-                verwendet
-            </h2>
-            <button onClick={generateQrCodes}>Als PDF drucken</button>
+            <h2>Folgende QR-Codes können zum Authorisieren verwendet werden</h2>
+            <button onClick={generateLoginQRCodes}>Als PDF drucken</button>
             <div>
                 {qrCodes.map((code, index) => (
                     <div

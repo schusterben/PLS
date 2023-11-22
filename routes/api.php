@@ -6,6 +6,7 @@ use App\Http\Controllers\PersonenController;
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PatientQrCodeController;
+use App\Http\Controllers\QRLoginController;
 use App\Http\Controllers\TokenValidationController;
 use App\Http\Controllers\UserController;
 use Tymon\JWTAuth\Validators\TokenValidator;
@@ -29,10 +30,12 @@ Route::middleware(['jwt'])->group(function () {
   // Your protected routes go here
   Route::get('/persons', [PersonenController::class, 'index']);
   Route::get('/getUnusedPatientQrCodes', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
+  Route::get('/getLoginQrCodes', [QRLoginController::class, 'getLoginQrCodes']);
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
-  Route::post('/generateQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
+  Route::post('/generatePatientQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
   Route::post('/createAdminUser', [UserController::class, 'createNewAdminUser']);
   Route::post('/changeAdminPassword', [UserController::class, 'changeAdminPassword']);
+  Route::post('/generateLoginQRCodes', [QRLoginController::class, 'generateLoginQRCodes']);
 });
 
 
