@@ -17,6 +17,7 @@ import ProtectedRoute from "./components/ProtctedRoute";
 import ShowBodyFront from "./pages/ShowBodyFront";
 import ShowBodyBack from "./pages/ShowBodyBack";
 import ProtectedAdminRoute from "./components/ProtctedAdminRoute";
+import ShowUnusedQrCodesPage from "./pages/ShowUnusedQrCodesPage";
 
 const router = createBrowserRouter([
     {
@@ -76,6 +77,11 @@ const router = createBrowserRouter([
         path: "/AdminLandingPage",
         element: <AdminLandingPage />,
     },
+    {
+        path: "/ShowUnusedQrCodesPage",
+        element: <ProtectedAdminRoute element={<ShowUnusedQrCodesPage />} />,
+    },
+
     {
         path: "*",
         element: <NotFound />,

@@ -8,10 +8,17 @@ export default function AdminSettingsPage() {
         navigate("/CreatePatientQrCodePage");
     }
 
+    function onClickShowUnusedQrCodes() {
+        navigate("/ShowUnusedQrCodesPage");
+    }
+
     return (
         <div>
             <button onClick={onClickQrCreate}>
                 Patienten QR-Codes erzeugen
+            </button>
+            <button onClick={onClickShowUnusedQrCodes}>
+                Nicht verwendete QR-Codes
             </button>
             <button>Admin-User erstellen</button>
         </div>

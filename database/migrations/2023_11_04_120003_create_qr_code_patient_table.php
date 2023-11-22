@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up()
     {
+
         Schema::create('qr_code_patient', function (Blueprint $table) {
-            $table->id('idqr_code_patient');
-            $table->longText('qr_login')->nullable();
-            $table->dateTime('registration_time')->nullable();
-            $table->unsignedBigInteger('patient_idpatient');
-            $table->foreign('patient_idpatient')->references('idpatient')->on('patient');
+            $table->id('idqr_code_login');
+            $table->longText('qr_login');
+            $table->dateTime('first_login')->nullable();
             $table->timestamps();
         });
     }

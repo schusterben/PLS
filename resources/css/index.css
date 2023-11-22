@@ -14,8 +14,7 @@
     -webkit-text-size-adjust: 100%;
 }
 .content {
-    margin-top: 13%; /* Dieser Wert sollte der Höhe des .header entsprechen oder größer sein */
-    /* Weitere Stilregeln für Ihren Inhaltsbereich */
+    margin-top: 20%; /* Dieser Wert sollte der Höhe des .header entsprechen oder größer sein */
 }
 canvas {
     width: 100%;

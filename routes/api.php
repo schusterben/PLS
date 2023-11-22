@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonenController;
 
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\PatientQrCodeController;
 use App\Http\Controllers\TokenValidationController;
 use Tymon\JWTAuth\Validators\TokenValidator;
 
@@ -20,14 +21,15 @@ use Tymon\JWTAuth\Validators\TokenValidator;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user();
 });
 
 Route::middleware(['jwt'])->group(function () {
-    // Your protected routes go here
+  // Your protected routes go here
   Route::get('/persons', [PersonenController::class, 'index']);
+  Route::get('/qrCodePatientExists', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
-
+  Route::post('/qrCodePatientExists', [PatientQrCodeController::class, 'checkIfQrCodeExists']);
 });
 
 
@@ -36,13 +38,11 @@ Route::middleware(['jwt'])->group(function () {
 
 Route::post('/persons/{person}/update-triage-color', [PersonenController::class, 'update']);
 //Route::post('/persons/{id}/update-triage-color', 'PersonenController@update');
-Route::post('/qr-login', [LoginController::class,'qrLogin']);
-Route::post('/adminLogin', [LoginController::class,'adminLogin']);
+Route::post('/qr-login', [LoginController::class, 'qrLogin']);
+Route::post('/adminLogin', [LoginController::class, 'adminLogin']);
 
 
 //Get-Routes
 
 //Route::get('/persons', [PersonenController::class, 'index']);
 Route::get('/test-db', [PersonenController::class, 'testDatabaseConnection']);
-
-

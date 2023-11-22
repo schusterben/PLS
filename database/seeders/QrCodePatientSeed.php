@@ -2,12 +2,16 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\QRCodeLogin;
+use App\Models\QRCodePatient;
 
-class QRCodeLoginSeeder extends Seeder
+class QrCodePatientSeed extends Seeder
 {
-    public function run()
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
     {
         for ($i = 0; $i < 10; $i++) {
             // Erzeuge einen zufälligen QR-Code.
@@ -17,11 +21,10 @@ class QRCodeLoginSeeder extends Seeder
             $firstLogin = now()->subDays($i);
 
             // Füge einen neuen Eintrag hinzu.
-            QRCodeLogin::create([
+            QRCodePatient::create([
                 'qr_login' => $qrCode,
                 'first_login' => $firstLogin,
             ]);
         }
     }
 }
-
