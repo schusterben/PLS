@@ -1,8 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useStateContext } from "../contexts/ContextProvider";
+import { IoIosLogOut } from "react-icons/io";
+import { FaKey } from "react-icons/fa";
 
 export default function AdminSettingsPage() {
     const navigate = useNavigate();
+    const { adminToken, setAdminToken } = useStateContext();
 
     function onClickQrCreate() {
         navigate("/CreatePatientQrCodePage");
@@ -16,6 +20,17 @@ export default function AdminSettingsPage() {
         navigate("/CreateNewAdminUserPage");
     }
 
+    function onClickLogout() {
+        setAdminToken(null);
+        window.location.reload();
+    }
+
+    function onClickChangePassword() {
+        navigate("/ChangeAdminPasswordPage", {
+            state: { username: localStorage.getItem("Username") },
+        });
+    }
+
     return (
         <div
             style={{
@@ -24,6 +39,18 @@ export default function AdminSettingsPage() {
                 alignItems: "center",
             }}
         >
+            <div style={{ flexDirection: "row", marginBottom: "50px" }}>
+                <button onClick={onClickLogout} style={{ fontSize: "12px" }}>
+                    <IoIosLogOut /> Logout
+                </button>
+                <button
+                    onClick={onClickChangePassword}
+                    style={{ fontSize: "12px" }}
+                >
+                    <FaKey /> Passwort ändern
+                </button>
+            </div>
+
             <button onClick={onClickQrCreate}>
                 Patienten QR-Codes erzeugen
             </button>

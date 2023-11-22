@@ -1,6 +1,6 @@
 {
   "node_modules/canvg/lib/index.es.js": {
-    "file": "assets/index.es-f0bd67ba.js",
+    "file": "assets/index.es-7b8d7e37.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -35,7 +35,7 @@
     "src": "resources/css/app.css"
   },
   "resources/js/app.css": {
-    "file": "assets/app-cb03597b.css",
+    "file": "assets/app-fc5a1d04.css",
     "src": "resources/js/app.css"
   },
   "resources/js/app.js": {
@@ -45,14 +45,14 @@
       "assets/marker-icon-574c3a5c.png"
     ],
     "css": [
-      "assets/app-cb03597b.css"
+      "assets/app-fc5a1d04.css"
     ],
     "dynamicImports": [
       "node_modules/html2canvas/dist/html2canvas.esm.js",
       "node_modules/dompurify/dist/purify.es.js",
       "node_modules/canvg/lib/index.es.js"
     ],
-    "file": "assets/app-dd3352b1.js",
+    "file": "assets/app-cbaa9fb8.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   }

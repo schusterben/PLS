@@ -31,4 +31,28 @@ class UserController extends Controller
             return response()->json(['error' => 'User wurde nicht angelegt'], 500);
         }
     }
+
+    public function changeAdminPassword(Request $request)
+    {
+        $validatedData = $request->validate([
+            'username' => 'required|string|max:255',
+            'password' => 'required|string',
+            'newpassword' => 'required|string|min:6',
+        ]);
+
+        $user = User::where('username', $validatedData['username'])->first();
+
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if ($user) {
+            if (Hash::check($validatedData['password'], $user->password)) {
+                $user->password = Hash::make($validatedData['newpassword']);
+                $user->save();
+                return response()->json(['message' => 'User updated successfully', 'user' => $user]);
+            }
+        }
+    }
 }

@@ -32,6 +32,7 @@ Route::middleware(['jwt'])->group(function () {
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
   Route::post('/generateQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
   Route::post('/createAdminUser', [UserController::class, 'createNewAdminUser']);
+  Route::post('/changeAdminPassword', [UserController::class, 'changeAdminPassword']);
 });
 
 

@@ -58,7 +58,7 @@ const CreateNewAdminUserPage = () => {
             )}
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>
+                    <label style={{ color: "white" }}>
                         Username:
                         <input
                             type="text"
@@ -70,7 +70,7 @@ const CreateNewAdminUserPage = () => {
                     </label>
                 </div>
                 <div>
-                    <label>
+                    <label style={{ color: "white" }}>
                         Passwort:
                         <input
                             type="password"

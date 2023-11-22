@@ -19,6 +19,7 @@ import ShowBodyBack from "./pages/ShowBodyBack";
 import ProtectedAdminRoute from "./components/ProtctedAdminRoute";
 import ShowUnusedQrCodesPage from "./pages/ShowUnusedQrCodesPage";
 import CreateNewAdminUserPage from "./pages/CreateNewAdminUserPage";
+import ChangeAdminPasswordPage from "./pages/ChangeAdminPasswordPage";
 
 const router = createBrowserRouter([
     {
@@ -85,6 +86,10 @@ const router = createBrowserRouter([
     {
         path: "/CreateNewAdminUserPage",
         element: <ProtectedAdminRoute element={<CreateNewAdminUserPage />} />,
+    },
+    {
+        path: "/ChangeAdminPasswordPage",
+        element: <ProtectedAdminRoute element={<ChangeAdminPasswordPage />} />,
     },
 
     {
