@@ -115,15 +115,18 @@ public function update(Request $request, $id)
 
 public function verifyPatientQrCode(Request $request)
     {
-        
+        Log::info('verifyPatientQrCode Methode aufgerufen', ['request' => $request->all()]);
         $qrCode = $request->input('qr_code');
             
         // Überprüfen, ob der QR-Code in der qr_code_patient Tabelle existiert
         $qrCodePatient = QRCodePatient::where('qr_login', $qrCode)->first();
+        Log::info('QR-Code aus Anfrage erhalten', ['qrCode' => $qrCode]);
 
         if ($qrCodePatient) {
+            Log::info('QRCodePatient Eintrag gefunden', ['qrCodePatient' => $qrCodePatient]);
         // Überprüfen, ob ein Wert im Feld 'patient_idpatient' vorhanden ist
         if ($qrCodePatient->patient_idpatient) {
+            Log::info('Patienten-ID im QRCodePatient vorhanden', ['patientId' => $qrCodePatient->patient_idpatient]);
             // Übergabe der PatientenId
             return response()->json(['patientId' => $qrCodePatient->patient_idpatient]);
         } else {
@@ -131,15 +134,18 @@ public function verifyPatientQrCode(Request $request)
             $patient = new Patient;
             // Hier weitere notwendige Daten für den Patienten hinzufügen
             $patient->save();
+            Log::info('Neuer Patient erstellt', ['patientId' => $patient->idpatient]);
 
             // Zuweisen des Patienten zum QR-Code
-            $qrCodePatient->patient_idpatient = $patient->id;
+            $qrCodePatient->patient_idpatient = $patient->idpatient;
             $qrCodePatient->save();
+            Log::info('Patienten-ID dem QRCodePatient zugewiesen', ['patientId' => $patient->idpatient]);
 
             // Zurückgeben der ID des neu erstellten Patienteneintrags
             return response()->json(['patientId' => $patient->id]);
         }
     } else {
+        Log::error('Kein QRCodePatient Eintrag für gegebenen QR-Code gefunden', ['qrCode' => $qrCode]);
         // Zurückgeben einer Fehlermeldung, falls der QR-Code nicht gefunden wurde
         return response()->json(['message' => 'Ungültiger QR-Code'], 404);
     }
