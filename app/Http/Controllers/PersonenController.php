@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\Patient;
 use App\Models\QRCodePatient;
 
@@ -69,11 +70,19 @@ class PersonenController extends Controller
 
 public function update(Request $request, $id)
 {
-    Log::info('Update Methode aufgerufen',['id' => $id, 'request' => $request->all()]);
+    Log::info('Update Methode aufgerufen',['idpatient' => $id, 'request' => $request->all()]);
 
-    // Finden der Person anhand der ID
-    $person = Person::findOrFail($id);
-    Log::info('Person gefunden', ['person' => $person]);
+    try {
+        // Finden der Person anhand der ID
+        $person = Patient::where('idpatient', $id)->firstOrFail();
+        Log::info('Person gefunden', ['person' => $person]);
+
+        // ... Rest Ihres Codes ...
+    } catch (ModelNotFoundException $e) {
+        Log::error('Keine Person mit der ID gefunden', ['id' => $id]);
+        // Optional: Senden einer Fehlerantwort
+        return response()->json(['message' => 'Person nicht gefunden'], 404);
+    }
 
     // Übernehmen der Triagefarbe aus der Anfrage
     $triageColor = $request->input('triageColor');
@@ -90,8 +99,8 @@ public function update(Request $request, $id)
      if ($lng !== null && $lat !== null) {
          // Zuweisen der Position als Array
         //$person->position = ['lng' => $lng, 'lat' => $lat];
-         $person->longitude_patient->$lng;
-         $person->latitude_patient->lat;
+         $person->longitude_patient=$lng;
+         $person->latitude_patient=$lat;
          Log::info('GPS-Daten zugewiesen', ['longitude' => $lng, 'latitude' => $lat]);
 
      }

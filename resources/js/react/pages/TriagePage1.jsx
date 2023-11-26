@@ -1,15 +1,12 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import axios from "axios";
 
 export default function TriagePage1() {
     const navigate = useNavigate();
-    const routerLocation = useLocation();       //Position Router
-    const location = useLocation(); // Verwenden von useLocation, um auf den Navigationszustand zuzugreifen
+    const location = useLocation();
     const [green, setGreen] = useState(false);
     const [black, setBlack] = useState(false);
-    const [selectedPatientId, setSelectedPatientId] = useState(null); //  ID des ausgewählten Patienten wird gespeichert
-    const [position, setPosition] = useState({  //GPS Position Gerät
+    const [position, setPosition] = useState({
         loaded: false,
         coordinates: { lat: '', lng: '' },
         error: null
@@ -17,79 +14,79 @@ export default function TriagePage1() {
     const patientId = location.state?.patientId;
 
     useEffect(() => {
-        let isMounted = true;  // Flag zum Überprüfen, ob die Komponente noch eingehängt ist
+        let isMounted = true;
 
-        // Abrufen der Patienten-ID aus dem Navigationszustand    
-        if (position.state && position.state.patientId) {
-        setSelectedPatientId(position.state.patientId);
-    }
-        //Geolokalisierung
-
-
-        const getGeolocation = () => {
-            if (!navigator.geolocation) {
-                if (isMounted) {
-                    setPosition(prevState => ({
-                        ...prevState,
-                        loaded: true,
-                        error: { message: "Geolocation is not supported by your browser" }
-                    }));
-                }
-            } else {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        if (isMounted) {
-                            setPosition({
-                                loaded: true,
-                                coordinates: {
-                                    lat: position.coords.latitude,
-                                    lng: position.coords.longitude,
-                                },
-                                error: null
-                            });
-                        }
-                    },
-                    (error) => {
-                        if (isMounted) {
-                            setPosition(prevState => ({
-                                ...prevState,
-                                loaded: true,
-                                error: error
-                            }));
-                        }
-                    }
-                );
+        if (!navigator.geolocation) {
+            if (isMounted) {
+                setPosition(prevState => ({
+                    ...prevState,
+                    loaded: true,
+                    error: { message: "Geolocation is not supported by your browser" }
+                }));
             }
-        };
+        } else {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    if (isMounted) {
+                        setPosition({
+                            loaded: true,
+                            coordinates: {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            },
+                            error: null
+                        });
+                    }
+                },
+                (error) => {
+                    if (isMounted) {
+                        setPosition(prevState => ({
+                            ...prevState,
+                            loaded: true,
+                            error: error
+                        }));
+                    }
+                }
+            );
+        }
 
-        getGeolocation();
-
-        // Bereinigungsfunktion
         return () => {
             isMounted = false;
         };
-    }, []); // Abhängigkeiten-Array ist leer, wird also nur beim ersten Rendern ausgeführt
+    }, []);
 
     const updateTriageColor = async (color) => {
-        if(!{patientId}) {
+        if (!patientId) {
             console.error("Keine Patienten-ID verfügbar");
             return;
         }
+
+        if (!position.loaded || position.error) {
+            console.error('Koordinaten sind nicht verfügbar.');
+            return;
+        }
+
+        const { lat, lng } = position.coordinates;
+
         try {
-            if (!position.loaded || position.error) {
-                console.error('Koordinaten sind nicht verfügbar.');
-                return;
+            const response = await fetch(`/api/persons/${patientId}/update-triage-color`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    triageColor: color,
+                    lat: lat,
+                    lng: lng
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Serverantwort war nicht ok");
             }
 
-            const { lat, lng } = position.coordinates;
-            console.log("Patienten ID: ", {patientId});
-            const response = await axios.post("/api/persons/${patientId}/update-triage-color", {
-            //const response = await axios.post("/api/persons/25/update-triage-color", {
-                triageColor: color,
-                lat: lat,
-                lng: lng
-            });
-            console.log(response.data.message);
+            const data = await response.json();
+            console.log(data.message);
         } catch (error) {
             console.error('Fehler beim Aktualisieren der Triagefarbe:', error);
         }
@@ -263,7 +260,7 @@ export default function TriagePage1() {
                     <p>Längengrad: {position.coordinates.lng}</p>
                 </div>
             )}
-            {routerLocation.error && (
+            {position.error && (
                 <div>
                     <p>Fehler: {position.error.message}</p>
                 </div>
