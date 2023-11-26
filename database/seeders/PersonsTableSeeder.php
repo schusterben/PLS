@@ -29,7 +29,7 @@ class PersonsTableSeeder extends Seeder
                 'name' => 'Patient' . ($i + 1), // Name basierend auf dem Index
                 'longitude_patient' => mt_rand(13060, 13090) / 1000, // Zufällige Longitude im Bereich von -180 bis 180
                 'latitude_patient' => mt_rand(47930, 47940) / 1000,    // Zufällige Latitude im Bereich von -90 bis 90
-                'user_iduser' => rand(1, 10), // Zufällige Benutzer-ID (angepasst an deine Benutzerdaten)
+                //'user_iduser' => rand(1, 10), // Zufällige Benutzer-ID (angepasst an deine Benutzerdaten)
                 'created_at' => now(),       // Aktuelles Datum und Uhrzeit
                 'updated_at' => now(),       // Aktuelles Datum und Uhrzeit
             ]);
