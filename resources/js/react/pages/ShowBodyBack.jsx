@@ -23,44 +23,35 @@ const Component = () => {
       <svg className="body-svg" viewBox="0 0 103 202" preserveAspectRatio="xMidYMid meet" version="1.1" xmlns="http://www.w3.org/2000/svg" >
         {/* First Layer */}
         <g className="first-layer">
-        <BodyPart id="kopf" onClick={handleBodyPartClick} />
-          <BodyPart id="hals" onClick={handleBodyPartClick} />
+        <BodyPart id="kopf_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="hals_hinten" onClick={handleBodyPartClick} />
           <BodyPart id="ruecken_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="oberschenkel_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="unterschenkel_links" onClick={handleBodyPartClick} />
-          <BodyPart id="oberschenkel_links" onClick={handleBodyPartClick} />
-          <BodyPart id="unterschenkel_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="oberarm_links" onClick={handleBodyPartClick} />
-          <BodyPart id="oberarm_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="unterarm_links" onClick={handleBodyPartClick} />
-          <BodyPart id="unterarm_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="becken_links" onClick={handleBodyPartClick} />
+          <BodyPart id="oberschenkel_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="unterschenkel_links_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="oberschenkel_links_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="unterschenkel_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="oberarm_links_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="oberarm_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="unterarm_links_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="unterarm_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="becken_links_hinten" onClick={handleBodyPartClick} />
           <BodyPart id="ruecken_links" onClick={handleBodyPartClick} />
-          <BodyPart id="becken_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="genital" onClick={handleBodyPartClick} />
-          <BodyPart id="huefte_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="huefte_links" onClick={handleBodyPartClick} />
-          <BodyPart id="knie_links" onClick={handleBodyPartClick} />
-          <BodyPart id="knie_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="ellbogen_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="ellbogen_links" onClick={handleBodyPartClick} />
-          <BodyPart id="fuss_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="fuss_links" onClick={handleBodyPartClick} />
-          <BodyPart id="auge_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="auge_links" onClick={handleBodyPartClick} />
-          <BodyPart id="mund" onClick={handleBodyPartClick} />
-          <BodyPart id="hand_links" onClick={handleBodyPartClick} />
-          <BodyPart id="hand_rechts" onClick={handleBodyPartClick} />
-
-
-          <BodyPart id="schulter_rechts" onClick={handleBodyPartClick} />
-          <BodyPart id="schulter_links" onClick={handleBodyPartClick} />
+          <BodyPart id="becken_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="genital_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="huefte_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="huefte_links_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="knie_links_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="knie_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="ellbogen_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="ellbogen_links_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="fuss_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="fuss_links_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="hand_links_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="hand_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="schulter_rechts_hinten" onClick={handleBodyPartClick} />
+          <BodyPart id="schulter_links_hinten" onClick={handleBodyPartClick} />
           <BodyPart id="brustwirbel" onClick={handleBodyPartClick} />
           <BodyPart id="lendenwirbel" onClick={handleBodyPartClick} />
-          
-
-
-
           {/* ... other BodyPart components for the first layer ... */}
         </g>
 

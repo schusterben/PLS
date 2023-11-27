@@ -33,14 +33,20 @@ class Patient extends Model
     }
 
     // Define a relationship with the Body model (assuming you have one)
-    public function body()
-    {
-        return $this->hasOne(Body::class, 'patient_idpatient', 'idpatient');
-    }
+    //public function body()
+   // {
+        //return $this->hasOne(Body::class, 'patient_idpatient', 'idpatient');
+   // }
 
     // Define a relationship with the QRCodePatient model (assuming you have one)
     public function qrCodePatient()
     {
         return $this->hasOne(QRCodePatient::class, 'patient_idpatient', 'idpatient');
+    }
+
+    // Define a relationship with the Body model
+    public function body()
+    {
+        return $this->hasOne(Body::class, 'idpatient', 'idpatient');
     }
 }

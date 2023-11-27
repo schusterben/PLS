@@ -7,6 +7,7 @@ use App\Http\Controllers\PersonenController;
 use App\Http\Controllers\QRLoginController;
 use App\Http\Controllers\TokenValidationController;
 use Tymon\JWTAuth\Validators\TokenValidator;
+use App\Http\Controllers\BodyPartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,12 @@ Route::middleware(['jwt'])->group(function () {
     // Your protected routes go here
   Route::get('/persons', [PersonenController::class, 'index']);
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
+  Route::put('/save-body-part', [BodyPartController::class, 'saveBodyPart']);
+  Route::get('/get-body-parts', [BodyPartController::class, 'getBodyParts']);
+  //Route::get('/get-body-parts/{patient_id}', 'BodyPartController@getBodyParts');
+  //Route::middleware('api')->get('/get-body-parts', [BodyPartController::class, 'getBodyParts']);
+
+
 
 });
 

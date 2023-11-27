@@ -9,19 +9,13 @@ class QRCodeLoginSeeder extends Seeder
 {
     public function run()
     {
-        for ($i = 0; $i < 10; $i++) {
-            // Erzeuge einen zufälligen QR-Code.
-            $qrCode = bin2hex(random_bytes(32));
+        // Assign the QR code value directly
+        $helloThereQrCode = 'hellothere';
 
-            // Erzeuge ein Datum für den ersten Login.
-            $firstLogin = now()->subDays($i);
-
-            // Füge einen neuen Eintrag hinzu.
-            QRCodeLogin::create([
-                'qr_login' => $qrCode,
-                'first_login' => $firstLogin,
-            ]);
-        }
+        // Create a new entry with the QR code and the current timestamp
+        QRCodeLogin::create([
+            'qr_login' => $helloThereQrCode,
+            'first_login' => now(),
+        ]);
     }
 }
-
