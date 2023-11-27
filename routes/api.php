@@ -10,7 +10,7 @@ use App\Http\Controllers\TokenValidationController;
 use App\Http\Controllers\UserController;
 use Tymon\JWTAuth\Validators\TokenValidator;
 use App\Http\Controllers\BodyPartController;
-use App\Http\Controllers\BodyPartController;
+
 
 /*
 |--------------------------------------------------------------------------
