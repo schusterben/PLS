@@ -4,7 +4,10 @@ import "../../../css/title.css";
 export default function Appbar() {
     return (
         <div className="header">
-            <h2>PLS</h2>
+            <div className="logo">PLS</div>
+            <a href="/AdminSettingsPage" className="admin-text">
+                Admin
+            </a>
         </div>
     );
 }

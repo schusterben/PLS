@@ -1,4 +1,22 @@
 {
+  "node_modules/canvg/lib/index.es.js": {
+    "file": "assets/index.es-7b8d7e37.js",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "node_modules/canvg/lib/index.es.js"
+  },
+  "node_modules/dompurify/dist/purify.es.js": {
+    "file": "assets/purify.es-cf254a40.js",
+    "isDynamicEntry": true,
+    "src": "node_modules/dompurify/dist/purify.es.js"
+  },
+  "node_modules/html2canvas/dist/html2canvas.esm.js": {
+    "file": "assets/html2canvas.esm-e0a7d97b.js",
+    "isDynamicEntry": true,
+    "src": "node_modules/html2canvas/dist/html2canvas.esm.js"
+  },
   "node_modules/leaflet/dist/images/layers-2x.png": {
     "file": "assets/layers-2x-066daca8.png",
     "src": "node_modules/leaflet/dist/images/layers-2x.png"
@@ -17,7 +35,7 @@
     "src": "resources/css/app.css"
   },
   "resources/js/app.css": {
-    "file": "assets/app-1a3e17ef.css",
+    "file": "assets/app-fc5a1d04.css",
     "src": "resources/js/app.css"
   },
   "resources/js/app.js": {
@@ -27,9 +45,14 @@
       "assets/marker-icon-574c3a5c.png"
     ],
     "css": [
-      "assets/app-1a3e17ef.css"
+      "assets/app-fc5a1d04.css"
     ],
-    "file": "assets/app-525f8269.js",
+    "dynamicImports": [
+      "node_modules/html2canvas/dist/html2canvas.esm.js",
+      "node_modules/dompurify/dist/purify.es.js",
+      "node_modules/canvg/lib/index.es.js"
+    ],
+    "file": "assets/app-7ae2fa8f.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   }

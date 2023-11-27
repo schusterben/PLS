@@ -20,7 +20,7 @@ class QRCodeLogin extends Model implements JWTSubject
 
 
 
-public function getJWTIdentifier()
+    public function getJWTIdentifier()
     {
         return $this->getKey();
     }

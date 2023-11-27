@@ -1,9 +1,11 @@
 <?php
 
-use App\Models\QRCodePatient;
-use Illuminate\Database\Seeder;
+namespace Database\Seeders;
 
-class QRCodePatientSeeder extends Seeder
+use Illuminate\Database\Seeder;
+use App\Models\QRCodeLogin;
+
+class QRCodeLoginSeeder extends Seeder
 {
     public function run()
     {
@@ -15,10 +17,11 @@ class QRCodePatientSeeder extends Seeder
             $firstLogin = now()->subDays($i);
 
             // Füge einen neuen Eintrag hinzu.
-            QRCodePatient::create([
+            QRCodeLogin::create([
                 'qr_login' => $qrCode,
                 'first_login' => $firstLogin,
             ]);
         }
     }
 }
+
