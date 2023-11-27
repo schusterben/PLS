@@ -6,12 +6,18 @@ export default function TriagePage1() {
     const location = useLocation();
     const [green, setGreen] = useState(false);
     const [black, setBlack] = useState(false);
+    const patientId = location.state?.patientId;
     const [position, setPosition] = useState({
         loaded: false,
         coordinates: { lat: '', lng: '' },
         error: null
     });
-    const patientId = location.state?.patientId;
+    // const [additionalInfo, setAdditionalINfo] = useState[{
+    //     zusatzInfo1: '',
+    //     zusatzInfo2: '',
+    //     //hier können noch weitere Informationen mit übergeben werden
+    // }]
+    
 
     useEffect(() => {
         let isMounted = true;
@@ -66,7 +72,14 @@ export default function TriagePage1() {
             return;
         }
 
-        const { lat, lng } = position.coordinates;
+        // entfernen: const { lat, lng } = position.coordinates;
+
+        const requestBody = {
+            triageColor: color,
+            lat: position.coordinates.lat,
+            lng: position.coordinates.lng,
+            //...additionalInfo
+        };
 
         try {
             const response = await fetch(`/api/persons/${patientId}/update-triage-color`, {
@@ -74,11 +87,7 @@ export default function TriagePage1() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    triageColor: color,
-                    lat: lat,
-                    lng: lng
-                })
+                body: JSON.stringify(requestBody)
             });
 
             if (!response.ok) {
@@ -95,6 +104,7 @@ export default function TriagePage1() {
     const handleGreen = () => {
         setGreen(true);
         updateTriageColor('grün');
+        
     };
 
     const handleBlack = () => {
@@ -104,7 +114,7 @@ export default function TriagePage1() {
     };
 
     const handleNextPage = () => {
-        navigate("/TriagePage2");
+        navigate('/TriagePage2', {state: { patientId: patientId}});
     };
     const handleNewPatient = () => {
         navigate("/ScanPatient");
