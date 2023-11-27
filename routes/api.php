@@ -4,9 +4,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonenController;
 
-use App\Http\Controllers\QRLoginController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\PatientQrCodeController;
 use App\Http\Controllers\TokenValidationController;
+use App\Http\Controllers\UserController;
 use Tymon\JWTAuth\Validators\TokenValidator;
+use App\Http\Controllers\BodyPartController;
 use App\Http\Controllers\BodyPartController;
 
 /*
@@ -21,12 +24,13 @@ use App\Http\Controllers\BodyPartController;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user();
 });
 
 Route::middleware(['jwt'])->group(function () {
-    // Your protected routes go here
+  // Your protected routes go here
   Route::get('/persons', [PersonenController::class, 'index']);
+  Route::get('/getUnusedPatientQrCodes', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
   Route::put('/save-body-part', [BodyPartController::class, 'saveBodyPart']);
   Route::get('/get-body-parts', [BodyPartController::class, 'getBodyParts']);
@@ -40,7 +44,8 @@ Route::middleware(['jwt'])->group(function () {
 
 Route::post('/persons/{person}/update-triage-color', [PersonenController::class, 'update']);
 //Route::post('/persons/{id}/update-triage-color', 'PersonenController@update');
-Route::post('/qr-login', [QRLoginController::class,'qrLogin']);
+Route::post('/qr-login', [LoginController::class, 'qrLogin']);
+Route::post('/adminLogin', [LoginController::class, 'adminLogin']);
 
 
 //Get-Routes

@@ -1,24 +1,24 @@
 <?php
 
+use App\Models\QRCodePatient;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class QRCodePatientSeeder extends Seeder
 {
     public function run()
     {
-        $patients = DB::table('patient')->get();
+        for ($i = 0; $i < 10; $i++) {
+            // Erzeuge einen zufälligen QR-Code.
+            $qrCode = bin2hex(random_bytes(32));
 
-        foreach ($patients as $patient) {
-            DB::table('qr_code_patient')->insert([
-                'qr_login' => 'dein_qr_login_wert',
-                'registration_time' => now(),
-                'patient_idpatient' => $patient->idpatient,
-                'created_at' => now(),
-                'updated_at' => now(),
+            // Erzeuge ein Datum für den ersten Login.
+            $firstLogin = now()->subDays($i);
+
+            // Füge einen neuen Eintrag hinzu.
+            QRCodePatient::create([
+                'qr_login' => $qrCode,
+                'first_login' => $firstLogin,
             ]);
         }
     }
 }
-
- 

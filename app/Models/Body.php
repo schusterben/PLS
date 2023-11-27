@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Patient;
+use App\Models\Patient;
 
 class Body extends Model
 {
@@ -75,6 +76,8 @@ class Body extends Model
         'lendenwirbel',
     ];
 
+    // Define a relationship with the Patient model
+    public function patient()
     // Define a relationship with the Patient model
     public function patient()
     {

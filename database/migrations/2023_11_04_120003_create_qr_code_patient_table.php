@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up()
     {
+
         Schema::create('qr_code_patient', function (Blueprint $table) {
             $table->id('idqr_code_patient');
             $table->longText('qr_login')->nullable();

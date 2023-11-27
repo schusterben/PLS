@@ -35,6 +35,18 @@ export default function QrAuthenticator() {
         }
     });
 
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            scanner.stop();
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
+
     function onAdminClick() {
         navigate("/AdminLandingPage");
     }
@@ -72,10 +84,6 @@ export default function QrAuthenticator() {
                 }
             })
             .catch((error) => console.error("Fetch error:", error));
-
-        var x = "";
-
-        //console.log(`Code matched = ${decodedText}`, decodedResult);
     }
 
     return (

@@ -16,6 +16,10 @@ import CreatePatientQrCodes from "./pages/CreatePatientQrCodes";
 import ProtectedRoute from "./components/ProtctedRoute";
 import ShowBodyFront from "./pages/ShowBodyFront";
 import ShowBodyBack from "./pages/ShowBodyBack";
+import ProtectedAdminRoute from "./components/ProtctedAdminRoute";
+import ShowUnusedQrCodesPage from "./pages/ShowUnusedQrCodesPage";
+import CreateNewAdminUserPage from "./pages/CreateNewAdminUserPage";
+import ChangeAdminPasswordPage from "./pages/ChangeAdminPasswordPage";
 
 const router = createBrowserRouter([
     {
@@ -52,16 +56,12 @@ const router = createBrowserRouter([
         element: <ProtectedRoute element={<SituationRoomTable />} />,
     },
     {
-        path: "/AdminLandingPage",
-        element: <ProtectedRoute element={<AdminLandingPage />} />,
-    },
-    {
         path: "/AdminSettingsPage",
-        element: <ProtectedRoute element={<AdminSettingsPage />} />,
+        element: <ProtectedAdminRoute element={<AdminSettingsPage />} />,
     },
     {
         path: "/CreatePatientQrCodePage",
-        element: <ProtectedRoute element={<CreatePatientQrCodes />} />,
+        element: <ProtectedAdminRoute element={<CreatePatientQrCodes />} />,
     },
     {
         path: "/ShowBodyFront",
@@ -75,6 +75,23 @@ const router = createBrowserRouter([
         path: "/test-db",
         element: <SituationRoomTable />,
     }, */
+    {
+        path: "/AdminLandingPage",
+        element: <AdminLandingPage />,
+    },
+    {
+        path: "/ShowUnusedQrCodesPage",
+        element: <ProtectedAdminRoute element={<ShowUnusedQrCodesPage />} />,
+    },
+    {
+        path: "/CreateNewAdminUserPage",
+        element: <ProtectedAdminRoute element={<CreateNewAdminUserPage />} />,
+    },
+    {
+        path: "/ChangeAdminPasswordPage",
+        element: <ProtectedAdminRoute element={<ChangeAdminPasswordPage />} />,
+    },
+
     {
         path: "*",
         element: <NotFound />,

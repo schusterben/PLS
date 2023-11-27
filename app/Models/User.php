@@ -7,38 +7,54 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 // use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory;
 
-    protected $table = 'user'; // Specify the table name
+    protected $table = 'user'; // Tabellenname
 
-    protected $primaryKey = 'iduser'; // Specify the primary key field
-
+    protected $primaryKey = 'iduser'; // Primärschlüssel
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
      */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected $fillable = [
+        'username',
+        'password',
+        'adminRole',
         'longitude_user',
         'latitude_user',
         'first_login_time',
         'last_login_time',
     ];
 
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'password' => 'hashed',
+    ];
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }
-
-
-
-    // The 'password' field should be handled separately if you want to use Laravel's built-in authentication.
-    // If you have a 'password' column in your 'user' table, you can include it here:
-    // 'password',
-
-    // The 'remember_token' field should be handled separately if you want to use Laravel's built-in authentication.
-    // If you have a 'remember_token' column in your 'user' table, you can include it here:
-    // 'remember_token',
-
-    // Define any relationships with other models here if needed.
