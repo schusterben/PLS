@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('idqr_code_patient');
             $table->longText('qr_login')->nullable();
             $table->dateTime('registration_time')->nullable();
-            $table->unsignedBigInteger('patient_idpatient');
+            $table->unsignedBigInteger('patient_idpatient')->nullable();
             $table->foreign('patient_idpatient')->references('idpatient')->on('patient');
             $table->timestamps();
         });

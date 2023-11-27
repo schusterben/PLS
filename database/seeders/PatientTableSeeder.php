@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class PersonsTableSeeder extends Seeder
+class PatientTableSeeder extends Seeder
 {
     /**
      * Führe den Seeder aus.
