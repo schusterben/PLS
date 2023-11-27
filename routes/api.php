@@ -31,7 +31,8 @@ Route::middleware(['jwt'])->group(function () {
   Route::get('/persons', [PersonenController::class, 'index']);
   Route::get('/getUnusedPatientQrCodes', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
-
+  Route::put('/save-body-part', [BodyPartController::class, 'saveBodyPart']);
+  Route::get('/get-body-parts/{patient_id}', [BodyPartController::class, 'getBodyParts']);
 });
 
 
