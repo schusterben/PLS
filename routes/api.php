@@ -10,6 +10,8 @@ use App\Http\Controllers\QRLoginController;
 use App\Http\Controllers\TokenValidationController;
 use App\Http\Controllers\UserController;
 use Tymon\JWTAuth\Validators\TokenValidator;
+use App\Http\Controllers\BodyPartController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -32,10 +34,11 @@ Route::middleware(['jwt'])->group(function () {
   Route::get('/getUnusedPatientQrCodes', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
   Route::get('/getLoginQrCodes', [QRLoginController::class, 'getLoginQrCodes']);
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
-  Route::post('/generatePatientQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
+  Route::post('/generateQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
   Route::post('/createAdminUser', [UserController::class, 'createNewAdminUser']);
   Route::post('/changeAdminPassword', [UserController::class, 'changeAdminPassword']);
-  Route::post('/generateLoginQRCodes', [QRLoginController::class, 'generateLoginQRCodes']);
+  Route::put('/save-body-part', [BodyPartController::class, 'saveBodyPart']);
+  Route::get('/get-body-parts', [BodyPartController::class, 'getBodyParts']);
 });
 
 

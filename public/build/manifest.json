@@ -52,7 +52,7 @@
       "node_modules/dompurify/dist/purify.es.js",
       "node_modules/canvg/lib/index.es.js"
     ],
-    "file": "assets/app-cbaa9fb8.js",
+    "file": "assets/app-7ae2fa8f.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   }
