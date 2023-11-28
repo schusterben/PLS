@@ -1,19 +1,113 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useLocation  } from "react-router-dom";
+import { useState, useEffect  } from "react";
 
 export default function TriagePage3() {
     const navigate = useNavigate();
-
+    const location = useLocation();
     const [red, setRed] = useState(false);
     const [yellow, setYellow] = useState(false);
+    const patientId = location.state?.patientId;
+    const [position, setPosition] = useState({
+        loaded: false,
+        coordinates: { lat: '', lng: '' },
+        error: null
+    });
+    // const [additionalInfo, setAdditionalINfo] = useState[{
+    //     zusatzInfo1: '',
+    //     zusatzInfo2: '',
+    //     //hier können noch weitere Informationen mit übergeben werden
+    // }]
+
+    useEffect(() => {
+        let isMounted = true;
+
+        if (!navigator.geolocation) {
+            if (isMounted) {
+                setPosition(prevState => ({
+                    ...prevState,
+                    loaded: true,
+                    error: { message: "Geolocation is not supported by your browser" }
+                }));
+            }
+        } else {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    if (isMounted) {
+                        setPosition({
+                            loaded: true,
+                            coordinates: {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            },
+                            error: null
+                        });
+                    }
+                },
+                (error) => {
+                    if (isMounted) {
+                        setPosition(prevState => ({
+                            ...prevState,
+                            loaded: true,
+                            error: error
+                        }));
+                    }
+                }
+            );
+        }
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const updateTriageColor = async (color) => {
+        if (!patientId) {
+            console.error("Keine Patienten-ID verfügbar");
+            return;
+        }
+
+        if (!position.loaded || position.error) {
+            console.error('Koordinaten sind nicht verfügbar.');
+            return;
+        }
+
+        // entfernen: const { lat, lng } = position.coordinates;
+
+        const requestBody = {
+            triageColor: color,
+            lat: position.coordinates.lat,
+            lng: position.coordinates.lng,
+            //...additionalInfo
+        };
+
+        try {
+            const response = await fetch(`/api/persons/${patientId}/update-triage-color`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error("Serverantwort war nicht ok");
+            }
+
+            const data = await response.json();
+            console.log(data.message);
+        } catch (error) {
+            console.error('Fehler beim Aktualisieren der Triagefarbe:', error);
+        }
+    };
 
     const handleRed = () => {
-        //TODO: fetch category red to Server
         setRed(true);
+        updateTriageColor('rot')
     };
     const handleYellow = () => {
         //TODO: fetch category red to Server
         setYellow(true);
+        updateTriageColor('gelb')
     };
 
     const handleNewPatient = () => {
@@ -34,7 +128,7 @@ export default function TriagePage3() {
                             padding: "0",
                         }}
                     >
-                        Patient:In <br /> nicht gehfähig <br /> Atmung
+                        Patient:In ID: {patientId} <br /> nicht gehfähig <br /> Atmung
                         suffizient
                     </p>
                     <div>
@@ -70,7 +164,7 @@ export default function TriagePage3() {
                             padding: "0",
                         }}
                     >
-                        Patient:In <br /> nicht gehfähig <br /> Atmung
+                        Patient:In ID: {patientId} <br /> nicht gehfähig <br /> Atmung
                     </p>
                     <p
                         style={{
@@ -101,7 +195,7 @@ export default function TriagePage3() {
                             padding: "0",
                         }}
                     >
-                        Patient:In <br /> nicht gehfähig <br /> Atmung
+                        Patient:In ID: {patientId} <br /> nicht gehfähig <br /> Atmung
                     </p>
                     <p
                         style={{

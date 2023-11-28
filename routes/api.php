@@ -48,6 +48,7 @@ Route::middleware(['jwt'])->group(function () {
 Route::post('/persons/{person}/update-triage-color', [PersonenController::class, 'update']);
 //Route::post('/persons/{id}/update-triage-color', 'PersonenController@update');
 Route::post('/qr-login', [LoginController::class, 'qrLogin']);
+Route::post('/verify-patient-qr-code', [PersonenController::class, 'verifyPatientQrCode']);
 Route::post('/adminLogin', [LoginController::class, 'adminLogin']);
 
 

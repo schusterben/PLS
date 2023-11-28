@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\Patient;
+use App\Models\QRCodePatient;
 
 
 
@@ -68,32 +70,86 @@ class PersonenController extends Controller
 
 public function update(Request $request, $id)
 {
-    Log::info('Update Methode aufgerufen',['id' => $id, 'request' => $request->all()]);
+    Log::info('Update Methode aufgerufen',['idpatient' => $id, 'request' => $request->all()]);
 
-    // Finden der Person anhand der ID
-    $person = Person::findOrFail($id);
+    try {
+        // Finden der Person anhand der ID
+        $person = Patient::where('idpatient', $id)->firstOrFail();
+        Log::info('Person gefunden', ['person' => $person]);
+
+        // ... Rest Ihres Codes ...
+    } catch (ModelNotFoundException $e) {
+        Log::error('Keine Person mit der ID gefunden', ['id' => $id]);
+        // Optional: Senden einer Fehlerantwort
+        return response()->json(['message' => 'Person nicht gefunden'], 404);
+    }
 
     // Übernehmen der Triagefarbe aus der Anfrage
     $triageColor = $request->input('triageColor');
+    Log::info('Triagefarbe aus Anfrage', ['triageColor' => $triageColor]);
     if ($triageColor !== null) {
-        $person->Triagefarbe = $triageColor;
+        $person->triagefarbe = $triageColor;
+        Log::info('Triagefarbe zugewiesen', ['triagefarbe' => $triageColor]);
     }
 
      // Übernehmen der GPS-Daten aus der Anfrage
      $lng = $request->input('lng');
      $lat = $request->input('lat');
+     Log::info('GPS-Daten aus Anfrage', ['lng' => $lng, 'lat' => $lat]);
      if ($lng !== null && $lat !== null) {
          // Zuweisen der Position als Array
-         $person->position = ['lng' => $lng, 'lat' => $lat];
+        //$person->position = ['lng' => $lng, 'lat' => $lat];
+         $person->longitude_patient=$lng;
+         $person->latitude_patient=$lat;
+         Log::info('GPS-Daten zugewiesen', ['longitude' => $lng, 'latitude' => $lat]);
+
      }
 
     // Speichern der geänderten Daten
     $person->save();
-    Log::info('Triagefarbe für Person mit ID ' . $id . ' aktualisiert.');
+    Log::info('Änderungen an Person gespeichert', ['id' => $id]);
 
     // Zurückgeben der aktualisierten Person als JSON
     return response()->json($person);
 }
+
+public function verifyPatientQrCode(Request $request)
+    {
+        Log::info('verifyPatientQrCode Methode aufgerufen', ['request' => $request->all()]);
+        $qrCode = $request->input('qr_code');
+            
+        // Überprüfen, ob der QR-Code in der qr_code_patient Tabelle existiert
+        $qrCodePatient = QRCodePatient::where('qr_login', $qrCode)->first();
+        Log::info('QR-Code aus Anfrage erhalten', ['qrCode' => $qrCode]);
+
+        if ($qrCodePatient) {
+            Log::info('QRCodePatient Eintrag gefunden', ['qrCodePatient' => $qrCodePatient]);
+        // Überprüfen, ob ein Wert im Feld 'patient_idpatient' vorhanden ist
+        if ($qrCodePatient->patient_idpatient) {
+            Log::info('Patienten-ID im QRCodePatient vorhanden', ['patientId' => $qrCodePatient->patient_idpatient]);
+            // Übergabe der PatientenId
+            return response()->json(['patientId' => $qrCodePatient->patient_idpatient]);
+        } else {
+            // Erstellen eines neuen Patienteneintrags, falls kein Wert vorhanden ist
+            $patient = new Patient;
+            // Hier weitere notwendige Daten für den Patienten hinzufügen
+            $patient->save();
+            Log::info('Neuer Patient erstellt', ['patientId' => $patient->idpatient]);
+
+            // Zuweisen des Patienten zum QR-Code
+            $qrCodePatient->patient_idpatient = $patient->idpatient;
+            $qrCodePatient->save();
+            Log::info('Patienten-ID dem QRCodePatient zugewiesen', ['patientId' => $patient->idpatient]);
+
+            // Zurückgeben der ID des neu erstellten Patienteneintrags
+            return response()->json(['patientId' => $patient->id]);
+        }
+    } else {
+        Log::error('Kein QRCodePatient Eintrag für gegebenen QR-Code gefunden', ['qrCode' => $qrCode]);
+        // Zurückgeben einer Fehlermeldung, falls der QR-Code nicht gefunden wurde
+        return response()->json(['message' => 'Ungültiger QR-Code'], 404);
+    }
+    }
 
 
 }
