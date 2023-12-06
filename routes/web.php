@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PersonenController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,4 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/{any?}', [PagesController::class, 'index']);
 
+
+Route::resource('posts', 'PostsController');
+
+Route::post('/patients', 'PatientController@store');
 

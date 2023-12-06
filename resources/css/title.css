@@ -6,11 +6,33 @@
     justify-content: center;
     align-items: baseline;
     position: fixed;
-    top: 0;
+    flex-direction: column;
+    top: 23pt;
     margin: 0%;
     left: 0;
-    background-color: rgb(192, 45, 26);
+
     color: #fff;
+}
+
+.links {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.admin-text {
+    font-size: medium;
+    line-height: 3;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 100%;
+    color: mediumblue;
+    font-weight: bold;
+}
+
+.logo {
+    width: 100%;
 }
 
 .content {

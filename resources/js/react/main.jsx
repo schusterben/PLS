@@ -10,7 +10,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
         <ContextProvider>
             <Appbar />
-            <RouterProvider router={router} />
+            <div className="content">
+                <RouterProvider router={router} />
+            </div>
         </ContextProvider>
     </React.StrictMode>
 );

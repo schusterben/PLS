@@ -1,31 +1,23 @@
 import { Html5Qrcode } from "html5-qrcode";
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useStateContext } from "./../contexts/ContextProvider";
 
 export default function QrAuthenticator() {
     const [cameraBlocked, setCameraBlocked] = useState(false);
     const [accessGranted, setaccessGranted] = useState(false);
+    const { token, setToken } = useStateContext();
+
+    const navigate = useNavigate();
     let scanner;
+
+    const csrfToken = document.getElementById("root").getAttribute("data-csrf");
+
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+        onScanSuccess(decodedText, decodedResult);
+    };
+
     useEffect(() => {
-        function onScanSuccess(decodedText, decodedResult) {
-            // TODO: here we should check the access in the DB
-            if (decodedText.toUpperCase() === "HALLO MARKO") {
-                scanner.stop();
-                setaccessGranted(true);
-            }
-            console.log(`Code matched = ${decodedText}`, decodedResult);
-        }
-
-        const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-            onScanSuccess(decodedText, decodedResult);
-        };
-
-        function onScanError(error) {
-            // handle scan failure, usually better to ignore and keep scanning.
-            // for example:
-            console.warn(`Code scan error = ${error}`);
-        }
-
         if (!scanner?.getState()) {
             const config = { fps: 5, qrbox: { width: 200, height: 200 } };
             scanner = new Html5Qrcode("reader");
@@ -41,7 +33,56 @@ export default function QrAuthenticator() {
                     console.warn(`Code scan error = ${error}`);
                 });
         }
-    });
+    }, []);
+
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            scanner.stop();
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
+
+    function onAdminClick() {
+        navigate("/AdminLandingPage");
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+        fetch("/api/qr-login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+            body: JSON.stringify({ qr_code: decodedText }), // Send the decoded QR code
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                // Hier kannst du auf die Antwort von Laravel reagieren
+                if (data.status.toLowerCase() === "success") {
+                    if (data.token) {
+                        setToken(data.token);
+                    } else {
+                        console.error("Authentication failed");
+                    }
+                    scanner.stop();
+                    setaccessGranted(true);
+                } else {
+                    // Authentifizierung fehlgeschlagen
+                    console.error("Ungültiger QR-Code");
+                }
+            })
+            .catch((error) => console.error("Fetch error:", error));
+    }
 
     return (
         <div>
@@ -57,6 +98,8 @@ export default function QrAuthenticator() {
                 ""
             )}
             {accessGranted && <Navigate to="/RoleSelection" />}
+            <br />
+            <button onClick={onAdminClick}>Anmelden als Admin</button>
         </div>
     );
 }

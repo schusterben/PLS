@@ -1,31 +1,132 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useStateContext } from "./../contexts/ContextProvider";
 
 export default function TriagePage1() {
+    const { token, setToken } = useStateContext();
     const navigate = useNavigate();
+    const location = useLocation();
     const [green, setGreen] = useState(false);
     const [black, setBlack] = useState(false);
+    const patientId = location.state?.patientId;
+    const [position, setPosition] = useState({
+        loaded: false,
+        coordinates: { lat: "", lng: "" },
+        error: null,
+    });
+    // const [additionalInfo, setAdditionalINfo] = useState[{
+    //     zusatzInfo1: '',
+    //     zusatzInfo2: '',
+    //     //hier können noch weitere Informationen mit übergeben werden
+    // }]
+
+    useEffect(() => {
+        let isMounted = true;
+
+        if (!navigator.geolocation) {
+            if (isMounted) {
+                setPosition((prevState) => ({
+                    ...prevState,
+                    loaded: true,
+                    error: {
+                        message: "Geolocation is not supported by your browser",
+                    },
+                }));
+            }
+        } else {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    if (isMounted) {
+                        setPosition({
+                            loaded: true,
+                            coordinates: {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            },
+                            error: null,
+                        });
+                    }
+                },
+                (error) => {
+                    if (isMounted) {
+                        setPosition((prevState) => ({
+                            ...prevState,
+                            loaded: true,
+                            error: error,
+                        }));
+                    }
+                }
+            );
+        }
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const updateTriageColor = async (color) => {
+        if (!patientId) {
+            console.error("Keine Patienten-ID verfügbar");
+            return;
+        }
+
+        if (!position.loaded || position.error) {
+            console.error("Koordinaten sind nicht verfügbar.");
+            return;
+        }
+
+        // entfernen: const { lat, lng } = position.coordinates;
+
+        const requestBody = {
+            triageColor: color,
+            lat: position.coordinates.lat,
+            lng: position.coordinates.lng,
+            //...additionalInfo
+        };
+
+        try {
+            const response = await fetch(
+                `/api/persons/${patientId}/update-triage-color`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(requestBody),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Serverantwort war nicht ok");
+            }
+
+            const data = await response.json();
+            console.log(data.message);
+        } catch (error) {
+            console.error("Fehler beim Aktualisieren der Triagefarbe:", error);
+        }
+    };
 
     const handleGreen = () => {
-        //TODO: fetch category green to server
         setGreen(true);
+        updateTriageColor("grün");
     };
 
     const handleBlack = () => {
-        //TODO: fetch category black to server
-
         setBlack(true);
+        updateTriageColor("schwarz");
     };
 
     const handleNextPage = () => {
-        navigate("/TriagePage2");
+        navigate("/TriagePage2", { state: { patientId: patientId } });
     };
     const handleNewPatient = () => {
         navigate("/ScanPatient");
     };
 
     const handleBodyClick = () => {
-        navigate("/ShowBody");
+        navigate("/ShowBodyFront");
     };
 
     handleBodyClick;
@@ -44,7 +145,7 @@ export default function TriagePage1() {
                             padding: "0",
                         }}
                     >
-                        Patient:In
+                        Patient:In ID: {patientId}
                     </p>
                     <div>
                         <div
@@ -96,7 +197,7 @@ export default function TriagePage1() {
                             padding: "0",
                         }}
                     >
-                        Patient:In
+                        Patient:In ID: {patientId}
                     </p>
                     <p
                         style={{
@@ -126,7 +227,7 @@ export default function TriagePage1() {
                             padding: "0",
                         }}
                     >
-                        Patient:In
+                        Patient:In ID: {patientId}
                     </p>
                     <p
                         style={{
@@ -163,6 +264,19 @@ export default function TriagePage1() {
             >
                 👤
             </button>
+            <h4>GPS Koordinaten:</h4>
+            <p>Laden: {position.loaded ? "Erfolgreich" : "Lädt..."}</p>
+            {position.loaded && !position.error && (
+                <div>
+                    <p>Breitengrad: {position.coordinates.lat}</p>
+                    <p>Längengrad: {position.coordinates.lng}</p>
+                </div>
+            )}
+            {position.error && (
+                <div>
+                    <p>Fehler: {position.error.message}</p>
+                </div>
+            )}
         </div>
     );
 }

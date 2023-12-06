@@ -8,36 +8,114 @@ import ScanPatient from "./pages/ScanPatient";
 import TriagePage1 from "./pages/TriagePage1";
 import TriagePage2 from "./pages/TriagePage2";
 import TriagePage3 from "./pages/TriagePage3";
+import SituationRoomTable from "./pages/SituationRoomTable";
+
+import AdminLandingPage from "./pages/AdminLandingPage";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
+import CreatePatientQrCodes from "./pages/CreatePatientQrCodes";
+import ProtectedRoute from "./components/ProtctedRoute";
+import ShowBodyFront from "./pages/ShowBodyFront";
+import ShowBodyBack from "./pages/ShowBodyBack";
+import ProtectedAdminRoute from "./components/ProtctedAdminRoute";
+import ShowUnusedPatientQrCodesPage from "./pages/ShowUnusedPatientQrCodesPage";
+import CreateNewAdminUserPage from "./pages/CreateNewAdminUserPage";
+import ChangeAdminPasswordPage from "./pages/ChangeAdminPasswordPage";
+import CreateLoginQrCodesPage from "./pages/CreateLoginQrCodesPage";
+import ShowUnusedLoginQrCodesPage from "./pages/ShowUnusedLoginQrCodesPage";
+import CreateOperationScene from "./pages/CreateOperationScene";
+import EditOperationScene from "./pages/EditOperationScene";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <LandingPage />,
+        element: <ProtectedRoute element={<LandingPage />} />,
     },
     {
         path: "/qrAuthenticator",
-        element: <QrAuthenticator />,
+        element: <ProtectedRoute element={<QrAuthenticator />} />,
     },
     {
         path: "/TriagePage1",
-        element: <TriagePage1 />,
+        element: <ProtectedRoute element={<TriagePage1 />} />,
     },
     {
         path: "/TriagePage2",
-        element: <TriagePage2 />,
+        element: <ProtectedRoute element={<TriagePage2 />} />,
     },
     {
         path: "/TriagePage3",
-        element: <TriagePage3 />,
+        element: <ProtectedRoute element={<TriagePage3 />} />,
     },
     {
         path: "/RoleSelection",
-        element: <RoleSelection />,
+        element: <ProtectedRoute element={<RoleSelection />} />,
     },
 
     {
         path: "/ScanPatient",
-        element: <ScanPatient />,
+        element: <ProtectedRoute element={<ScanPatient />} />,
+    },
+    {
+        path: "/SituationRoomTable",
+        element: <ProtectedRoute element={<SituationRoomTable />} />,
+    },
+    {
+        path: "/AdminSettingsPage",
+        element: <ProtectedAdminRoute element={<AdminSettingsPage />} />,
+    },
+    {
+        path: "/CreatePatientQrCodePage",
+        element: <ProtectedAdminRoute element={<CreatePatientQrCodes />} />,
+    },
+    {
+        path: "/ShowBodyFront",
+        element: <ProtectedRoute element={<ShowBodyFront />} />,
+    },
+    {
+        path: "/ShowBodyBack",
+        element: <ProtectedRoute element={<ShowBodyBack />} />,
+    },
+    /* {
+        path: "/test-db",
+        element: <SituationRoomTable />,
+    }, */
+    {
+        path: "/AdminLandingPage",
+        element: <AdminLandingPage />,
+    },
+    {
+        path: "/ShowUnusedPatientQrCodesPage",
+        element: (
+            <ProtectedAdminRoute element={<ShowUnusedPatientQrCodesPage />} />
+        ),
+    },
+    {
+        path: "/CreateLoginQrCodesPage",
+        element: <ProtectedAdminRoute element={<CreateLoginQrCodesPage />} />,
+    },
+    {
+        path: "/CreateNewAdminUserPage",
+        element: <ProtectedAdminRoute element={<CreateNewAdminUserPage />} />,
+    },
+    {
+        path: "/ChangeAdminPasswordPage",
+        element: <ProtectedAdminRoute element={<ChangeAdminPasswordPage />} />,
+    },
+
+    {
+        path: "/ShowUnusedLoginQrCodesPage",
+        element: (
+            <ProtectedAdminRoute element={<ShowUnusedLoginQrCodesPage />} />
+        ),
+    },
+
+    {
+        path: "/CreateOperationScene",
+        element: <ProtectedAdminRoute element={<CreateOperationScene />} />,
+    },
+    {
+        path: "/EditOperationScene",
+        element: <ProtectedAdminRoute element={<EditOperationScene />} />,
     },
     {
         path: "*",
