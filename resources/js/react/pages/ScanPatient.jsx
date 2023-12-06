@@ -1,74 +1,64 @@
 import { Html5Qrcode } from "html5-qrcode";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 //import { Navigate } from "react-router-dom";
-import { Navigate, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useStateContext } from "./../contexts/ContextProvider";
 
 export default function ScanPatient() {
+    const location = useLocation();
     const [cameraBlocked, setCameraBlocked] = useState(false);
     const [accessGranted, setaccessGranted] = useState(false);
     const [patientId, setPatientId] = useState(null);
-    const [isScanning, setIsScanning] = useState(false); // Zustand zum Verfolgen des Scannerstatus
+    const { token, setToken } = useStateContext();
+    const operationScene = location.state?.operationScene;
     const navigate = useNavigate();
-    const scannerRef = useRef(null);
-    const [isRequestInProgress, setIsRequestInProgress] = useState(false);
+    let scanner;
 
     useEffect(() => {
-        if (!scannerRef.current) {
+        if (!scanner?.getState()) {
             const config = { fps: 5, qrbox: { width: 200, height: 200 } };
-            scannerRef.current = new Html5Qrcode("reader");
-            scannerRef.current
+            scanner = new Html5Qrcode("reader");
+
+            scanner
                 .start(
                     { facingMode: "environment" },
                     config,
                     qrCodeSuccessCallback
                 )
-                .then(() => {
-                    setIsScanning(true); // Scannerstatus auf 'true' setzen, wenn der Scanner startet
-                })
                 .catch((error) => {
                     setCameraBlocked(true);
                     console.warn(`Code scan error = ${error}`);
                 });
         }
-
-        //Aufräumfunktion für den useEffect Hook
-        return () => {
-            if (isScanning && scannerRef.current) {
-                scannerRef.current.stop().then(() => {
-                    setIsScanning(false); // Scannerstatus auf 'false' setzen, wenn der Scanner stoppt
-                });
-            }
-        };
     }, []);
 
     const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-        console.log("onScanSuccess aufgerufen mit QR-Code:", decodedText);
+        onScanSuccess(decodedText, decodedResult);
+    };
 
-        if (isRequestInProgress || accessGranted) {
-            return;
-        }
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            scanner.stop();
+        };
 
-        if (scannerRef.current && isScanning) {
-            scannerRef.current
-                .stop()
-                .then(() => {
-                    setIsScanning(false);
-                    console.log("Scanner gestoppt");
-                })
-                .catch((error) => {
-                    console.error("Fehler beim Stoppen des Scanners:", error);
-                });
-        }
+        window.addEventListener("beforeunload", handleBeforeUnload);
 
-        setIsRequestInProgress(true);
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
 
+    function onScanSuccess(decodedText, decodedResult) {
         fetch("/api/verify-patient-qr-code", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ qr_code: decodedText }),
+            body: JSON.stringify({
+                qr_code: decodedText,
+                operationScene: operationScene,
+            }),
         })
             .then((response) => {
                 if (!response.ok) {
@@ -78,10 +68,14 @@ export default function ScanPatient() {
             })
             .then((data) => {
                 if (data.patientId) {
+                    scanner.stop();
                     setPatientId(data.patientId);
                     //setAccessGranted(true);
                     navigate("/TriagePage1", {
-                        state: { patientId: data.patientId },
+                        state: {
+                            patientId: data.patientId,
+                            operationScene: operationScene,
+                        },
                     });
                 } else {
                     console.error(
@@ -91,11 +85,8 @@ export default function ScanPatient() {
             })
             .catch((error) => {
                 console.error("Fehler beim Senden des QR-Codes", error);
-            })
-            .finally(() => {
-                setIsRequestInProgress(false);
             });
-    };
+    }
 
     return (
         <div>
@@ -109,7 +100,6 @@ export default function ScanPatient() {
             ) : (
                 ""
             )}
-            {accessGranted}
         </div>
     );
 }

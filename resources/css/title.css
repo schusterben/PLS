@@ -7,15 +7,21 @@
     align-items: baseline;
     position: fixed;
     flex-direction: column;
-    top: 0;
+    top: 23pt;
     margin: 0%;
     left: 0;
-    background-color: rgb(192, 45, 26);
+
     color: #fff;
 }
 
+.links {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
 .admin-text {
-    font-size: small;
+    font-size: medium;
     line-height: 3;
     align-items: center;
     justify-content: center;

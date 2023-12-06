@@ -22,6 +22,8 @@ import CreateNewAdminUserPage from "./pages/CreateNewAdminUserPage";
 import ChangeAdminPasswordPage from "./pages/ChangeAdminPasswordPage";
 import CreateLoginQrCodesPage from "./pages/CreateLoginQrCodesPage";
 import ShowUnusedLoginQrCodesPage from "./pages/ShowUnusedLoginQrCodesPage";
+import CreateOperationScene from "./pages/CreateOperationScene";
+import EditOperationScene from "./pages/EditOperationScene";
 
 const router = createBrowserRouter([
     {
@@ -107,6 +109,14 @@ const router = createBrowserRouter([
         ),
     },
 
+    {
+        path: "/CreateOperationScene",
+        element: <ProtectedAdminRoute element={<CreateOperationScene />} />,
+    },
+    {
+        path: "/EditOperationScene",
+        element: <ProtectedAdminRoute element={<EditOperationScene />} />,
+    },
     {
         path: "*",
         element: <NotFound />,

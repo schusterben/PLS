@@ -33,7 +33,7 @@ export default function QrAuthenticator() {
                     console.warn(`Code scan error = ${error}`);
                 });
         }
-    });
+    }, []);
 
     useEffect(() => {
         const handleBeforeUnload = (e) => {
@@ -52,8 +52,6 @@ export default function QrAuthenticator() {
     }
 
     function onScanSuccess(decodedText, decodedResult) {
-        // TODO: here we should check the access in the DB
-
         fetch("/api/qr-login", {
             method: "POST",
             headers: {

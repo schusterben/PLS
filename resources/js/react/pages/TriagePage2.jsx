@@ -1,15 +1,17 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useStateContext } from "./../contexts/ContextProvider";
 
 export default function TriagePage2() {
+    const { token, setToken } = useStateContext();
     const navigate = useNavigate();
     const location = useLocation();
     const [red, setRed] = useState(false);
     const patientId = location.state?.patientId;
     const [position, setPosition] = useState({
         loaded: false,
-        coordinates: { lat: '', lng: '' },
-        error: null
+        coordinates: { lat: "", lng: "" },
+        error: null,
     });
     // const [additionalInfo, setAdditionalINfo] = useState[{
     //     zusatzInfo1: '',
@@ -21,10 +23,12 @@ export default function TriagePage2() {
 
         if (!navigator.geolocation) {
             if (isMounted) {
-                setPosition(prevState => ({
+                setPosition((prevState) => ({
                     ...prevState,
                     loaded: true,
-                    error: { message: "Geolocation is not supported by your browser" }
+                    error: {
+                        message: "Geolocation is not supported by your browser",
+                    },
                 }));
             }
         } else {
@@ -37,16 +41,16 @@ export default function TriagePage2() {
                                 lat: position.coords.latitude,
                                 lng: position.coords.longitude,
                             },
-                            error: null
+                            error: null,
                         });
                     }
                 },
                 (error) => {
                     if (isMounted) {
-                        setPosition(prevState => ({
+                        setPosition((prevState) => ({
                             ...prevState,
                             loaded: true,
-                            error: error
+                            error: error,
                         }));
                     }
                 }
@@ -65,7 +69,7 @@ export default function TriagePage2() {
         }
 
         if (!position.loaded || position.error) {
-            console.error('Koordinaten sind nicht verfügbar.');
+            console.error("Koordinaten sind nicht verfügbar.");
             return;
         }
 
@@ -75,17 +79,21 @@ export default function TriagePage2() {
             triageColor: color,
             lat: position.coordinates.lat,
             lng: position.coordinates.lng,
-            //...additionalInfo
+            respiration: false,
         };
 
         try {
-            const response = await fetch(`/api/persons/${patientId}/update-triage-color`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            });
+            const response = await fetch(
+                `/api/persons/${patientId}/update-triage-color`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(requestBody),
+                }
+            );
 
             if (!response.ok) {
                 throw new Error("Serverantwort war nicht ok");
@@ -94,17 +102,46 @@ export default function TriagePage2() {
             const data = await response.json();
             console.log(data.message);
         } catch (error) {
-            console.error('Fehler beim Aktualisieren der Triagefarbe:', error);
+            console.error("Fehler beim Aktualisieren der Triagefarbe:", error);
         }
     };
 
     const handleRed = () => {
         setRed(true);
-        updateTriageColor('rot')
+        updateTriageColor("rot");
     };
 
-    const handleNextPage = () => {
-        navigate("/TriagePage3", {state: { patientId: patientId}});
+    const handleNextPage = async () => {
+        const requestBody = {
+            lat: position.coordinates.lat,
+            lng: position.coordinates.lng,
+            respiration: true,
+        };
+
+        try {
+            const response = await fetch(
+                `/api/persons/${patientId}/respiration`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(requestBody),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Serverantwort war nicht ok");
+            }
+
+            const data = await response.json();
+            console.log(data.message);
+        } catch (error) {
+            console.error("Fehler beim Aktualisieren der Atmung:", error);
+        }
+
+        navigate("/TriagePage3", { state: { patientId: patientId } });
     };
     const handleNewPatient = () => {
         navigate("/ScanPatient");

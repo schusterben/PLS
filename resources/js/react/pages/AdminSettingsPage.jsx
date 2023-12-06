@@ -12,6 +12,10 @@ export default function AdminSettingsPage() {
         navigate("/CreatePatientQrCodePage");
     }
 
+    function onClickEditOperationScene() {
+        navigate("/EditOperationScene");
+    }
+
     function onClickShowUnusedQrCodes() {
         navigate("/ShowUnusedPatientQrCodesPage");
     }
@@ -69,10 +73,16 @@ export default function AdminSettingsPage() {
                 }}
             >
                 <legend>Authorizierungs Qr-Codes</legend>
-                <button onClick={onClickLoginQrCreate}>
+                <button
+                    onClick={onClickLoginQrCreate}
+                    style={{ width: "350px" }}
+                >
                     QR-Codes für Authorizierung erzeugen
                 </button>
-                <button onClick={onClickShowUnusedLoginQrCodes}>
+                <button
+                    onClick={onClickShowUnusedLoginQrCodes}
+                    style={{ width: "350px" }}
+                >
                     Nicht verwendete QR-Codes
                 </button>
             </fieldset>
@@ -88,15 +98,27 @@ export default function AdminSettingsPage() {
                 }}
             >
                 <legend>Patienten Qr-Codes</legend>
-                <button onClick={onClickQrCreate}>
+                <button onClick={onClickQrCreate} style={{ width: "350px" }}>
                     Patienten QR-Codes erzeugen
                 </button>
-                <button onClick={onClickShowUnusedQrCodes}>
+                <button
+                    onClick={onClickShowUnusedQrCodes}
+                    style={{ width: "350px" }}
+                >
                     Nicht verwendete QR-Codes
                 </button>
             </fieldset>
-            <button onClick={onClickCreateNewAdminUser}>
+            <button
+                onClick={onClickCreateNewAdminUser}
+                style={{ width: "350px" }}
+            >
                 Admin-User erstellen
+            </button>
+            <button
+                onClick={onClickEditOperationScene}
+                style={{ width: "350px" }}
+            >
+                Einsatzort erstellen/bearbeiten
             </button>
         </div>
     );

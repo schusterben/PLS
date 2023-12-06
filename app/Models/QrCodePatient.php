@@ -9,7 +9,6 @@ class QRCodePatient extends Model
     protected $table = 'qr_code_patient';
     protected $primaryKey = 'idqr_code_login';
     protected $fillable = [
-        'qr_login',
-        'first_login'
+        'qr_login'
     ];
 }

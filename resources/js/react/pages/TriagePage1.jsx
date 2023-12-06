@@ -1,7 +1,9 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useStateContext } from "./../contexts/ContextProvider";
 
 export default function TriagePage1() {
+    const { token, setToken } = useStateContext();
     const navigate = useNavigate();
     const location = useLocation();
     const [green, setGreen] = useState(false);
@@ -89,6 +91,7 @@ export default function TriagePage1() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify(requestBody),
                 }
