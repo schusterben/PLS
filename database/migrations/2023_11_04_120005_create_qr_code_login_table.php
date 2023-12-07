@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('qr_code_login', function (Blueprint $table) {
             $table->id('idqr_code_login');
-            $table->longText('qr_login')->nullable();
+            $table->longText('qr_login');
             $table->dateTime('first_login')->nullable();
             $table->timestamps();
         });
