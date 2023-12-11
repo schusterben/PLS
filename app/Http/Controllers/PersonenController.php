@@ -128,9 +128,14 @@ class PersonenController extends Controller
         }
 
         $respiration = $request->input('respiration');
+        if ($respiration !== null) {
+            $person->atmung = $respiration;
+        }
 
-        $person->atmung = $respiration;
-
+        $bloodStopable = $request->input('bloodStopable');
+        if ($bloodStopable !== null) {
+            $person->blutung = $bloodStopable;
+        }
 
         // Speichern der geänderten Daten
         $person->save();
