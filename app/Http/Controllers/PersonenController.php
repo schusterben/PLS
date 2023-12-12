@@ -15,28 +15,21 @@ use App\Models\QRCodePatient;
 
 class PersonenController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+
+        $operationScene =
+            json_decode($request->input('operationScene'), true);
+
+        $operationSceneId = $operationScene['idoperationScene'];
+
+
         Log::info('index Methode aufgerufen');
 
-        // Wählen Sie die gewünschten Spalten aus der `patient` Tabelle aus.
-        $patients = Patient::select(
-            'idpatient',
-            'atmung',
-            'blutung',
-            'radialispuls',
-            'triagefarbe',
-            'transport',
-            'dringend',
-            'kontaminiert',
-            'name',
-            'user_iduser',
-            'created_at',
-            'updated_at',
-            'longitude_patient',
-            'latitude_patient'
-        )->get();
-
+        $patients = QRCodePatient::join('patient', 'qr_code_patient.patient_idpatient', '=', 'patient.idpatient')
+            ->where('qr_code_patient.operationScene_id', $operationSceneId) // Filter nach der ID der Operationsszene
+            ->select('patient.*') // Wähle die gewünschten Spalten aus der patient Tabelle
+            ->get();
         return response()->json($patients);
     }
 

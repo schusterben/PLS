@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useLocation } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 import "../../../css/MarkerStyles.css";
 import { useStateContext } from "../contexts/ContextProvider";
 
 function SituationRoomTable() {
+    const location = useLocation();
     const [persons, setPersons] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [mapCenter, setMapCenter] = useState([48.2715, 16.403]);
     const { token } = useStateContext();
+    const operationScene = location.state?.operationScene;
 
     useEffect(() => {
         fetch("/api/persons", {
-            method: "GET",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
+            body: JSON.stringify({
+                operationScene: operationScene,
+            }),
         })
             .then((response) => response.json())
             .then((data) => {

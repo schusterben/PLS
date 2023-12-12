@@ -31,12 +31,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware(['jwt'])->group(function () {
   // Your protected routes go here
-  Route::get('/persons', [PersonenController::class, 'index']);
   Route::get('/getUnusedPatientQrCodes', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
   Route::get('/getLoginQrCodes', [QRLoginController::class, 'getLoginQrCodes']);
   Route::get('/get-body-parts', [BodyPartController::class, 'getBodyParts']);
   Route::get('/getAllCurrentOperationScenes', [OperationSceneController::class, 'getAllCurrentOperationScenes']);
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
+  Route::post('/persons', [PersonenController::class, 'index']);
+
   Route::post('/generateQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
   Route::post('/createAdminUser', [UserController::class, 'createNewAdminUser']);
   Route::post('/changeAdminPassword', [UserController::class, 'changeAdminPassword']);

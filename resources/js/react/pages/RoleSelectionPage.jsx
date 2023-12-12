@@ -35,7 +35,9 @@ export default function RoleSelection() {
                 });
                 break;
             case "LEITSTELLE":
-                navigate("/SituationRoomTable");
+                navigate("/SituationRoomTable", {
+                    state: { operationScene: selectedOperationScene },
+                });
                 break;
             default:
                 navigate("/NotFound");

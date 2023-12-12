@@ -61,25 +61,23 @@ export default function CreatePatientQrCodes() {
     }, [buttonClicked, adminToken, navigate, requestedQrCount]);
 
     async function printQrCodesToPDF() {
-        async function printQrCodesToPDF() {
-            const x = 50;
-            const y = 50;
-            const size = 100;
-            const doc = new jsPDF();
+        const x = 50;
+        const y = 50;
+        const size = 100;
+        const doc = new jsPDF();
 
-            const qrCodeElements = document.querySelectorAll("[id^='qrcode-']");
+        const qrCodeElements = document.querySelectorAll("[id^='qrcode-']");
 
-            qrCodeElements.forEach((element, index) => {
-                if (index !== 0) {
-                    doc.addPage();
-                }
+        qrCodeElements.forEach((element, index) => {
+            if (index !== 0) {
+                doc.addPage();
+            }
 
-                const qrCodeDataURL = element.toDataURL("image/png");
-                doc.addImage(qrCodeDataURL, "PNG", x, y, size, size);
-            });
+            const qrCodeDataURL = element.toDataURL("image/png");
+            doc.addImage(qrCodeDataURL, "PNG", x, y, size, size);
+        });
 
-            doc.save("qrcode_pdf.pdf");
-        }
+        doc.save("qrcode_pdf.pdf");
     }
 
     function generatePatientQRCodes() {
