@@ -17,9 +17,13 @@ import ProtectedRoute from "./components/ProtctedRoute";
 import ShowBodyFront from "./pages/ShowBodyFront";
 import ShowBodyBack from "./pages/ShowBodyBack";
 import ProtectedAdminRoute from "./components/ProtctedAdminRoute";
-import ShowUnusedQrCodesPage from "./pages/ShowUnusedQrCodesPage";
+import ShowUnusedPatientQrCodesPage from "./pages/ShowUnusedPatientQrCodesPage";
 import CreateNewAdminUserPage from "./pages/CreateNewAdminUserPage";
 import ChangeAdminPasswordPage from "./pages/ChangeAdminPasswordPage";
+import CreateLoginQrCodesPage from "./pages/CreateLoginQrCodesPage";
+import ShowUnusedLoginQrCodesPage from "./pages/ShowUnusedLoginQrCodesPage";
+import CreateOperationScene from "./pages/CreateOperationScene";
+import EditOperationScene from "./pages/EditOperationScene";
 
 const router = createBrowserRouter([
     {
@@ -80,8 +84,14 @@ const router = createBrowserRouter([
         element: <AdminLandingPage />,
     },
     {
-        path: "/ShowUnusedQrCodesPage",
-        element: <ProtectedAdminRoute element={<ShowUnusedQrCodesPage />} />,
+        path: "/ShowUnusedPatientQrCodesPage",
+        element: (
+            <ProtectedAdminRoute element={<ShowUnusedPatientQrCodesPage />} />
+        ),
+    },
+    {
+        path: "/CreateLoginQrCodesPage",
+        element: <ProtectedAdminRoute element={<CreateLoginQrCodesPage />} />,
     },
     {
         path: "/CreateNewAdminUserPage",
@@ -92,6 +102,21 @@ const router = createBrowserRouter([
         element: <ProtectedAdminRoute element={<ChangeAdminPasswordPage />} />,
     },
 
+    {
+        path: "/ShowUnusedLoginQrCodesPage",
+        element: (
+            <ProtectedAdminRoute element={<ShowUnusedLoginQrCodesPage />} />
+        ),
+    },
+
+    {
+        path: "/CreateOperationScene",
+        element: <ProtectedAdminRoute element={<CreateOperationScene />} />,
+    },
+    {
+        path: "/EditOperationScene",
+        element: <ProtectedAdminRoute element={<EditOperationScene />} />,
+    },
     {
         path: "*",
         element: <NotFound />,

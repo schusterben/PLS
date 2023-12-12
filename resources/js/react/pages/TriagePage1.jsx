@@ -1,69 +1,108 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { useStateContext } from "./../contexts/ContextProvider";
 
 export default function TriagePage1() {
+    const { token, setToken } = useStateContext();
     const navigate = useNavigate();
+    const location = useLocation();
     const [green, setGreen] = useState(false);
     const [black, setBlack] = useState(false);
-    const [selectedPatientId, setSelectedPatientId] = useState(null); //  ID des ausgewählten Patienten wird gespeichert
-    const [location, setLocation] = useState({
+    const patientId = location.state?.patientId;
+    const [position, setPosition] = useState({
         loaded: false,
         coordinates: { lat: "", lng: "" },
         error: null,
     });
+    // const [additionalInfo, setAdditionalINfo] = useState[{
+    //     zusatzInfo1: '',
+    //     zusatzInfo2: '',
+    //     //hier können noch weitere Informationen mit übergeben werden
+    // }]
 
     useEffect(() => {
+        let isMounted = true;
+
         if (!navigator.geolocation) {
-            setLocation((prevState) => ({
-                ...prevState,
-                loaded: true,
-                error: {
-                    message: "Geolocation is not supported by your browser",
-                },
-            }));
+            if (isMounted) {
+                setPosition((prevState) => ({
+                    ...prevState,
+                    loaded: true,
+                    error: {
+                        message: "Geolocation is not supported by your browser",
+                    },
+                }));
+            }
         } else {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    setLocation({
-                        loaded: true,
-                        coordinates: {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                        },
-                        error: null,
-                    });
+                    if (isMounted) {
+                        setPosition({
+                            loaded: true,
+                            coordinates: {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            },
+                            error: null,
+                        });
+                    }
                 },
                 (error) => {
-                    setLocation((prevState) => ({
-                        ...prevState,
-                        loaded: true,
-                        error: error,
-                    }));
+                    if (isMounted) {
+                        setPosition((prevState) => ({
+                            ...prevState,
+                            loaded: true,
+                            error: error,
+                        }));
+                    }
                 }
             );
         }
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const updateTriageColor = async (color) => {
-        try {
-            if (!location.loaded || location.error) {
-                console.error("Koordinaten sind nicht verfügbar.");
-                return;
-            }
+        if (!patientId) {
+            console.error("Keine Patienten-ID verfügbar");
+            return;
+        }
 
-            const { lat, lng } = location.coordinates;
-            console.log("Patienten ID: ", selectedPatientId);
-            //const response = await axios.post(`/api/persons/${selectedPatientId}/update-triage-color`, {
-            const response = await axios.post(
-                "/api/persons/15/update-triage-color",
+        if (!position.loaded || position.error) {
+            console.error("Koordinaten sind nicht verfügbar.");
+            return;
+        }
+
+        // entfernen: const { lat, lng } = position.coordinates;
+
+        const requestBody = {
+            triageColor: color,
+            lat: position.coordinates.lat,
+            lng: position.coordinates.lng,
+            //...additionalInfo
+        };
+
+        try {
+            const response = await fetch(
+                `/api/persons/${patientId}/update-triage-color`,
                 {
-                    triageColor: color,
-                    lat: lat,
-                    lng: lng,
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(requestBody),
                 }
             );
-            console.log(response.data.message);
+
+            if (!response.ok) {
+                throw new Error("Serverantwort war nicht ok");
+            }
+
+            const data = await response.json();
+            console.log(data.message);
         } catch (error) {
             console.error("Fehler beim Aktualisieren der Triagefarbe:", error);
         }
@@ -80,7 +119,7 @@ export default function TriagePage1() {
     };
 
     const handleNextPage = () => {
-        navigate("/TriagePage2");
+        navigate("/TriagePage2", { state: { patientId: patientId } });
     };
     const handleNewPatient = () => {
         navigate("/ScanPatient");
@@ -106,7 +145,7 @@ export default function TriagePage1() {
                             padding: "0",
                         }}
                     >
-                        Patient:In
+                        Patient:In ID: {patientId}
                     </p>
                     <div>
                         <div
@@ -158,7 +197,7 @@ export default function TriagePage1() {
                             padding: "0",
                         }}
                     >
-                        Patient:In
+                        Patient:In ID: {patientId}
                     </p>
                     <p
                         style={{
@@ -188,7 +227,7 @@ export default function TriagePage1() {
                             padding: "0",
                         }}
                     >
-                        Patient:In
+                        Patient:In ID: {patientId}
                     </p>
                     <p
                         style={{
@@ -226,16 +265,16 @@ export default function TriagePage1() {
                 👤
             </button>
             <h4>GPS Koordinaten:</h4>
-            <p>Laden: {location.loaded ? "Erfolgreich" : "Lädt..."}</p>
-            {location.loaded && !location.error && (
+            <p>Laden: {position.loaded ? "Erfolgreich" : "Lädt..."}</p>
+            {position.loaded && !position.error && (
                 <div>
-                    <p>Breitengrad: {location.coordinates.lat}</p>
-                    <p>Längengrad: {location.coordinates.lng}</p>
+                    <p>Breitengrad: {position.coordinates.lat}</p>
+                    <p>Längengrad: {position.coordinates.lng}</p>
                 </div>
             )}
-            {location.error && (
+            {position.error && (
                 <div>
-                    <p>Fehler: {location.error.message}</p>
+                    <p>Fehler: {position.error.message}</p>
                 </div>
             )}
         </div>

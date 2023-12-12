@@ -6,10 +6,12 @@ use App\Http\Controllers\PersonenController;
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PatientQrCodeController;
+use App\Http\Controllers\QRLoginController;
 use App\Http\Controllers\TokenValidationController;
 use App\Http\Controllers\UserController;
 use Tymon\JWTAuth\Validators\TokenValidator;
 use App\Http\Controllers\BodyPartController;
+use App\Http\Controllers\OperationSceneController;
 
 
 /*
@@ -31,18 +33,28 @@ Route::middleware(['jwt'])->group(function () {
   // Your protected routes go here
   Route::get('/persons', [PersonenController::class, 'index']);
   Route::get('/getUnusedPatientQrCodes', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
-  Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
-  Route::put('/save-body-part', [BodyPartController::class, 'saveBodyPart']);
+  Route::get('/getLoginQrCodes', [QRLoginController::class, 'getLoginQrCodes']);
   Route::get('/get-body-parts', [BodyPartController::class, 'getBodyParts']);
+  Route::get('/getAllCurrentOperationScenes', [OperationSceneController::class, 'getAllCurrentOperationScenes']);
+  Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
+  Route::post('/generateQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
+  Route::post('/createAdminUser', [UserController::class, 'createNewAdminUser']);
+  Route::post('/changeAdminPassword', [UserController::class, 'changeAdminPassword']);
+  Route::post('/createOperationScene', [OperationSceneController::class, 'createOperationScene']);
+  Route::post('/generateLoginQRCodes', [QRLoginController::class, 'generateLoginQRCodes']);
+  Route::post('/generatePatientQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
+  Route::post('/verify-patient-qr-code', [PersonenController::class, 'verifyPatientQrCode']);
+  Route::post('/persons/{person}/update-triage-color', [PersonenController::class, 'update']);
+  Route::post('/persons/{person}/respiration', [PersonenController::class, 'updateRespiration']);
 
-
+  Route::put('/save-body-part', [BodyPartController::class, 'saveBodyPart']);
 });
 
 
 
 //POST-Routes
 
-Route::post('/persons/{person}/update-triage-color', [PersonenController::class, 'update']);
+
 //Route::post('/persons/{id}/update-triage-color', 'PersonenController@update');
 Route::post('/qr-login', [LoginController::class, 'qrLogin']);
 Route::post('/adminLogin', [LoginController::class, 'adminLogin']);
