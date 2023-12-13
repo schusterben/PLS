@@ -9,6 +9,8 @@ export default function TriagePage3() {
     const [red, setRed] = useState(false);
     const [yellow, setYellow] = useState(false);
     const patientId = location.state?.patientId;
+    const operationScene = location.state?.operationScene;
+
     const [position, setPosition] = useState({
         loaded: false,
         coordinates: { lat: "", lng: "" },
@@ -137,7 +139,11 @@ export default function TriagePage3() {
     };
 
     const handleNewPatient = () => {
-        navigate("/ScanPatient");
+        navigate("/ScanPatient", {
+            state: {
+                operationScene: operationScene,
+            },
+        });
     };
 
     function renderContent() {
@@ -244,7 +250,11 @@ export default function TriagePage3() {
         }
     }
     const handleBodyClick = () => {
-        navigate("/ShowBody");
+        navigate("/ShowBodyFront", {
+            state: {
+                patientId: patientId,
+            },
+        });
     };
     return (
         <div>

@@ -106,7 +106,7 @@ function SituationRoomTable() {
                             person.longitude_patient,
                         ]}
                         icon={createMarkerIcon(
-                            getBackgroundColor(person.Triagefarbe)
+                            getBackgroundColor(person.triagefarbe)
                         )}
                     >
                         <Popup>
@@ -134,7 +134,7 @@ function SituationRoomTable() {
         <div
             style={{
                 position: "absolute",
-                top: "13%",
+                top: "20%",
                 left: "0",
                 width: "100%",
                 textAlign: "center",
@@ -145,19 +145,16 @@ function SituationRoomTable() {
                 flexDirection: "column",
             }}
         >
-            <h2>Alle Personen:</h2>
             <div>
-                <table border="1">
+                <table border="1" style={{ margin: 15 }}>
                     <thead>
                         <tr>
                             <th>Nummer</th>
                             <th>Atmung</th>
                             <th>Blutung</th>
-                            <th>Radialispuls</th>
                             <th>Triagefarbe</th>
                             <th>Transport</th>
                             <th>Dringend</th>
-                            <th>Kontaminiert</th>
                             <th>Name</th>
                             <th>Position (Longitude)</th>
                             <th>Position (Latitude)</th>
@@ -171,7 +168,6 @@ function SituationRoomTable() {
                                 <td>{person.idpatient}</td>
                                 <td>{person.atmung ? "Ja" : "Nein"}</td>
                                 <td>{person.blutung ? "Ja" : "Nein"}</td>
-                                <td>{person.radialispuls}</td>
                                 <td>
                                     <div
                                         style={{
@@ -185,7 +181,6 @@ function SituationRoomTable() {
                                 </td>
                                 <td>{person.transport ? "Ja" : "Nein"}</td>
                                 <td>{person.dringend ? "Ja" : "Nein"}</td>
-                                <td>{person.kontaminiert ? "Ja" : "Nein"}</td>
                                 <td>{person.name || "N/A"}</td>
                                 <td>{person.longitude_patient || "N/A"}</td>
                                 <td>{person.latitude_patient || "N/A"}</td>
@@ -206,11 +201,10 @@ function SituationRoomTable() {
             </div>
 
             <div style={{ height: "400px", width: "100%" }}>
-                <h2>Karte:</h2>
                 <MapContainer
                     center={mapCenter}
                     zoom={13}
-                    style={{ flex: 1, height: "400px", width: "100%" }}
+                    style={{ flex: 1, height: "300px", width: "100%" }}
                 >
                     <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

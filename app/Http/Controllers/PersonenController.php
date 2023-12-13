@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Body;
 use App\Models\Person;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -165,10 +166,16 @@ class PersonenController extends Controller
                 // Hier weitere notwendige Daten für den Patienten hinzufügen
                 $patient->save();
 
+                $body = new Body();
+                $idpat = $patient->idpatient;
+                $body->idpatient = $idpat;
+                $body->save();
+
+
                 // Zuweisen des Patienten zum QR-Code
                 $qrCodePatient->patient_idpatient = $patient->idpatient;
                 if ($operationScene) {
-                    $qrCodePatient->operationScene_id = $operationScene->idoperationScene;
+                    $qrCodePatient->operationScene_id = $operationScene['idoperationScene'];
                 }
                 $qrCodePatient->save();
 

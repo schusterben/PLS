@@ -62,6 +62,13 @@ export default function ScanPatient() {
         })
             .then((response) => {
                 if (!response.ok) {
+                    if (
+                        data.error &&
+                        data.error.toUpperCase() === "UNAUTHORIZED"
+                    ) {
+                        navigate("/AdminLandingPage");
+                        return;
+                    }
                     throw new Error("Netzwerkantwort war nicht ok");
                 }
                 return response.json();

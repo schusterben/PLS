@@ -8,6 +8,8 @@ export default function TriagePage2() {
     const location = useLocation();
     const [red, setRed] = useState(false);
     const patientId = location.state?.patientId;
+    const operationScene = location.state?.operationScene;
+
     const [position, setPosition] = useState({
         loaded: false,
         coordinates: { lat: "", lng: "" },
@@ -141,10 +143,16 @@ export default function TriagePage2() {
             console.error("Fehler beim Aktualisieren der Atmung:", error);
         }
 
-        navigate("/TriagePage3", { state: { patientId: patientId } });
+        navigate("/TriagePage3", {
+            state: { patientId: patientId, operationScene: operationScene },
+        });
     };
     const handleNewPatient = () => {
-        navigate("/ScanPatient");
+        navigate("/ScanPatient", {
+            state: {
+                operationScene: operationScene,
+            },
+        });
     };
 
     function renderContent() {
@@ -217,7 +225,11 @@ export default function TriagePage2() {
         }
     }
     const handleBodyClick = () => {
-        navigate("/ShowBody");
+        navigate("/ShowBodyFront", {
+            state: {
+                patientId: patientId,
+            },
+        });
     };
 
     return (

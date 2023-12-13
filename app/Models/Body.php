@@ -74,9 +74,77 @@ class Body extends Model
         'schulter_links_hinten',
         'brustwirbel',
         'lendenwirbel',
+        'idpatient'
     ];
 
-    
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        // Set default values for fields
+        $this->attributes['hals_vorne'] = 0;
+        $this->attributes['brust_links'] = 0;
+        $this->attributes['brust_rechts'] = 0;
+        $this->attributes['leiste_links_vorne'] = 0;
+        $this->attributes['leiste_rechts_vorne'] = 0;
+        $this->attributes['oberschenkel_rechts_vorne'] = 0;
+        $this->attributes['unterschenkel_links_vorne'] = 0;
+        $this->attributes['oberschenkel_links_vorne'] = 0;
+        $this->attributes['unterschenkel_rechts_vorne'] = 0;
+        $this->attributes['oberarm_links_vorne'] = 0;
+        $this->attributes['oberarm_rechts_vorne'] = 0;
+        $this->attributes['unterarm_links_vorne'] = 0;
+        $this->attributes['unterarm_rechts_vorne'] = 0;
+        $this->attributes['genital_vorne'] = 0;
+        $this->attributes['kopf_vorne'] = 0;
+        $this->attributes['schulter_links_vorne'] = 0;
+        $this->attributes['schulter_rechts_vorne'] = 0;
+        $this->attributes['huefte_links_vorne'] = 0;
+        $this->attributes['huefte_rechts_vorne'] = 0;
+        $this->attributes['knie_links_vorne'] = 0;
+        $this->attributes['knie_rechts_vorne'] = 0;
+        $this->attributes['ellbogen_rechts_vorne'] = 0;
+        $this->attributes['ellbogen_links_vorne'] = 0;
+        $this->attributes['fuss_rechts_vorne'] = 0;
+        $this->attributes['fuss_links_vorne'] = 0;
+        $this->attributes['auge_rechts'] = 0;
+        $this->attributes['auge_links'] = 0;
+        $this->attributes['mund'] = 0;
+        $this->attributes['hand_links_vorne'] = 0;
+        $this->attributes['hand_rechts_vorne'] = 0;
+        $this->attributes['kopf_hinten'] = 0;
+        $this->attributes['hals_hinten'] = 0;
+        $this->attributes['ruecken_rechts'] = 0;
+        $this->attributes['oberschenkel_rechts_hinten'] = 0;
+        $this->attributes['unterschenkel_links_hinten'] = 0;
+        $this->attributes['oberschenkel_links_hinten'] = 0;
+        $this->attributes['unterschenkel_rechts_hinten'] = 0;
+        $this->attributes['oberarm_links_hinten'] = 0;
+        $this->attributes['oberarm_rechts_hinten'] = 0;
+        $this->attributes['unterarm_links_hinten'] = 0;
+        $this->attributes['unterarm_rechts_hinten'] = 0;
+        $this->attributes['becken_links_hinten'] = 0;
+        $this->attributes['ruecken_links'] = 0;
+        $this->attributes['becken_rechts_hinten'] = 0;
+        $this->attributes['genital_hinten'] = 0;
+        $this->attributes['huefte_rechts_hinten'] = 0;
+        $this->attributes['huefte_links_hinten'] = 0;
+        $this->attributes['knie_links_hinten'] = 0;
+        $this->attributes['knie_rechts_hinten'] = 0;
+        $this->attributes['ellbogen_rechts_hinten'] = 0;
+        $this->attributes['ellbogen_links_hinten'] = 0;
+        $this->attributes['fuss_rechts_hinten'] = 0;
+        $this->attributes['fuss_links_hinten'] = 0;
+        $this->attributes['hand_links_hinten'] = 0;
+        $this->attributes['hand_rechts_hinten'] = 0;
+        $this->attributes['schulter_rechts_hinten'] = 0;
+        $this->attributes['schulter_links_hinten'] = 0;
+        $this->attributes['brustwirbel'] = 0;
+        $this->attributes['lendenwirbel'] = 0;
+    }
+
+
+
     // Define a relationship with the Patient model
     public function patient()
     {
