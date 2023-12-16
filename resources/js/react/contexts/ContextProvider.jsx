@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 
+// Create a context to manage and share state data across components
 const StateContext = createContext({
     token: null,
     adminToken: null,
@@ -8,7 +9,7 @@ const StateContext = createContext({
     validateToken: () => {},
 });
 
-// Function to validate the token
+// Function to validate the user token by sending a request to the server
 const validateToken = async (token) => {
     try {
         const response = await fetch("/api/validate-token", {
@@ -32,6 +33,7 @@ const validateToken = async (token) => {
     }
 };
 
+// ContextProvider component manages the state and provides it to child components
 export const ContextProvider = ({ children }) => {
     const [token, setTokenInternal] = useState(
         localStorage.getItem("ACCESS_TOKEN")
@@ -40,6 +42,7 @@ export const ContextProvider = ({ children }) => {
         localStorage.getItem("ACCESS_ADMIN_TOKEN")
     );
 
+    // Function to set the user token and store it in local storage
     const setToken = (newToken) => {
         setTokenInternal(newToken);
 
@@ -50,6 +53,7 @@ export const ContextProvider = ({ children }) => {
         }
     };
 
+    // Provide the state values and functions to child components through the context
     const setAdminToken = (newToken) => {
         setAdminTokenInternal(newToken);
 
@@ -59,7 +63,7 @@ export const ContextProvider = ({ children }) => {
             localStorage.removeItem("ACCESS_ADMIN_TOKEN");
         }
     };
-
+    // Provide the state values and functions to child components through the context
     return (
         <StateContext.Provider
             value={{
@@ -74,5 +78,5 @@ export const ContextProvider = ({ children }) => {
         </StateContext.Provider>
     );
 };
-
+// Custom hook to access the context values within components
 export const useStateContext = () => useContext(StateContext);
