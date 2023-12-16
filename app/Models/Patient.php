@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
+/**
+ * The Patient class represents the patient model.
+ */
 class Patient extends Model
 {
     protected $table = 'patient'; // Set the table name
@@ -26,25 +30,33 @@ class Patient extends Model
         'user_iduser', // Assuming there is a foreign key to the User model
     ];
 
-    // Define a relationship with the User model
+    /**
+     * Define a relationship with the User model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user()
     {
         return $this->belongsTo(User::class, 'user_iduser', 'iduser');
     }
 
-    // Define a relationship with the Body model (assuming you have one)
-    //public function body()
-   // {
-        //return $this->hasOne(Body::class, 'patient_idpatient', 'idpatient');
-   // }
 
-    // Define a relationship with the QRCodePatient model (assuming you have one)
+    /**
+     * Define a one-to-one relationship with the QRCodePatient model (assuming you have one).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function qrCodePatient()
     {
         return $this->hasOne(QRCodePatient::class, 'patient_idpatient', 'idpatient');
     }
 
-    // Define a relationship with the Body model
+
+    /**
+     * Define a one-to-one relationship with the Body model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function body()
     {
         return $this->hasOne(Body::class, 'idpatient', 'idpatient');

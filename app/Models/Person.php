@@ -7,93 +7,88 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class Person extends Model
-/* {
-    //use HasFactory;
-    protected $table = 'persons';
-}
+
+/**
+ * The Person class represents the person model.
  */
+class Person extends Model
 {
-    // Gibt an, dass die automatische Zuweisung von Timestamps genutzt werden soll
+    // Indicates that automatic timestamp assignment should be used
     public $timestamps = true;
 
-    // Gibt die Tabelle an, mit der dieses Modell verbunden ist
+    // Specifies the table associated with this model
     protected $table = 'persons';
 
-    // Gibt die Attribute an, die massenzuweisbar sind
+    // Defines the attributes that are mass assignable
     protected $fillable = [
         'Triagefarbe',
-        'position', // Nehmen wir an, das ist ein String 'latitude,longitude'
+        'position', // Assuming it's a string in the format 'latitude,longitude'
     ];
 
-     /* // Konvertiert die Position in ein Array, wenn sie abgerufen wird
-    protected $casts = [
-        'position' => 'array',
-    ]; */ 
 
-    // Mutator, um die Position zu setzen
+    /**
+     * Mutator to set the position attribute.
+     * @param array $value An array containing 'lat' and 'lng'.
+     */
     public function setPositionAttribute($value)
     {
-        // Überprüfen Sie, ob die 'lat' und 'lng' Schlüssel im $value Array vorhanden sind.
+        // Check if 'lat' and 'lng' keys exist in the $value array.
         if (isset($value['lat']) && isset($value['lng'])) {
             $lat = $value['lat'];
             $lng = $value['lng'];
-    
-            // Stellen Sie sicher, dass $lat und $lng tatsächlich Zahlen sind, bevor Sie sie in die Datenbankabfrage einfügen
+
+            // Ensure $lat and $lng are numeric before inserting them into the database query.
             if (is_numeric($lat) && is_numeric($lng)) {
                 $this->attributes['position'] = DB::raw("ST_PointFromText('POINT($lng $lat)')");
             } else {
-                // Loggen Sie den Fehler und/oder werfen Sie eine Exception
-                Log::error("Invalid latitude or longitude. Lat: $lat, Lng: $lng");
+
                 throw new \InvalidArgumentException("Invalid latitude or longitude. Lat: $lat, Lng: $lng");
             }
         } else {
-            // Loggen Sie den Fehler und/oder werfen Sie eine Exception, wenn 'lat' oder 'lng' nicht gesetzt sind
-            Log::error("Missing latitude or longitude. Value array: " . print_r($value, true));
+            //throw an exception if 'lat' or 'lng' is not set            
             throw new \InvalidArgumentException("Missing latitude or longitude.");
         }
     }
 
+
+    /**
+     * Accessor to get the position attribute.
+     * @param string $value The stored position value.
+     * @return array|null An array with 'lat' and 'lng' or null if no position is present.
+     */
     public function getPositionAttribute($value)
-{
-    Log::info('getPositionAttribute method called.');
+    {
 
-    // Nur versuchen, die Position zu holen, wenn der Wert gesetzt ist.
-    if (!empty($this->attributes['position'])) {
-        Log::info('Position attribute is set.', ['position' => $this->attributes['position']]);
-        // Verwenden von Eloquent's Accessor, um die geometrische Daten zu konvertieren.
-        // Die Umwandlung erfolgt ohne Rohdaten-Abfrage zur Vermeidung von SQL-Injection.
-        $point = $this->attributes['position'];
 
-        // Loggen des Punktes, der konvertiert wird.
-        Log::info('Converting position to point.', ['point' => $point]);
+        // Only attempt to retrieve the position if the value is set.
+        if (!empty($this->attributes['position'])) {
 
-        // Wir verwenden die DB::raw-Funktion innerhalb eines sicheren Kontextes, 
-        // da wir keine externen Daten einfügen, nur eine SQL-Funktion ausführen.
-        // Beachten Sie, dass dies immer noch eine rohe Abfrage ist und bestimmte Risiken birgt.
-        $coords = DB::select(DB::raw("SELECT ST_X(ST_GeomFromText(?)) AS lng, ST_Y(ST_GeomFromText(?)) AS lat", [$point, $point]));
+            // Using Eloquent's Accessor to convert the geometric data.
+            // Conversion is done without raw data query to prevent SQL injection.
+            $point = $this->attributes['position'];
 
-        // Prüfen, ob Koordinaten abgerufen wurden und loggen des Ergebnisses.
-        if (!empty($coords)) {
-            Log::info('Coordinates retrieved from the database.', ['coords' => $coords]);
 
-            // Konvertiere die Ergebnisse in ein Array mit 'lat' und 'lng' als Schlüssel und loggen der Rückgabe.
-            $result = ['lat' => $coords[0]->lat, 'lng' => $coords[0]->lng];
-            Log::info('Returning coordinates array.', $result);
-            return $result;
+            // We use the DB::raw function within a safe context since we're not inserting external data,
+            // only executing an SQL function. Note that this is still a raw query and carries certain risks.
+            $coords = DB::select(DB::raw("SELECT ST_X(ST_GeomFromText(?)) AS lng, ST_Y(ST_GeomFromText(?)) AS lat", [$point, $point]));
+
+            // Check if coordinates were retrieved and log the result.
+            if (!empty($coords)) {
+
+                // Convert the results into an array with 'lat' and 'lng' as keys and log the return.
+                $result = ['lat' => $coords[0]->lat, 'lng' => $coords[0]->lng];
+
+                return $result;
+            } else {
+                // Log if no coordinates were found.
+                Log::info('No coordinates found for given position.');
+            }
         } else {
-            // Loggen, wenn keine Koordinaten gefunden wurden.
-            Log::info('No coordinates found for given position.');
+            // Log if the 'position' attribute is empty.
+            Log::info('No position attribute set.');
         }
-    } else {
-        // Loggen, wenn das Attribut 'position' leer ist.
-        Log::info('No position attribute set.');
+
+        // Return null if no position is present and log this case.
+        return null;
     }
-
-    // Rückgabe null, wenn keine Position vorhanden ist und loggen dieses Falles.
-    Log::info('Returning null as no position was present.');
-    return null;
-}
-
-
 }

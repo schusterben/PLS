@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Patient;
 
-
+/**
+ * The Body class represents the body parts model.
+ */
 class Body extends Model
 {
     protected $table = 'body'; // Set the table name
@@ -77,6 +79,12 @@ class Body extends Model
         'idpatient'
     ];
 
+    /**
+     * Create a new Body instance.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -145,16 +153,25 @@ class Body extends Model
 
 
 
-    // Define a relationship with the Patient model
+    /**
+     * Define the relationship with the Patient model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function patient()
     {
         return $this->belongsTo(Patient::class, 'idpatient', 'idpatient');
     }
 
-
-    // Controller method to get initial body parts for a patient
+    /**
+     * Get the initial body parts for a patient.
+     *
+     * @param  int  $idpatient
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getInitialBodyParts($idpatient)
     {
+        // Retrieve and pluck body parts based on the patient ID
         $bodyParts = Body::where('idpatient', $idpatient)->pluck('body_part', 'is_clicked');
 
         return response()->json($bodyParts);
