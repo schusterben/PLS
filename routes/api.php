@@ -25,10 +25,12 @@ use App\Http\Controllers\OperationSceneController;
 |
 */
 
+// Authenticated User Routes (Authenticated with Sanctum)
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
   return $request->user();
 });
 
+// Protected Routes for JWT Authentication
 Route::middleware(['jwt'])->group(function () {
   // Your protected routes go here
   Route::get('/getUnusedPatientQrCodes', [PatientQrCodeController::class, 'getAllUnusedQrCodes']);
@@ -37,7 +39,6 @@ Route::middleware(['jwt'])->group(function () {
   Route::get('/getAllCurrentOperationScenes', [OperationSceneController::class, 'getAllCurrentOperationScenes']);
   Route::post('/validate-token', [TokenValidationController::class, 'validateToken']);
   Route::post('/persons', [PersonenController::class, 'index']);
-
   Route::post('/generateQRCodes', [PatientQrCodeController::class, 'generateQRCodeForPatients']);
   Route::post('/createAdminUser', [UserController::class, 'createNewAdminUser']);
   Route::post('/changeAdminPassword', [UserController::class, 'changeAdminPassword']);
@@ -54,14 +55,9 @@ Route::middleware(['jwt'])->group(function () {
 
 
 //POST-Routes
-
-
-//Route::post('/persons/{id}/update-triage-color', 'PersonenController@update');
 Route::post('/qr-login', [LoginController::class, 'qrLogin']);
 Route::post('/adminLogin', [LoginController::class, 'adminLogin']);
 
 
 //Get-Routes
-
-//Route::get('/persons', [PersonenController::class, 'index']);
 Route::get('/test-db', [PersonenController::class, 'testDatabaseConnection']);
