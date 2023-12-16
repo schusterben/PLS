@@ -1,6 +1,10 @@
 import React from "react";
 import "../../../css/title.css";
 
+/**
+ * The `Appbar` component represents the application header.
+ * It includes a logo and navigation links.
+ */
 export default function Appbar() {
     return (
         <div className="header">
