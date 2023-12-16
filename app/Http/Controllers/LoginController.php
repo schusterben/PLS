@@ -9,10 +9,18 @@ use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Symfony\Component\HttpFoundation\Response;
 
-use Tymon\JWTAuth\Contracts\JWTSubject;
 
+/**
+ * The LoginController class handles user authentication and login functionality.
+ */
 class LoginController extends Controller
 {
+    /**
+     * Authenticate a user using a QR code.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function qrLogin(Request $request)
     {
         // Validate the incoming request
@@ -35,6 +43,12 @@ class LoginController extends Controller
     }
 
 
+    /**
+     * Authenticate an admin user with username and password.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function adminLogin(Request $request)
     {
         $request->validate([

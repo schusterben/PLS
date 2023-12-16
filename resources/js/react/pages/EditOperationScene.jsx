@@ -128,7 +128,10 @@ export default function EditOperationScene() {
         if (selectedScene) {
             setSceneData({
                 name: selectedScene.name,
-                description: selectedScene.description,
+                description:
+                    selectedScene.description == null
+                        ? ""
+                        : selectedScene.description,
             });
         } else {
             setSceneData({

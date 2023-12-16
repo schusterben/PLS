@@ -7,45 +7,60 @@ use Illuminate\Support\Facades\DB;
 
 class BodyPartController extends Controller
 {
+
+    /**
+     * Save the clicked status of a body part for a patient.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function saveBodyPart(Request $request)
-{
-    try {
-        // Validate the request data if needed
+    {
+        try {
+            // Validate the request data if needed
 
-        $bodyPartId = $request->input('bodyPartId');
-        $isClicked = $request->input('isClicked');
-        $idpatient = $request->input('idpatient');
+            // Get the body part ID, click status, and patient ID from the request
 
-        // Update the 'body' table based on the body part ID, patient ID, and click status
-        DB::table('body')
-            ->where('idpatient', $idpatient)
-            ->update([$bodyPartId => $isClicked]);
+            $bodyPartId = $request->input('bodyPartId');
+            $isClicked = $request->input('isClicked');
+            $idpatient = $request->input('idpatient');
 
-        // You can add more logic or error handling here if needed
+            // Update the 'body' table based on the body part ID, patient ID, and click status
 
-        return response()->json(['message' => 'Body part saved successfully']);
-    } catch (\Exception $e) {
-        // Handle exceptions or errors
-        return response()->json(['error' => 'Error saving body part'], 500);
+            DB::table('body')
+                ->where('idpatient', $idpatient)
+                ->update([$bodyPartId => $isClicked]);
+
+            // You can add more logic or error handling here if needed
+
+            return response()->json(['message' => 'Body part saved successfully']);
+        } catch (\Exception $e) {
+            // Handle exceptions or errors
+            return response()->json(['error' => 'Error saving body part'], 500);
+        }
     }
-}
 
-public function getBodyParts(Request $request)
-{
-    try {
-        $idpatient = $request->input('idpatient');
 
-        // Retrieve body parts for the patient ID from the 'body' table
-        $bodyParts = DB::table('body')
-            ->where('idpatient', $idpatient)
-            ->first();
+    /**
+     * Get the body parts status for a patient.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBodyParts(Request $request)
+    {
+        try {
+            $idpatient = $request->input('idpatient');
 
-        return response()->json($bodyParts);
-    } catch (\Exception $e) {
-        // Handle exceptions or errors
-        return response()->json(['error' => 'Error fetching body parts'], 500);
+            // Retrieve body parts for the patient ID from the 'body' table
+            $bodyParts = DB::table('body')
+                ->where('idpatient', $idpatient)
+                ->first();
+
+            return response()->json($bodyParts);
+        } catch (\Exception $e) {
+            // Handle exceptions or errors
+            return response()->json(['error' => 'Error fetching body parts'], 500);
+        }
     }
-}
-
-
 }

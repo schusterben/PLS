@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\QRCodeLogin;
 use Illuminate\Http\Request;
 
+/**
+ * The QRLoginController class handles operations related to QR code logins.
+ */
 class QRLoginController extends Controller
 {
-
+    /**
+     * Generate a random QR code.
+     *
+     * @param int $length
+     * @return string
+     */
     function generateRandomQR($length = 64)
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -20,6 +28,13 @@ class QRLoginController extends Controller
         return $randomString;
     }
 
+
+    /**
+     * Generate QR codes for logins.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function generateLoginQRCodes(Request $request)
     {
 
@@ -36,11 +51,14 @@ class QRLoginController extends Controller
         for ($i = 0; $i < $number; $i++) {
             $tempQR = $this->generateRandomQR(64);
 
+            // Check if the generated QR code already exists in the database
             while (QRCodeLogin::where('qr_login', $tempQR)->exists()) {
                 $tempQR = $this->generateRandomQR(64);
             }
 
             $qrCodes[] = $tempQR;
+
+            // Create a new QRCodeLogin entry
             QRCodeLogin::create([
                 'qr_login' => $tempQR,
             ]);
@@ -49,9 +67,15 @@ class QRLoginController extends Controller
         return response()->json(['status' => 'success', 'qrcodes' => $qrCodes]);
     }
 
-
+    /**
+     * Get all login QR codes.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getLoginQrCodes(Request $request)
     {
+        // Retrieve all QR login codes from the database
         $codes = QRCodeLogin::pluck('qr_login')->toArray();
 
 

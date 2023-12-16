@@ -14,19 +14,27 @@ use App\Models\QRCodePatient;
 
 
 
+/**
+ * The PersonenController class handles operations related to persons and patients.
+ */
 class PersonenController extends Controller
 {
+
+    /**
+     * Get a list of patients associated with a specific operation scene.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
-
+        // Extract operation scene information from the request
         $operationScene =
             json_decode($request->input('operationScene'), true);
 
         $operationSceneId = $operationScene['idoperationScene'];
 
-
-        Log::info('index Methode aufgerufen');
-
+        // Retrieve patients associated with the specified operation scene
         $patients = QRCodePatient::join('patient', 'qr_code_patient.patient_idpatient', '=', 'patient.idpatient')
             ->where('qr_code_patient.operationScene_id', $operationSceneId) // Filter nach der ID der Operationsszene
             ->select('patient.*') // Wähle die gewünschten Spalten aus der patient Tabelle
@@ -34,26 +42,33 @@ class PersonenController extends Controller
         return response()->json($patients);
     }
 
-
+    /**
+     * Get information about a specific person.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
-        Log::info('show Methode aufgerufen mit ID: ' . $id);
-
-        // Finde die Person mit der gegebenen ID und inkludiere die Längen- und Breitengrade.
-
+        // Find the person with the given ID and include longitude and latitude.
         $person = Person::select(
             '*',
             DB::raw('ST_X(position) as longitude'),
             DB::raw('ST_Y(position) as latitude')
         )->findOrFail($id);
 
-        // Konvertiere das Ergebnis in JSON und sende die Antwort zurück.
+
         return response()->json($person);
     }
 
+    /**
+     * Test the database connection by retrieving the first entry from the table.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function testDatabaseConnection()
     {
-        // Versuche, den ersten Eintrag aus der Tabelle zu holen.
+        // Try to retrieve the first entry from the table
         $person = Person::first();
         if ($person) {
             return response()->json($person);
@@ -63,13 +78,22 @@ class PersonenController extends Controller
     }
 
 
-
+    /**
+     * Update the respiration rate for a patient.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updateRespiration(Request $request, $id)
     {
-
+        // Find the patient by ID
         $person = Patient::where('idpatient', $id)->firstOrFail();
+
+        // Update respiration rate and GPS data from the request
         $respiration = $request->input('respiration');
-        // Übernehmen der GPS-Daten aus der Anfrage
+
+
         $lng = $request->input('lng');
         $lat = $request->input('lat');
 
@@ -84,41 +108,36 @@ class PersonenController extends Controller
 
 
 
-
+    /**
+     * Update patient information.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, $id)
     {
-        Log::info('Update Methode aufgerufen', ['idpatient' => $id, 'request' => $request->all()]);
 
         try {
             // Finden der Person anhand der ID
             $person = Patient::where('idpatient', $id)->firstOrFail();
-            Log::info('Person gefunden', ['person' => $person]);
-
-            // ... Rest Ihres Codes ...
         } catch (ModelNotFoundException $e) {
-            Log::error('Keine Person mit der ID gefunden', ['id' => $id]);
-            // Optional: Senden einer Fehlerantwort
+            // Handle the case when no patient is found with the provided ID
             return response()->json(['message' => 'Person nicht gefunden'], 404);
         }
 
-        // Übernehmen der Triagefarbe aus der Anfrage
         $triageColor = $request->input('triageColor');
-        Log::info('Triagefarbe aus Anfrage', ['triageColor' => $triageColor]);
+
         if ($triageColor !== null) {
             $person->triagefarbe = $triageColor;
-            Log::info('Triagefarbe zugewiesen', ['triagefarbe' => $triageColor]);
         }
 
-        // Übernehmen der GPS-Daten aus der Anfrage
+
         $lng = $request->input('lng');
         $lat = $request->input('lat');
-        Log::info('GPS-Daten aus Anfrage', ['lng' => $lng, 'lat' => $lat]);
         if ($lng !== null && $lat !== null) {
-            // Zuweisen der Position als Array
-            //$person->position = ['lng' => $lng, 'lat' => $lat];
             $person->longitude_patient = $lng;
             $person->latitude_patient = $lat;
-            Log::info('GPS-Daten zugewiesen', ['longitude' => $lng, 'latitude' => $lat]);
         }
 
         $respiration = $request->input('respiration');
@@ -131,14 +150,19 @@ class PersonenController extends Controller
             $person->blutung = $bloodStopable;
         }
 
-        // Speichern der geänderten Daten
         $person->save();
-        Log::info('Änderungen an Person gespeichert', ['id' => $id]);
 
-        // Zurückgeben der aktualisierten Person als JSON
+
         return response()->json($person);
     }
 
+
+    /**
+     * Verify a patient QR code and associate it with a patient if not already done.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function verifyPatientQrCode(Request $request)
     {
         $qrCode = $request->input('qr_code');
@@ -146,11 +170,11 @@ class PersonenController extends Controller
             json_decode($request->input('operationScene'), true);
 
 
-        // Überprüfen, ob der QR-Code in der qr_code_patient Tabelle existiert
+        // Check if the QR code exists in the qr_code_patient table
         $qrCodePatient = QRCodePatient::where('qr_login', $qrCode)->first();
 
         if ($qrCodePatient) {
-            // Überprüfen, ob ein Wert im Feld 'patient_idpatient' vorhanden ist
+            // If the QR code is associated with a patient, return the patient ID
             if ($qrCodePatient->patient_idpatient) {
                 // Übergabe der PatientenId
                 if ($operationScene) {
@@ -161,30 +185,31 @@ class PersonenController extends Controller
 
                 return response()->json(['patientId' => $qrCodePatient->patient_idpatient]);
             } else {
-                // Erstellen eines neuen Patienteneintrags, falls kein Wert vorhanden ist
-                $patient = new Patient;
-                // Hier weitere notwendige Daten für den Patienten hinzufügen
+                // Create a new patient entry if the QR code is not associated with any patient
+                $patient = new Patient();
+                // Add any additional necessary patient data here
                 $patient->save();
 
+
+                // Create a body entry for the patient
                 $body = new Body();
                 $idpat = $patient->idpatient;
                 $body->idpatient = $idpat;
                 $body->save();
 
 
-                // Zuweisen des Patienten zum QR-Code
+                // Associate the patient with the QR code
                 $qrCodePatient->patient_idpatient = $patient->idpatient;
                 if ($operationScene) {
                     $qrCodePatient->operationScene_id = $operationScene['idoperationScene'];
                 }
                 $qrCodePatient->save();
 
-                // Zurückgeben der ID des neu erstellten Patienteneintrags
+                // Return the ID of the newly created patient
                 return response()->json(['patientId' => $patient->id]);
             }
         } else {
-            Log::error('Kein QRCodePatient Eintrag für gegebenen QR-Code gefunden', ['qrCode' => $qrCode]);
-            // Zurückgeben einer Fehlermeldung, falls der QR-Code nicht gefunden wurde
+            // Return an error message if the QR code is not found
             return response()->json(['message' => 'Ungültiger QR-Code'], 404);
         }
     }
