@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate, useLocation } from "react-router-dom";
 
+/**
+ * Component for changing the admin user's password.
+ */
 const ChangeAdminPasswordPage = () => {
     const location = useLocation();
     const usernameFromLocalStorage = location.state?.username;
@@ -17,11 +20,19 @@ const ChangeAdminPasswordPage = () => {
     const { adminToken } = useStateContext();
     const navigate = useNavigate();
 
+    /**
+     * Handle input changes in the form.
+     * @param {Object} event - The input change event.
+     */
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setFormData({ ...formData, [name]: value });
     };
 
+    /**
+     * Handle form submission.
+     * @param {Object} event - The form submission event.
+     */
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (formData.newpassword !== formData.checknewpassword) {

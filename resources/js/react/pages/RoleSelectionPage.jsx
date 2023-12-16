@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * RoleSelection component for selecting user roles and operation scenes.
+ */
 export default function RoleSelection() {
     const [selectedRole, setSelectedRole] = useState("");
     const [nextPage, setNextPage] = useState("");
@@ -14,15 +17,28 @@ export default function RoleSelection() {
 
     const roles = [];
 
+    /**
+     * Handle the change event for selecting an operation scene.
+     * @param {object} event - The change event.
+     */
     const handleOptionChange = (event) => {
         const selectedId = event.target.value;
         setSelectedOperationScene(selectedId);
     };
 
+    /**
+     * Handle the change event for selecting a user role.
+     * @param {object} item - The selected role item.
+     */
     const handleRoleChange = (item) => {
         setSelectedRole(item.target.value);
     };
 
+    /**
+     * Handle the form submission based on the selected user role.
+     * Redirects to the appropriate route.
+     * @param {object} event - The form submission event.
+     */
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -46,6 +62,7 @@ export default function RoleSelection() {
     };
 
     useEffect(() => {
+        // Fetch existing operation scenes from the server.
         const fetchExistingScenes = async () => {
             try {
                 const response = await fetch(

@@ -2,20 +2,36 @@ import React, { useEffect, useState } from "react";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Component for editing operation scenes.
+ * Allows users to select, modify, and create operation scenes.
+ */
 export default function EditOperationScene() {
+    // Access the `navigate` function from 'react-router-dom' for route navigation.
     const navigate = useNavigate();
+
+    // State to store the data of the currently selected operation scene to edit.
     const [sceneData, setSceneData] = useState({
         name: "",
         description: "",
     });
+    // State to control the loading indicator.
     const [loading, setLoading] = useState(true);
+
+    // Access the `adminToken` from the context.
     const { adminToken } = useStateContext();
+
+    // State to store the selected operation scene.
     const [selectedOperationScene, setSelectedOperationScene] = useState("");
+
+    // State to store the list of existing operation scenes.
     const [existingOperationScenes, setExistingOperationScenes] = useState([]);
 
+    // State to display a success message after updating an operation scene.
     const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
+        // This useEffect hook fetches existing operation scenes when the component mounts.
         const fetchExistingScenes = async () => {
             try {
                 const response = await fetch(
@@ -46,13 +62,20 @@ export default function EditOperationScene() {
             }
         };
 
+        // Call the `fetchExistingScenes` function when the component mounts.
         fetchExistingScenes();
     }, []);
 
+    /**
+     * Function to navigate to the page for creating a new operation scene.
+     */
     function onClickCreateOperationScene() {
         navigate("/CreateOperationScene");
     }
 
+    /**
+     * Function to update the selected operation scene.
+     */
     async function onClickUpdateOperationScene() {
         try {
             const response = await fetch("/api/createOperationScene", {
@@ -87,6 +110,8 @@ export default function EditOperationScene() {
                 setSelectedOperationScene("");
             }
             setLoading(true);
+
+            // Update the list of existing operation scenes after an update.
             const refreshedResponse = await fetch(
                 "/api/getAllCurrentOperationScenes",
                 {
@@ -118,6 +143,7 @@ export default function EditOperationScene() {
         }
     }
 
+    // Function to handle the change in the selected operation scene.
     const handleSelectChange = (event) => {
         const selectedId = event.target.value;
         setSelectedOperationScene(selectedId);

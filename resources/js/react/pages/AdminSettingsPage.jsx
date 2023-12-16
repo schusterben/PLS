@@ -4,38 +4,74 @@ import { useStateContext } from "../contexts/ContextProvider";
 import { IoIosLogOut } from "react-icons/io";
 import { FaKey } from "react-icons/fa";
 
+/**
+ * Component for the admin settings page.
+ */
 export default function AdminSettingsPage() {
     const navigate = useNavigate();
     const { adminToken, setAdminToken } = useStateContext();
 
+    /**
+     * Handle the "Patienten QR-Codes erzeugen" button click event.
+     * Navigates to the "CreatePatientQrCodePage".
+     */
     function onClickQrCreate() {
         navigate("/CreatePatientQrCodePage");
     }
 
+    /**
+     * Handle the "Einsatzort erstellen/bearbeiten" button click event.
+     * Navigates to the "EditOperationScene".
+     */
     function onClickEditOperationScene() {
         navigate("/EditOperationScene");
     }
 
+    /**
+     * Handle the "Nicht verwendete QR-Codes" button click event for patient QR codes.
+     * Navigates to the "ShowUnusedPatientQrCodesPage".
+     */
     function onClickShowUnusedQrCodes() {
         navigate("/ShowUnusedPatientQrCodesPage");
     }
 
+    /**
+     * Handle the "Admin-User erstellen" button click event.
+     * Navigates to the "CreateNewAdminUserPage".
+     */
     function onClickCreateNewAdminUser() {
         navigate("/CreateNewAdminUserPage");
     }
 
+    /**
+     * Handle the "Logout" button click event.
+     * Clears the admin token and reloads the page.
+     */
     function onClickLogout() {
         setAdminToken(null);
         window.location.reload();
     }
 
+    /**
+     * Handle the "QR-Codes für Authorizierung erzeugen" button click event.
+     * Navigates to the "CreateLoginQrCodesPage".
+     */
     function onClickLoginQrCreate() {
         navigate("/CreateLoginQrCodesPage");
     }
 
+    /**
+     * Handle the "Nicht verwendete QR-Codes" button click event for authorization QR codes.
+     * Navigates to the "ShowUnusedLoginQrCodesPage".
+     */
     function onClickShowUnusedLoginQrCodes() {
         navigate("/ShowUnusedLoginQrCodesPage");
     }
+
+    /**
+     * Handle the "Passwort ändern" button click event.
+     * Navigates to the "ChangeAdminPasswordPage" with the username in the state.
+     */
     function onClickChangePassword() {
         navigate("/ChangeAdminPasswordPage", {
             state: { username: localStorage.getItem("Username") },

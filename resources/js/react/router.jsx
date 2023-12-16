@@ -1,7 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 
+// Import your page components
 import QrAuthenticator from "./pages/QRAuthenticator";
-import NotFound from "./pages/notFound";
+import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import RoleSelection from "./pages/RoleSelectionPage";
 import ScanPatient from "./pages/ScanPatient";
@@ -9,7 +10,6 @@ import TriagePage1 from "./pages/TriagePage1";
 import TriagePage2 from "./pages/TriagePage2";
 import TriagePage3 from "./pages/TriagePage3";
 import SituationRoomTable from "./pages/SituationRoomTable";
-
 import AdminLandingPage from "./pages/AdminLandingPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import CreatePatientQrCodes from "./pages/CreatePatientQrCodes";
@@ -25,6 +25,7 @@ import ShowUnusedLoginQrCodesPage from "./pages/ShowUnusedLoginQrCodesPage";
 import CreateOperationScene from "./pages/CreateOperationScene";
 import EditOperationScene from "./pages/EditOperationScene";
 
+// Create a router configuration using createBrowserRouter
 const router = createBrowserRouter([
     {
         path: "/",

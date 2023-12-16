@@ -4,6 +4,9 @@ import jsPDF from "jspdf";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Component for creating and printing login QR codes.
+ */
 export default function CreateLoginQrCodesPage() {
     const { adminToken } = useStateContext();
     const [requestedQrCount, setRequestedQrCount] = useState(0);
@@ -11,6 +14,10 @@ export default function CreateLoginQrCodesPage() {
     const [buttonClicked, setButtonClicked] = useState(false);
     const navigate = useNavigate();
 
+    /**
+     * Handle changes in the requested QR code count input.
+     * @param {Object} event - The input change event.
+     */
     function handleRequestedQrCountChange(event) {
         if (!isNaN(event.target.value) && event.target.value >= 0) {
             setRequestedQrCount(event.target.value);
@@ -57,6 +64,9 @@ export default function CreateLoginQrCodesPage() {
         }
     }, [buttonClicked, adminToken, navigate, requestedQrCount]);
 
+    /**
+     * Create and save QR codes as a PDF.
+     */
     async function printQrCodesToPDF() {
         const x = 50;
         const y = 50;
@@ -78,6 +88,9 @@ export default function CreateLoginQrCodesPage() {
         doc.save("qrcode_pdf.pdf");
     }
 
+    /**
+     * Handle the click event to generate patient QR codes.
+     */
     function generatePatientQRCodes() {
         setButtonClicked(true);
     }

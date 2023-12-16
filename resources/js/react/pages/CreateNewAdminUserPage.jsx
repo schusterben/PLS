@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Component for creating a new admin user.
+ */
 const CreateNewAdminUserPage = () => {
     const [formData, setFormData] = useState({
         username: "",
@@ -11,11 +14,19 @@ const CreateNewAdminUserPage = () => {
     const { adminToken } = useStateContext();
     const navigate = useNavigate();
 
+    /**
+     * Handle changes in the input fields.
+     * @param {Object} event - The input change event.
+     */
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setFormData({ ...formData, [name]: value });
     };
 
+    /**
+     * Handle form submission to create a new admin user.
+     * @param {Object} event - The form submit event.
+     */
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {

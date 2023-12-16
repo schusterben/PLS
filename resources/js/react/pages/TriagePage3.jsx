@@ -2,6 +2,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useStateContext } from "./../contexts/ContextProvider";
 
+/**
+ * Component for the third page of patient triage in an emergency situation.
+ */
 export default function TriagePage3() {
     const { token, setToken } = useStateContext();
     const navigate = useNavigate();
@@ -16,12 +19,10 @@ export default function TriagePage3() {
         coordinates: { lat: "", lng: "" },
         error: null,
     });
-    // const [additionalInfo, setAdditionalINfo] = useState[{
-    //     zusatzInfo1: '',
-    //     zusatzInfo2: '',
-    //     //hier können noch weitere Informationen mit übergeben werden
-    // }]
 
+    /**
+     * Fetches the user's geolocation coordinates.
+     */
     useEffect(() => {
         let isMounted = true;
 
@@ -66,6 +67,10 @@ export default function TriagePage3() {
         };
     }, []);
 
+    /**
+     * Updates the triage color of the patient and sends the update to the server.
+     * @param {string} color - The triage color to update.
+     */
     const updateTriageColor = async (color) => {
         if (!patientId) {
             console.error("Keine Patienten-ID verfügbar");
@@ -128,16 +133,26 @@ export default function TriagePage3() {
         }
     };
 
+    /**
+     * Handles the "red" triage button click.
+     */
     const handleRed = () => {
         setRed(true);
         updateTriageColor("rot");
     };
+
+    /**
+     * Handles the "yellow" triage button click.
+     */
     const handleYellow = () => {
         //TODO: fetch category red to Server
         setYellow(true);
         updateTriageColor("gelb");
     };
 
+    /**
+     * Handles the "New Patient" button click.
+     */
     const handleNewPatient = () => {
         navigate("/ScanPatient", {
             state: {
@@ -146,6 +161,10 @@ export default function TriagePage3() {
         });
     };
 
+    /**
+     * Renders the content based on the selected triage color.
+     * @returns {JSX.Element} - The rendered content.
+     */
     function renderContent() {
         if (!red && !yellow) {
             return (
@@ -249,6 +268,10 @@ export default function TriagePage3() {
             );
         }
     }
+
+    /**
+     * Handles the "Body Click" button click.
+     */
     const handleBodyClick = () => {
         navigate("/ShowBodyFront", {
             state: {

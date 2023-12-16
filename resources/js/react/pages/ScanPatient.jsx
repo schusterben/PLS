@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useStateContext } from "./../contexts/ContextProvider";
 
+/**
+ * ScanPatient component for scanning patient QR codes.
+ */
 export default function ScanPatient() {
     const location = useLocation();
     const [cameraBlocked, setCameraBlocked] = useState(false);
@@ -14,6 +17,9 @@ export default function ScanPatient() {
     const navigate = useNavigate();
     let scanner;
 
+    /**
+     * Initialize and start the QR code scanner when the component mounts.
+     */
     useEffect(() => {
         if (!scanner?.getState()) {
             const config = { fps: 5, qrbox: { width: 200, height: 200 } };
@@ -32,10 +38,18 @@ export default function ScanPatient() {
         }
     }, []);
 
+    /**
+     * Callback function for successful QR code scan.
+     * @param {string} decodedText - The decoded QR code text.
+     * @param {object} decodedResult - The decoded QR code result.
+     */
     const qrCodeSuccessCallback = (decodedText, decodedResult) => {
         onScanSuccess(decodedText, decodedResult);
     };
 
+    /**
+     * Cleanup effect to stop the scanner when the component unmounts.
+     */
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             scanner.stop();
@@ -48,6 +62,11 @@ export default function ScanPatient() {
         };
     }, []);
 
+    /**
+     * Handle the successful scan of a patient QR code.
+     * @param {string} decodedText - The decoded QR code text.
+     * @param {object} decodedResult - The decoded QR code result.
+     */
     function onScanSuccess(decodedText, decodedResult) {
         fetch("/api/verify-patient-qr-code", {
             method: "POST",

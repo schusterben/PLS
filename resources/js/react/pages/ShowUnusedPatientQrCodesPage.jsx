@@ -4,11 +4,18 @@ import QRCode from "qrcode.react";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Component for displaying and generating unused patient QR codes.
+ */
 export default function ShowUnusedPatientQrCodesPage() {
+    // Access the admin token from the global state
     const { adminToken } = useStateContext();
     const navigate = useNavigate();
     const [qrCodes, setQRCodes] = useState([]);
 
+    /**
+     * Fetches unused patient QR codes from the API.
+     */
     useEffect(() => {
         const fetchQRCodes = async () => {
             try {
@@ -35,6 +42,9 @@ export default function ShowUnusedPatientQrCodesPage() {
         fetchQRCodes();
     }, [adminToken, navigate]);
 
+    /**
+     * Generates a PDF document containing patient QR codes.
+     */
     async function generatePatientQRCodes() {
         const x = 50;
         const y = 50;

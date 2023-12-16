@@ -6,6 +6,9 @@ import "leaflet/dist/leaflet.css";
 import "../../../css/MarkerStyles.css";
 import { useStateContext } from "../contexts/ContextProvider";
 
+/**
+ * Component for displaying a table of persons and their positions on a map.
+ */
 function SituationRoomTable() {
     const location = useLocation();
     const [persons, setPersons] = useState([]);
@@ -14,6 +17,9 @@ function SituationRoomTable() {
     const { token } = useStateContext();
     const operationScene = location.state?.operationScene;
 
+    /**
+     * Fetches persons' data including their positions from the API.
+     */
     useEffect(() => {
         fetch("/api/persons", {
             method: "POST",
@@ -37,6 +43,10 @@ function SituationRoomTable() {
             });
     }, []);
 
+    /**
+     * Updates the map's center based on the positions of persons.
+     * @param {Array} persons - An array of persons' data including positions.
+     */
     const updateMapCenter = (persons) => {
         if (persons.length === 0) return;
         let personsWithKoordinates = 0;
@@ -58,6 +68,12 @@ function SituationRoomTable() {
             lonSum / personsWithKoordinates,
         ]);
     };
+
+    /**
+     * Determines the background color based on triage color.
+     * @param {string} triageColor - The triage color.
+     * @returns {string} - The corresponding background color.
+     */
     const getBackgroundColor = (triageColor) => {
         if (triageColor != undefined) {
             switch (triageColor.toLowerCase()) {
@@ -77,6 +93,11 @@ function SituationRoomTable() {
         }
     };
 
+    /**
+     * Creates a custom marker icon with the specified color.
+     * @param {string} color - The color for the marker.
+     * @returns {L.DivIcon} - The custom marker icon.
+     */
     const createMarkerIcon = (color) => {
         return L.divIcon({
             className: "custom-div-icon",
@@ -92,6 +113,10 @@ function SituationRoomTable() {
         "table tbody tr:first-child td"
     );
 
+    /**
+     * Renders markers on the map for each person with position data.
+     * @returns {Array} - An array of Marker components.
+     */
     const renderMarkers = () => {
         return persons.map((person) => {
             if (

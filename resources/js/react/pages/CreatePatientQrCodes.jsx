@@ -4,6 +4,9 @@ import jsPDF from "jspdf";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Component for generating and printing patient QR codes.
+ */
 export default function CreatePatientQrCodes() {
     const { adminToken } = useStateContext();
     const [requestedQrCount, setRequestedQrCount] = useState(0);
@@ -11,6 +14,10 @@ export default function CreatePatientQrCodes() {
     const [buttonClicked, setButtonClicked] = useState(false);
     const navigate = useNavigate();
 
+    /**
+     * Handle changes in the input field for the requested QR code count.
+     * @param {Object} event - The input change event.
+     */
     function handleRequestedQrCountChange(event) {
         if (!isNaN(event.target.value) && event.target.value >= 0) {
             setRequestedQrCount(event.target.value);
@@ -18,6 +25,10 @@ export default function CreatePatientQrCodes() {
     }
 
     useEffect(() => {
+        // This useEffect hook is responsible for fetching patient QR codes when the "generatePatientQRCodes" button is clicked.
+        // It also handles printing the generated QR codes to a PDF.
+
+        // Check if the requested QR code count is greater than 0 and the button is clicked.
         if (requestedQrCount > 0 && buttonClicked) {
             const fetchQRCodes = async () => {
                 try {
@@ -43,11 +54,13 @@ export default function CreatePatientQrCodes() {
                         data.error &&
                         data.error.toUpperCase() === "UNAUTHORIZED"
                     ) {
+                        // If the admin is unauthorized, navigate to the AdminLandingPage.
                         navigate("/AdminLandingPage");
                         return;
                     }
 
                     if (data.qrcodes && Array.isArray(data.qrcodes)) {
+                        // If QR codes are successfully generated, set them in the state.
                         setQRCodes(data.qrcodes);
                     }
                 } catch (error) {
@@ -55,11 +68,17 @@ export default function CreatePatientQrCodes() {
                 }
             };
 
+            // Call the fetchQRCodes function to initiate the QR code generation.
             fetchQRCodes();
+
+            // Reset the buttonClicked state to prevent unnecessary fetch calls.
             setButtonClicked(false);
         }
     }, [buttonClicked, adminToken, navigate, requestedQrCount]);
 
+    /**
+     * Generate a PDF containing the patient QR codes.
+     */
     async function printQrCodesToPDF() {
         const x = 50;
         const y = 50;
@@ -80,6 +99,9 @@ export default function CreatePatientQrCodes() {
         doc.save("qrcode_pdf.pdf");
     }
 
+    /**
+     * Handle the button click to generate patient QR codes.
+     */
     function generatePatientQRCodes() {
         setButtonClicked(true);
     }

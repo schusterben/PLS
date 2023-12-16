@@ -3,7 +3,11 @@ import BodyPart from "../components/BodyPartsFront";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useStateContext } from "./../contexts/ContextProvider";
 
+/**
+ * Component for managing and displaying body parts on the front side of a patient.
+ */
 const Component = () => {
+    // State to manage the state of body parts (clicked or not clicked)
     const [bodyParts, setBodyParts] = useState({});
     const navigate = useNavigate();
     //const staticPatientId = 1; // Static patient ID for testing
@@ -13,7 +17,11 @@ const Component = () => {
     // Loading state
     const [isLoading, setIsLoading] = useState(true);
 
-    // Function to handle body part click and API request
+    /**
+     * Handles a body part click event and sends an API request to update the state.
+     * @param {string} id - The ID of the clicked body part.
+     * @param {boolean} isClicked - The clicked state of the body part.
+     */
     const handleBodyPartClick = async (id, isClicked) => {
         setBodyParts({ ...bodyParts, [id]: isClicked });
 
@@ -49,7 +57,9 @@ const Component = () => {
         }
     };
 
-    // Function to fetch the initial state of body parts for the patient
+    /**
+     * Fetches the initial state of body parts for the patient from the API.
+     */
     const fetchInitialBodyParts = async () => {
         try {
             const response = await fetch(
@@ -87,7 +97,9 @@ const Component = () => {
         fetchInitialBodyParts();
     }, []); // The empty dependency array ensures this effect runs once when the component mounts
 
-    // Function to navigate to the back page
+    /**
+     * Navigates to the back page with the patient ID as state.
+     */
     const goToShowBodyBack = () => {
         navigate("/ShowBodyBack", {
             state: {

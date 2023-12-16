@@ -2,6 +2,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useStateContext } from "./../contexts/ContextProvider";
 
+/**
+ * Component for triaging patients in an emergency situation.
+ */
 export default function TriagePage1() {
     const { token, setToken } = useStateContext();
     const navigate = useNavigate();
@@ -15,12 +18,10 @@ export default function TriagePage1() {
         coordinates: { lat: "", lng: "" },
         error: null,
     });
-    // const [additionalInfo, setAdditionalINfo] = useState[{
-    //     zusatzInfo1: '',
-    //     zusatzInfo2: '',
-    //     //hier können noch weitere Informationen mit übergeben werden
-    // }]
 
+    /**
+     * Fetches the user's geolocation coordinates.
+     */
     useEffect(() => {
         let isMounted = true;
 
@@ -65,6 +66,10 @@ export default function TriagePage1() {
         };
     }, []);
 
+    /**
+     * Updates the triage color of the patient and sends the update to the server.
+     * @param {string} color - The triage color to update.
+     */
     const updateTriageColor = async (color) => {
         if (!patientId) {
             console.error("Keine Patienten-ID verfügbar");
@@ -109,21 +114,34 @@ export default function TriagePage1() {
         }
     };
 
+    /**
+     * Handles the "green" triage button click.
+     */
     const handleGreen = () => {
         setGreen(true);
         updateTriageColor("grün");
     };
 
+    /**
+     * Handles the "black" triage button click.
+     */
     const handleBlack = () => {
         setBlack(true);
         updateTriageColor("schwarz");
     };
 
+    /**
+     * Handles the "Next Page" button click.
+     */
     const handleNextPage = () => {
         navigate("/TriagePage2", {
             state: { patientId: patientId, operationScene: operationScene },
         });
     };
+
+    /**
+     * Handles the "New Patient" button click.
+     */
     const handleNewPatient = () => {
         navigate("/ScanPatient", {
             state: {
@@ -132,6 +150,9 @@ export default function TriagePage1() {
         });
     };
 
+    /**
+     * Handles the "Body Click" button click.
+     */
     const handleBodyClick = () => {
         navigate("/ShowBodyFront", {
             state: {
@@ -142,6 +163,10 @@ export default function TriagePage1() {
 
     handleBodyClick;
 
+    /**
+     * Renders the content based on the selected triage color.
+     * @returns {JSX.Element} - The rendered content.
+     */
     function renderContent() {
         if (!black && !green) {
             return (

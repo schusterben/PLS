@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useStateContext } from "./../contexts/ContextProvider";
 
+/**
+ * QrAuthenticator component for authenticating users using QR codes.
+ */
 export default function QrAuthenticator() {
     const [cameraBlocked, setCameraBlocked] = useState(false);
     const [accessGranted, setaccessGranted] = useState(false);
@@ -17,6 +20,7 @@ export default function QrAuthenticator() {
         onScanSuccess(decodedText, decodedResult);
     };
 
+    // This effect is used to initialize and start the QR code scanner when the component mounts.
     useEffect(() => {
         if (!scanner?.getState()) {
             const config = { fps: 5, qrbox: { width: 200, height: 200 } };
@@ -47,10 +51,20 @@ export default function QrAuthenticator() {
         };
     }, []);
 
+    /**
+     * Handle the click event for the "Anmelden als Admin" button.
+     * Navigates to the admin landing page.
+     */
     function onAdminClick() {
         navigate("/AdminLandingPage");
     }
 
+    /**
+     * Handle the successful QR code scan result.
+     * Sends the decoded QR code to the server for authentication.
+     * @param {string} decodedText - The decoded QR code text.
+     * @param {object} decodedResult - The decoded QR code result.
+     */
     function onScanSuccess(decodedText, decodedResult) {
         fetch("/api/qr-login", {
             method: "POST",

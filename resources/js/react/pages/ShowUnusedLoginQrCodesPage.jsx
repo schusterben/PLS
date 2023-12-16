@@ -4,10 +4,18 @@ import QRCode from "qrcode.react";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Component for displaying and generating unused login QR codes.
+ */
 export default function ShowUnusedLoginQrCodesPage() {
+    // Access the admin token from the global state
     const { adminToken } = useStateContext();
     const navigate = useNavigate();
     const [qrCodes, setQRCodes] = useState([]);
+
+    /**
+     * Fetches unused login QR codes from the API.
+     */
     useEffect(() => {
         const fetchQRCodes = async () => {
             try {
@@ -34,6 +42,9 @@ export default function ShowUnusedLoginQrCodesPage() {
         fetchQRCodes();
     }, [adminToken, navigate]);
 
+    /**
+     * Generates a PDF document containing login QR codes.
+     */
     async function generateLoginQRCodes() {
         const x = 50;
         const y = 50;

@@ -6,6 +6,9 @@ import router from "./router.jsx";
 import { ContextProvider } from "./contexts/ContextProvider.jsx";
 import Appbar from "./components/Appbar";
 
+/**
+ * Entry point of the React application.
+ */
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
         <ContextProvider>
