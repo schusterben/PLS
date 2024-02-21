@@ -30,3 +30,7 @@ Am Testserver muss in zwei Terminals folgendes gestartet werden
 
 -   Laravel Backend: php artisan serve
 -   React Frontend: npm run dev
+
+## Time to leave für JWT Gültigkeit
+
+Im Ordner "config\jwt.php" muss bei "'ttl' => env('JWT_TTL', 15)" die Zahl 15 durch die Anzahl der Minuten wie lange der Token gültig sein soll
