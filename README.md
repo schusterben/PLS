@@ -2,8 +2,9 @@
 
 ## Voraussetzungen
 
--   PHP (Version 8)
--   NPM (Version 10)
+-   PHP (Version 8.1 oder höher)
+-   Node.js (Version 10)
+-   composer
 -   MySQL
 
 ## Anpassungen in der .env
@@ -15,7 +16,11 @@ Daten für die Datenbankverbindung müssen angepasst werden.
 
 Damit alle notwendigen JWT erstellt werden können muss in einem Terminal der Pfad zum PLS Ordner geöffnet werden und folgende Befehle ausgeführt werden:
 
+-   composer update
+-   composer install
 -   composer require tymon/jwt-auth
+-   npm install vite --save-dev
+-   php artisan migrate
 -   php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
 -   php artisan jwt:secret
 
