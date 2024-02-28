@@ -34,3 +34,7 @@ Am Testserver muss in zwei Terminals folgendes gestartet werden
 ## Time to leave für JWT Gültigkeit
 
 Im Ordner "config\jwt.php" muss bei "'ttl' => env('JWT_TTL', 15)" die Zahl 15 durch die Anzahl der Minuten wie lange der Token gültig sein soll
+
+## Die Entwicklung dieser Software wurde im Rahmen des Horizon 2020 Projekts TeamAware von der EU gefördert.
+
+This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 101019808.
