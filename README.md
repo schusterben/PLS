@@ -35,6 +35,19 @@ Am Testserver muss in zwei Terminals folgendes gestartet werden
 
 Im Ordner "config\jwt.php" muss bei "'ttl' => env('JWT_TTL', 15)" die Zahl 15 durch die Anzahl der Minuten wie lange der Token gültig sein soll
 
+## Adminbereich
+
+Um sich nache dem einrichten im Admin-Bereich anzumelden kann folgender Benutzername und Passwort verwendet werden:
+Benutzer: admin
+Passwort: admin
+
+Es ist wichtig, dass das Passwort nach dem ersten Einstieg geändert wird.
+
+Im Adminberich kann man QR-Codes für die Autorisierung der Benutzer und für die Patienten erstellen.
+Für die Nutzung kann hier auch ein Einsatzort erstellt werden.
+In diesem Bereich können auch weitere User für den Adminbereich erstellt werden.
+
+
 ## Die Entwicklung dieser Software wurde im Rahmen des Horizon 2020 Projekts TeamAware von der EU gefördert.
 
 This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 101019808.
