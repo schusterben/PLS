@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+    # Backend (Laravel)
+    backend:
+        build:
+            dockerfile: Dockerfile
+        container_name: laravel_app
+        restart: unless-stopped
+        working_dir: /var/www
+        volumes:
+            - /var/www
+        networks:
+            - app-network
+        depends_on:
+            - mysql
+        environment:
+            - DB_HOST=mysql
+            - DB_PORT=3306
+            - DB_DATABASE=${DB_DATABASE}
+            - DB_USERNAME=${DB_USERNAME}
+            - DB_PASSWORD=${DB_PASSWORD}
+        ports:
+            - "8000:8000"
+
+    # Frontend (React)
+    frontend:
+        build:
+            dockerfile: Dockerfile.react
+        container_name: react_app
+        restart: unless-stopped
+        stdin_open: true
+        tty: true
+        ports:
+            - "3000:3000"
+        networks:
+            - app-network
+
+    # Database (MySQL)
+    mysql:
+        image: mysql:8.0
+        container_name: mysql_db
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+        volumes:
+            - mysql_data:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    mysql_data:
