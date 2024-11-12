@@ -1,8 +1,10 @@
+<!-- Personenliste anzeigen in index.blade.php -->
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Personenliste</title>
-    <meta http-equiv="refresh" content="60"> 
+    <meta http-equiv="refresh" content="60"><!-- Seite wird alle 60 Sekunden aktualisiert -->
 </head>
 <body>
 
@@ -24,7 +26,7 @@
                 <th>Kontaminiert</th>
                 <th>erfasst</th>
                 <th>letztes update</th>
-                
+
             </tr>
         </thead>
         <tbody>
@@ -64,9 +66,9 @@
                         <td>{{ $person->kontaminiert? 'Ja' : 'Nein' }}</td>
                         <td>{{ $person->created_at }}</td>
                         <td>{{ $person->updated_at }}</td>
-                    
+
                     </td>
-                    
+
                     <!-- Sie können hier weitere Datenfelder nach Ihren Bedürfnissen hinzufügen -->
                 </tr>
             @endforeach

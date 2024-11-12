@@ -6,19 +6,25 @@ use App\Models\QRCodePatient;
 use Illuminate\Http\Request;
 
 /**
- * The PatientQrCodeController class handles operations related to patient QR codes.
+ * Der PatientQrCodeController verwaltet alle Funktionen im Zusammenhang mit Patienten-QR-Codes.
+ *
+ * Funktionen umfassen das Generieren und Abrufen von QR-Codes, die für die Identifizierung
+ * von Patienten verwendet werden können.
  */
 class PatientQrCodeController extends Controller
 {
 
     /**
-     * Generate a random QR code string of a specified length.
-     *
+     * Generiert einen zufälligen QR-Code-String einer angegebenen Länge.
+     *Die gewünschte Länge des QR-Codes (Standard: 64 Zeichen).
      * @param int $length
+     * Gibt den generierten QR-Code als String zurück.
      * @return string
      */
     function generateRandomQR($length = 64)
     {
+                        // Zeichensatz für die Generierung
+
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $randomString = '';
 
@@ -29,27 +35,30 @@ class PatientQrCodeController extends Controller
         return $randomString;
     }
 
-    /**
-     * Generate QR codes for patients and store them in the database.
+     /**
+     * Generiert eine bestimmte Anzahl an QR-Codes für Patienten und speichert diese in der Datenbank.
      *
+     * Diese QR-Codes können später zur Identifizierung und Verwaltung von Patienten verwendet werden.
+     *Die HTTP-Anfrage mit der Anzahl der zu erstellenden QR-Codes
      * @param Request $request
+     * Gibt eine JSON-Antwort mit den generierten QR-Codes zurück.
      * @return \Illuminate\Http\JsonResponse
      */
     public function generateQRCodeForPatients(Request $request)
     {
 
-        // Validate the incoming request
+        // Validierung der Anfrage: Es muss eine Anzahl (number) angegeben sein
         $request->validate([
             'number' => 'required|integer',
         ]);
 
 
-        // Check if the QR code exists in the database
+        // Anzahl der QR-Codes, die generiert werden sollen
         $number = $request->input('number');
         $qrCodes = [];
 
         for ($i = 0; $i < $number; $i++) {
-            // Generate a random QR code
+            // Generiert einen zufälligen QR-Code-String
             $tempQR = $this->generateRandomQR(64);
 
             // Check if the generated QR code already exists in the database
@@ -57,7 +66,7 @@ class PatientQrCodeController extends Controller
                 $tempQR = $this->generateRandomQR(64);
             }
 
-            // Store the QR code in the database
+            // Speichert den QR-Code in der QRCodePatient-Tabelle
             QRCodePatient::create([
                 'qr_login' => $tempQR,
             ]);

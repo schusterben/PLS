@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Erstellt die "user"-Tabelle, die Benutzerdaten speichert.
+     * Felder enthalten Informationen wie Benutzername, gehashte Passwörter,
+     * Rollen (Admin oder normaler Benutzer), und Positionsdaten.
      */
     public function up()
     {
@@ -27,6 +29,7 @@ return new class extends Migration
         });
 
 
+        // Fügt einen Standard-Admin-Benutzer ein, der beim Erstellen der Tabelle verfügbar ist
 
         DB::table('user')->insert([
             'username' => 'admin',
@@ -37,7 +40,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Entfernt die "user"-Tabelle und löscht alle zugehörigen Daten.
      */
     public function down(): void
     {

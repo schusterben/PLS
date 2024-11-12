@@ -2,8 +2,9 @@ import React from "react";
 import "../../../css/title.css";
 
 /**
- * The `Appbar` component represents the application header.
- * It includes a logo and navigation links.
+ * Die `Appbar`-Komponente stellt die Kopfzeile der Anwendung dar.
+ * Sie zeigt das Logo und zwei Navigationslinks an.
+ * Der Benutzer kann über die Links zur Admin-Seite oder zur Startseite navigieren.
  */
 export default function Appbar() {
     return (

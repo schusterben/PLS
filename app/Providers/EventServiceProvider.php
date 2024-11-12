@@ -10,26 +10,29 @@ use Illuminate\Support\Facades\Event;
 class EventServiceProvider extends ServiceProvider
 {
     /**
-     * The event to listener mappings for the application.
+     * Ereignisse und zugehörige Listener der Anwendung.
      *
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
+                // Registriert das Ereignis "Registered", das beim Registrieren eines Benutzers ausgelöst wird,
+        // und ordnet ihm den Listener "SendEmailVerificationNotification" zu.
+
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
     ];
 
     /**
-     * Register any events for your application.
+     * Registrierung von Ereignissen für die Anwendung.
      */
     public function boot(): void
     {
-        //
+        // Weitere Ereignis-Listener-Registrierungen können hier hinzugefügt werden
     }
 
     /**
-     * Determine if events and listeners should be automatically discovered.
+     * Gibt an, ob Ereignisse automatisch erkannt werden sollen.
      */
     public function shouldDiscoverEvents(): bool
     {

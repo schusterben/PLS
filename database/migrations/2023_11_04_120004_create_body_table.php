@@ -3,17 +3,20 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+/**
+ * Diese Migration erstellt die Tabelle "body",
+ * die Daten für bestimmte Körperbereiche und ihren Zustand speichert.
+ */
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Definiert die Struktur der "body"-Tabelle.
      */
     public function up(): void
     {
         Schema::create('body', function (Blueprint $table) {
             $table->id('idbody'); // Auto-incremental primary key
-            $table->unsignedBigInteger('idpatient'); 
+            $table->unsignedBigInteger('idpatient');
 
             // Add all the TINYINT(1) columns here
             $table->tinyInteger('hals_vorne');
@@ -82,7 +85,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Entfernt die "body"-Tabelle.
      */
     public function down(): void
     {

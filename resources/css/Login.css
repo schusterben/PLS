@@ -1,3 +1,4 @@
+/* Stile für die Login-Komponente */
 .login-container {
     width: 300px;
     position: absolute;
@@ -20,6 +21,7 @@
 .input-container {
     margin-bottom: 15px;
 }
+/* Stile für Labels in der Login-Komponente */
 
 label {
     display: block;
@@ -27,6 +29,7 @@ label {
     font-weight: bold;
     color: #555;
 }
+/* Stile für Eingabefelder in der Login-Komponente */
 
 input {
     width: 100%;
@@ -34,6 +37,7 @@ input {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+/* Stile für den Login-Button */
 
 .login-button {
     width: 100%;

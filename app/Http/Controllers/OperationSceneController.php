@@ -8,39 +8,50 @@ use Carbon\Carbon;
 
 
 /**
- * The OperationSceneController class handles operations related to operation scenes.
+ * Die OperationSceneController-Klasse verwaltet Funktionen rund um Einsatzorte.
+ *
+ * Sie bietet Methoden zum Erstellen/Aktualisieren von Einsatzorten sowie zum Abrufen
+ * aktueller Einsatzorte, die in den letzten 20 Tagen aktualisiert wurden.
  */
 class OperationSceneController extends Controller
 {
 
     /**
-     * Create or update an operation scene.
+     * Erstellt oder aktualisiert einen Einsatzort.
      *
+     * Diese Methode prüft, ob ein Einsatzort mit einer bestimmten ID existiert:
+     * - Wenn ja, wird der vorhandene Datensatz aktualisiert.
+     * - Wenn nein, wird ein neuer Einsatzort erstellt.
+     *
+     * Die HTTP-Anfrage mit Informationen zum Einsatzort (Name und optional Beschreibung).
      * @param Request $request
+     * Gibt den Status und den Einsatzort als JSON-Antwort zurück.
      * @return \Illuminate\Http\JsonResponse
      */
     public function createOperationScene(Request $request)
     {
+        // Validiert, dass das Feld 'name' vorhanden und ein String ist.
 
         $request->validate([
             'name' => 'required|string',
 
         ]);
+        // Ruft Daten aus der Anfrage ab.
 
-        $id = $request->input('id');
-        $name = $request->input('name');
-        $description = $request->input('description');
+        $id = $request->input('id'); // Die ID des Einsatzortes, falls vorhanden
+        $name = $request->input('name');// Der Name des Einsatzortes
+        $description = $request->input('description'); // Prüft, ob eine ID vorhanden ist, um zu entscheiden, ob ein neuer Einsatzort erstellt oder ein vorhandener aktualisiert wird.
 
 
 
         // Check if an ID is provided to determine if it's an update or creation
         $operationScene = $id ? OperationScene::find($id) : new OperationScene();
 
-        // Set the name and description for the operation scene
+        // Setzt den Namen und die Beschreibung für den Einsatzort.
         $operationScene->name = $name;
         $operationScene->description = $description;
 
-        // Save the operation scene to the database
+        // Speichert den Einsatzort in der Datenbank.
         $operationScene->save();
 
 
@@ -51,18 +62,20 @@ class OperationSceneController extends Controller
     }
 
 
-    /**
-     * Get all current operation scenes updated within the last 20 days.
+     /**
+     * Ruft alle aktuellen Einsatzorte ab, die innerhalb der letzten 20 Tage aktualisiert wurden.
      *
+     * Diese Methode dient dazu, die neuesten Einsatzorte basierend auf dem Aktualisierungsdatum anzuzeigen.
      * @return \Illuminate\Http\JsonResponse
+     *Gibt eine JSON-Antwort mit allen kürzlich aktualisierten Einsatzorten zurück.
      */
     public function getAllCurrentOperationScenes()
     {
 
-        // Calculate a date 20 days ago
+        // Berechnet das Datum, das 20 Tage vor dem aktuellen Datum liegt.
         $twentyDaysAgo = Carbon::now()->subDays(20);
 
-        // Query for operation scenes updated within the last 20 days
+        // Sucht in der Datenbank nach Einsatzorten, die innerhalb der letzten 20 Tage aktualisiert wurden.
         $operationScenes = OperationScene::where('updated_at', '>=', $twentyDaysAgo)->get()->toArray();
         return response()->json($operationScenes);
     }

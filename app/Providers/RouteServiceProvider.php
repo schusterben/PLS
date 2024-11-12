@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 class RouteServiceProvider extends ServiceProvider
 {
     /**
-     * The path to your application's "home" route.
+     * Die Standard-Umleitungsroute der Anwendung nach der Authentifizierung.
      *
      * Typically, users are redirected here after authentication.
      *
@@ -22,13 +22,16 @@ class RouteServiceProvider extends ServiceProvider
 
 
     /**
-     * Define your route model bindings, pattern filters, and other route configuration.
+     * Definition der Routenbindungen, Pattern-Filter und weiterer Routen-Konfigurationen.
      */
     public function boot(): void
     {
+                        // Ratenbegrenzung für API-Anfragen: maximal 60 Anfragen pro Minute pro Benutzer oder IP-Adresse
+
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+        // Registriert Routen für API und Web, basierend auf Routen-Dateien
 
         $this->routes(function () {
             Route::middleware('api')

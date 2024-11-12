@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * The OperationScene class represents the operation scene model.
+ * Repräsentiert eine Einsatzszene mit einem Namen und einer Beschreibung.
  */
 class OperationScene extends Model
 {

@@ -9,7 +9,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 /**
  * The QRCodeLogin class represents the model for login QR codes.
  */
-class QRCodeLogin extends Model implements JWTSubject
+class QrCodeLogin extends Model implements JWTSubject
 {
     // Specifies the table associated with this model
     protected $table = 'qr_code_login';

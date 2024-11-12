@@ -15,26 +15,32 @@ use App\Models\QRCodePatient;
 
 
 /**
- * The PersonenController class handles operations related to persons and patients.
- */
+* Die Klasse PersonenController verwaltet Operationen für Personen und Patienten.
+*
+* Diese Controller-Klasse enthält Funktionen zur Verwaltung von Patienten-Daten,
+* einschließlich der Zuweisung von QR-Codes, Aktualisierung von Patienteninformationen und
+* Abfrage der Patienten in einer bestimmten Einsatzszene.
+*/
 class PersonenController extends Controller
 {
 
     /**
-     * Get a list of patients associated with a specific operation scene.
+    * Ruft eine Liste der Patienten für eine bestimmte Einsatzszene ab.
      *
      * @param Request $request
+     * HTTP-Anfrage mit Details zur Einsatzszene.
+     * Gibt die Patientenliste im JSON-Format zurück
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
-        // Extract operation scene information from the request
+        // Extrahiert die ID der Einsatzszene aus der Anfrage
         $operationScene =
             json_decode($request->input('operationScene'), true);
 
         $operationSceneId = $operationScene['idoperationScene'];
 
-        // Retrieve patients associated with the specified operation scene
+        // Abfrage aller Patienten, die mit der angegebenen Einsatzszene verknüpft sind
         $patients = QRCodePatient::join('patient', 'qr_code_patient.patient_idpatient', '=', 'patient.idpatient')
             ->where('qr_code_patient.operationScene_id', $operationSceneId) // Filter nach der ID der Operationsszene
             ->select('patient.*') // Wähle die gewünschten Spalten aus der patient Tabelle
@@ -47,10 +53,11 @@ class PersonenController extends Controller
      *
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     * Gibt die Informationen der Person im JSON-Format zurück.
      */
     public function show($id)
     {
-        // Find the person with the given ID and include longitude and latitude.
+        // Sucht die Person anhand der ID und fügt Breiten- und Längengrad aus der Position hinzu
         $person = Person::select(
             '*',
             DB::raw('ST_X(position) as longitude'),
@@ -62,13 +69,14 @@ class PersonenController extends Controller
     }
 
     /**
-     * Test the database connection by retrieving the first entry from the table.
+     * Testet die Datenbankverbindung, indem der erste Eintrag der Tabelle abgerufen wird.
      *
      * @return \Illuminate\Http\JsonResponse
+    * Gibt den ersten Eintrag der Tabelle oder eine Fehlermeldung zurück.
      */
     public function testDatabaseConnection()
     {
-        // Try to retrieve the first entry from the table
+        // Holt den ersten Eintrag aus der Person-Tabelle
         $person = Person::first();
         if ($person) {
             return response()->json($person);
@@ -79,11 +87,11 @@ class PersonenController extends Controller
 
 
     /**
-     * Update the respiration rate for a patient.
+     * Aktualisiert die Atemfrequenz und Position eines Patienten.
      *
-     * @param Request $request
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request HTTP-Anfrage mit den neuen Daten.
+     * @param int $idID des Patienten.
+     * @return \Illuminate\Http\JsonResponse Gibt die aktualisierten Patientendaten zurück.
      */
     public function updateRespiration(Request $request, $id)
     {
@@ -109,22 +117,23 @@ class PersonenController extends Controller
 
 
     /**
-     * Update patient information.
+     * Aktualisiert allgemeine Informationen eines Patienten.
      *
-     * @param Request $request
-     * @param int $id
+     * @param Request $request HTTP-Anfrage mit den neuen Daten.
+     * @param int $id ID des Patienten.
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
 
         try {
-            // Finden der Person anhand der ID
+            // Findet die Person anhand der ID oder gibt einen Fehler zurück
             $person = Patient::where('idpatient', $id)->firstOrFail();
         } catch (ModelNotFoundException $e) {
             // Handle the case when no patient is found with the provided ID
             return response()->json(['message' => 'Person nicht gefunden'], 404);
         }
+        // Aktualisiert Triage-Farbe, Position und andere Patientendaten
 
         $triageColor = $request->input('triageColor');
 
@@ -158,23 +167,25 @@ class PersonenController extends Controller
 
 
     /**
-     * Verify a patient QR code and associate it with a patient if not already done.
+     * Überprüft einen Patienten-QR-Code und ordnet diesen einem Patienten zu, falls dieser noch nicht verknüpft ist.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request HTTP-Anfrage mit dem QR-Code und Einsatzszenen-Daten.
+     * @return \Illuminate\Http\JsonResponse Gibt die Patienten-ID zurück oder meldet einen Fehler.
      */
     public function verifyPatientQrCode(Request $request)
     {
+     // Holt den QR-Code und die Einsatzszenen-Daten aus der Anfrage
+
         $qrCode = $request->input('qr_code');
         $operationScene =
             json_decode($request->input('operationScene'), true);
 
 
-        // Check if the QR code exists in the qr_code_patient table
+        // Überprüft, ob der QR-Code in der qr_code_patient-Tabelle existiert
         $qrCodePatient = QRCodePatient::where('qr_login', $qrCode)->first();
 
         if ($qrCodePatient) {
-            // If the QR code is associated with a patient, return the patient ID
+            // Wenn der QR-Code einem Patienten zugeordnet ist, gibt die Patienten-ID zurück
             if ($qrCodePatient->patient_idpatient) {
                 // Übergabe der PatientenId
                 if ($operationScene) {
@@ -185,20 +196,20 @@ class PersonenController extends Controller
 
                 return response()->json(['patientId' => $qrCodePatient->patient_idpatient]);
             } else {
-                // Create a new patient entry if the QR code is not associated with any patient
+                // Erstellt einen neuen Patienten, wenn der QR-Code nicht verknüpft ist
                 $patient = new Patient();
                 // Add any additional necessary patient data here
                 $patient->save();
 
 
-                // Create a body entry for the patient
+                // Erstellt einen neuen Eintrag für den Körper des Patienten
                 $body = new Body();
                 $idpat = $patient->idpatient;
                 $body->idpatient = $idpat;
                 $body->save();
 
 
-                // Associate the patient with the QR code
+                // Verknüpft den Patienten mit dem QR-Code und ggf. der Einsatzszene
                 $qrCodePatient->patient_idpatient = $patient->idpatient;
                 if ($operationScene) {
                     $qrCodePatient->operationScene_id = $operationScene['idoperationScene'];

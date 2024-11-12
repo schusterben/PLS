@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
-     */
+ * Diese Migration erstellt die Tabelle "patient",
+ * die Patientendaten speichert, wie Atmung, Blutung, Triagefarbe, etc.
+ */
     public function up()
     {
         Schema::create('patient', function (Blueprint $table) {
@@ -30,7 +31,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Entfernt die "patient"-Tabelle.
      */
     public function down()
     {

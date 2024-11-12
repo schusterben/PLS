@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class PatientTableSeeder extends Seeder
 {
     /**
-     * Führe den Seeder aus.
+     * Füllt die `patient`-Tabelle mit zufälligen Werten für eine Reihe von Feldern, die medizinische Parameter simulieren.
      *
      * @return void
      */

@@ -5,6 +5,9 @@ use Illuminate\Database\Seeder;
 
 class QRCodePatientSeeder extends Seeder
 {
+    /**
+     * Erzeugt Beispiel-Einträge für `qr_code_patient`, die mit zufälligen QR-Codes und Login-Zeiten gefüllt sind.
+     */
     public function run()
     {
         for ($i = 0; $i < 10; $i++) {

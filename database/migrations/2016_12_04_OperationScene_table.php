@@ -3,11 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+  /**
+ * Diese Migration erstellt die Tabelle "operationScene",
+ * die Informationen über Einsatzorte speichert.
+ */
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Definiert die Struktur der "operationScene"-Tabelle.
      */
     public function up(): void
     {

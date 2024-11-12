@@ -3,11 +3,15 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+/**
+ * Diese Migration erstellt die Tabelle "qr_code_login",
+ * die Daten für QR-Code-Logins speichert. Jeder Eintrag enthält
+ * einen QR-Code und den Zeitpunkt des ersten Logins.
+ */
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Definiert die Struktur der "qr_code_login"-Tabelle.
      */
     public function up()
     {
@@ -18,7 +22,9 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-
+/**
+     * Entfernt die "qr_code_login"-Tabelle.
+     */
     public function down()
     {
         Schema::dropIfExists('qr_code_login');
