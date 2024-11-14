@@ -1,4 +1,5 @@
 <?php
+namespace Database\Seeders;
 
 use App\Models\QRCodePatient;
 use Illuminate\Database\Seeder;

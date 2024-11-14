@@ -5,6 +5,7 @@ FROM php:8.2-apache
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
+    curl \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
@@ -15,14 +16,14 @@ RUN apt-get update && apt-get install -y \
 RUN a2enmod rewrite
 
 # Set working directory
-WORKDIR /var/www
+WORKDIR /var/www/html
 
 # Copy Laravel application files
-COPY . /var/www
+COPY . /var/www/html
 
 # Install Composer and dependencies
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN composer install
+RUN composer install --no-interaction --optimize-autoloader
 
 # Expose port 8000 for Laravel
 EXPOSE 8000
