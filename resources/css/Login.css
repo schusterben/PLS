@@ -1,13 +1,13 @@
 /* Stile für die Login-Komponente */
 .login-container {
-    width: 300px;
+    max-width: 400px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 20px;
     background-color: #f5f5f5;
-    border: 1px solid #ccc;
+    border: 1px solid #c10d0d;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -42,12 +42,12 @@ input {
 .login-button {
     width: 100%;
     padding: 10px;
-    color: #fff;
+    color: #000109;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
-.login-button:hover {
-    background-color: #0056b3;
+.login-button {
+    background-color: #b30000;
 }

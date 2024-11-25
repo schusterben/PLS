@@ -4,10 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useStateContext } from "./../contexts/ContextProvider";
 
 /**
- * Component for the admin login page.
+ * Component for Admin Login page.
  */
-export default function AdminLandingPage() {
-    // Initialize state variables for form data and error message
+export default function AdminLoginPage() {
     const [formData, setFormData] = useState({ username: "", password: "" });
     const [errorMessage, setError] = useState("");
     const navigate = useNavigate();
@@ -26,10 +25,10 @@ export default function AdminLandingPage() {
     const csrfToken = document.getElementById("root").getAttribute("data-csrf");
 
     /**
-     * Handle form submission.
+     * Handle admin login form submission.
      * @param {Object} event - The form submit event.
      */
-    const handleSubmit = async (event) => {
+    const handleAdminLogin = async (event) => {
         event.preventDefault();
 
         try {
@@ -49,56 +48,56 @@ export default function AdminLandingPage() {
             const data = await response.json();
 
             if (data.status.toLowerCase() === "success" && data.token) {
-                // Set the admin token and store the username in local storage
                 setAdminToken(data.token);
                 localStorage.setItem("Username", formData.username);
-                // Navigate to the admin settings page
                 navigate("/AdminSettingsPage");
             } else {
-                // Display an error message for invalid login credentials
-                setError(
-                    "Benutzername oder Passwort ist falsch. Bitte versuche es erneut."
-                );
+                setError("Benutzername oder Passwort ist falsch. Bitte versuche es erneut.");
             }
         } catch (error) {
             console.error("Fetch error:", error);
-
-            // Display a generic error message for login failure
-            setError("Anmeldung fehlgeschlagen. Bitte versuche es erneut.");
+            setError("Fehler bei der Anmeldung. Bitte versuche es nochmal.");
         }
     };
 
     return (
-        <div>
-            <div className="login-container">
-                <h2 className="Anmeldung">Benutzeranmeldung</h2>
-                {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-                <form onSubmit={handleSubmit}>
-                    <div className="input-container">
-                        <label htmlFor="username">Benutzername:</label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="input-container">
-                        <label htmlFor="password">Passwort:</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <button type="submit" className="login-button">
-                        Anmelden
-                    </button>
-                </form>
+        <div className="login-container">
+            <h2 className="Anmeldung">Admin-Anmeldung</h2>
+            <p>Geben Sie Ihre Zugangsdaten ein, um sich als Admin anzumelden.</p>
+            {errorMessage && (
+                <p style={ { color: "red", fontWeight: "bold", textAlign: "center"}}>
+                    {errorMessage}
+                </p>
+            )}
+            <form onSubmit={handleAdminLogin} className="admin-login-form">
+            <div className="input-container">
+                <label htmlFor="username">Benutzername:</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={formData.username}
+                    placeholder="Geben Sie Ihren Benutzernamen ein"
+                    onChange={handleInputChange}
+                    required
+                />
             </div>
+            <div className="input-container">
+                <label htmlFor="password">Passwort:</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    placeholder={"Geben Sie Ihr Passwort ein"}
+                    onChange={handleInputChange}
+                    required
+                />
+            </div>
+                <button type="submit" className="login-button">
+                Anmelden
+                </button>
+            </form>
         </div>
     );
 }

@@ -23,7 +23,7 @@ export default function QrAuthenticator() {
     // This effect is used to initialize and start the QR code scanner when the component mounts.
     useEffect(() => {
         if (!scanner?.getState()) {
-            const config = { fps: 5, qrbox: { width: 200, height: 200 } };
+            const config = { fps: 5, qrbox: { width: 150, height: 150 } };
             scanner = new Html5Qrcode("reader");
 
             scanner
@@ -55,9 +55,9 @@ export default function QrAuthenticator() {
      * Handle the click event for the "Anmelden als Admin" button.
      * Navigates to the admin landing page.
      */
-    function onAdminClick() {
+    const handleAdminLogin = () => {
         navigate("/AdminLandingPage");
-    }
+    };
 
     /**
      * Handle the successful QR code scan result.
@@ -65,7 +65,7 @@ export default function QrAuthenticator() {
      * @param {string} decodedText - The decoded QR code text.
      * @param {object} decodedResult - The decoded QR code result.
      */
-    function onScanSuccess(decodedText, decodedResult) {
+    const onScanSuccess = (decodedText, decodedResult) => {
         fetch("/api/qr-login", {
             method: "POST",
             headers: {
@@ -82,38 +82,53 @@ export default function QrAuthenticator() {
             })
             .then((data) => {
                 // Hier kannst du auf die Antwort von Laravel reagieren
-                if (data.status.toLowerCase() === "success") {
-                    if (data.token) {
-                        setToken(data.token);
-                    } else {
-                        console.error("Authentication failed");
-                    }
+                if (data.status.toLowerCase() === "success" && data.token) {
+                    setToken(data.token);
                     scanner.stop();
                     setaccessGranted(true);
                 } else {
-                    // Authentifizierung fehlgeschlagen
-                    console.error("Ungültiger QR-Code");
+                        console.error("Ungültiger QR-Code");
                 }
             })
             .catch((error) => console.error("Fetch error:", error));
-    }
+    };
 
     return (
-        <div>
-            <h2>Willkommen im PLS-System</h2>
-            <h5>Bitte den QR-Code für die Anmeldung scannen</h5>
-            <div id="reader"></div>
-            {cameraBlocked ? (
-                <p style={{ color: "red", fontWeight: "bold" }}>
+        <div className={"container"}>
+            <h1 style = {{ marginBottom: "10px", textAlign: "center" }}>
+                Willkommen im PLS-System
+            </h1>
+            <p style = {{ marginBottom: "20px", textAlign: "center" }}>
+                <h2>Hinweis:</h2>
+                <strong>Admin:</strong> Erstellen Sie zunächst einen Einsatzort und generieren Sie bei Bedarf QR-Codes
+                für die Authorisierung der Einsatzkräfte und Patienten.
+                <br/>
+                <button
+                    onClick={handleAdminLogin}
+                    className="admin-button"
+                    title="Admins erstellen zuerst einen Einsatzort und bei Bedarf QR-Codes für Einsatzkräfte und Patienten."
+                >
+                    Adminanmeldung
+                </button>
+                <br/>
+                <br/>
+                <strong>Einsatzkräfte:</strong> Nutzen Sie Ihren QR-Code für die Anmeldung.
+            </p>
+            <div className="actions">
+
+                <div
+                    id="reader"
+                    title="Scannen Sie Ihren QR-Code, um sich als Einsatzkraft zu registrieren."
+                ></div>
+            </div>
+
+            {cameraBlocked && (
+                <p style={{color: "red", fontWeight: "bold" }}>
                     Der Zugriff auf die Kamera wurde verweigert. Bitte erlauben
                     Sie den Zugriff auf die Kamera über die Einstellungen.
                 </p>
-            ) : (
-                ""
             )}
             {accessGranted && <Navigate to="/RoleSelection" />}
-            <br />
-            <button onClick={onAdminClick}>Anmelden als Admin</button>
         </div>
     );
 }

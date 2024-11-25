@@ -1,41 +1,41 @@
-.header {
-    font-size: larger;
-    width: 100%;
-    height: 13%;
-    display: flex;
-    justify-content: center;
-    align-items: baseline;
-    position: fixed;
-    flex-direction: column;
-    top: 23pt;
-    margin: 0%;
-    left: 0;
+:root {
+    --primary-color: #0048fd; /* Beispielhafte Farben vom Logo */
+    --secondary-color: #ffcc00;
+    --text-color: #ffffff;
+    --hover-color: #003580;
+}
 
-    color: #fff;
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logo img {
+    margin-top: 10px; /* Abstand vom oberen Rand */
+    max-height: 70px;
 }
 
 .links {
     display: flex;
-    flex-direction: row;
-    width: 100%;
+    gap: 20px;
 }
 
-.admin-text {
-    font-size: medium;
-    line-height: 3;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    width: 100%;
-    color: mediumblue;
+.links a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1.1rem;
     font-weight: bold;
+    transition: color 0.3s, background-color 0.3s;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
-.logo {
-    width: 100%;
-}
-
-.content {
-    margin-top: 13%; /* Dieser Wert sollte der Höhe des .header entsprechen oder größer sein */
-    /* Weitere Stilregeln für Ihren Inhaltsbereich */
+.links a:hover {
+    background-color: var(--hover-color);
+    color: var(--secondary-color);
 }

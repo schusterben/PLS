@@ -10,7 +10,7 @@ export default function Appbar() {
     return (
         <div className="header">
             <div className="logo">
-                <img src="logo.png" width={140} height={80}></img>
+                <img src="logo.png" alt="Logo" />
             </div>
             <div className="links">
                 <a href="/AdminSettingsPage" className="admin-text">

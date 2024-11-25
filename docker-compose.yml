@@ -23,7 +23,7 @@ services:
             - DB_USERNAME=${DB_USERNAME}
             - DB_PASSWORD=${DB_PASSWORD}
         ports:
-            - "8000:8000"
+            - "8000:80"
 
     # Frontend (React)
     frontend:
