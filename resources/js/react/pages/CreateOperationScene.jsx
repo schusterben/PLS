@@ -11,6 +11,7 @@ export default function CreateOperationScene() {
     });
     const { adminToken } = useStateContext();
     const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     /**
      * Handle changes in the input fields.
@@ -35,69 +36,97 @@ export default function CreateOperationScene() {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${adminToken}`,
                 },
-                body: JSON.stringify({
-                    name: sceneData.name,
-                    description: sceneData.description,
-                }),
+                body: JSON.stringify(sceneData),
             });
 
             if (!response.ok) {
-                throw new Error("Network response was not ok");
+                throw new Error("Fehler beim Senden der Anfrage.");
             }
 
             const data = await response.json();
 
             if (data.error && data.error.toUpperCase() === "UNAUTHORIZED") {
-                navigate("/AdminLandingPage");
+                setErrorMessage("Nicht autorisiert. Bitte melden Sie sich erneut an.");
                 return;
             }
+
             if (data.operactionScene) {
-                setSuccessMessage("Einsatzort wurde erfolgreich erstellt");
+                setSuccessMessage("Einsatzort wurde erfolgreich erstellt.");
                 setSceneData({
                     name: "",
                     description: "",
                 });
             }
         } catch (error) {
-            console.error("Einsatzort konnte nicht angelegt werden:", error);
+            setErrorMessage(
+                "Einsatzort konnte nicht angelegt werden. Bitte versuchen Sie es erneut."
+            );
         }
     };
 
     return (
-        <div>
+        <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px", textAlign: "center" }}>
             <h1>Neuen Einsatzort erstellen</h1>
-            {successMessage && (
-                <p style={{ color: "green" }}>{successMessage}</p>
-            )}
-            <label style={{ color: "white" }}>
-                Der Einsatzort steht nach Erstellung 20 Tage in der Liste der
-                Einsatzorte zur Auswahl
-            </label>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Name des Einsatzorts:
+            {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+
+            <p style={{ marginBottom: "20px" }}>
+                Der Einsatzort steht nach Erstellung 20 Tage in der Liste der Einsatzorte zur Auswahl.
+            </p>
+
+            <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
+                <label style={{ display: "block", marginBottom: "10px" }}>
+                    <strong>Name des Einsatzorts:</strong>
                     <input
                         type="text"
                         name="name"
                         value={sceneData.name}
                         onChange={handleInputChange}
+                        placeholder="Name des Einsatzorts eingeben"
+                        style={{
+                            width: "100%",
+                            padding: "10px",
+                            marginTop: "5px",
+                            border: "1px solid #ccc",
+                            borderRadius: "5px",
+                        }}
+                        required
                     />
                 </label>
-                <br />
-                <label>
-                    Beschreibung:
-                    <br />
+
+                <label style={{ display: "block", marginBottom: "20px" }}>
+                    <strong>Beschreibung:</strong>
                     <textarea
                         name="description"
                         value={sceneData.description}
                         onChange={handleInputChange}
                         rows={4}
-                        cols={100}
+                        placeholder="Beschreibung des Einsatzorts eingeben"
+                        style={{
+                            width: "100%",
+                            padding: "10px",
+                            marginTop: "5px",
+                            border: "1px solid #ccc",
+                            borderRadius: "5px",
+                        }}
+                        required
                     />
                 </label>
-                <br />
 
-                <button type="submit">Einsatzort erstellen</button>
+                <button
+                    type="submit"
+                    style={{
+                        padding: "10px 20px",
+                        backgroundColor: "#0047ab",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                        fontSize: "16px",
+                    }}
+                >
+                    Einsatzort erstellen
+                </button>
             </form>
         </div>
     );
