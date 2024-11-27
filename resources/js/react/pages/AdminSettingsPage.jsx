@@ -11,72 +11,16 @@ export default function AdminSettingsPage() {
     const navigate = useNavigate();
     const { adminToken, setAdminToken } = useStateContext();
 
-    /**
-     * Handle the "Patienten QR-Codes erzeugen" button click event.
-     * Navigates to the "CreatePatientQrCodePage".
-     */
-    function onClickQrCreate() {
-        navigate("/CreatePatientQrCodePage");
-    }
-
-    /**
-     * Handle the "Einsatzort erstellen/bearbeiten" button click event.
-     * Navigates to the "EditOperationScene".
-     */
-    function onClickEditOperationScene() {
-        navigate("/EditOperationScene");
-    }
-
-    /**
-     * Handle the "Nicht verwendete QR-Codes" button click event for patient QR codes.
-     * Navigates to the "ShowUnusedPatientQrCodesPage".
-     */
-    function onClickShowUnusedQrCodes() {
-        navigate("/ShowUnusedPatientQrCodesPage");
-    }
-
-    /**
-     * Handle the "Admin-User erstellen" button click event.
-     * Navigates to the "CreateNewAdminUserPage".
-     */
-    function onClickCreateNewAdminUser() {
-        navigate("/CreateNewAdminUserPage");
-    }
-
-    /**
-     * Handle the "Logout" button click event.
-     * Clears the admin token and reloads the page.
-     */
-    function onClickLogout() {
+    const handleLogout = () => {
         setAdminToken(null);
         window.location.reload();
-    }
+    };
 
-    /**
-     * Handle the "QR-Codes für Authorizierung erzeugen" button click event.
-     * Navigates to the "CreateLoginQrCodesPage".
-     */
-    function onClickLoginQrCreate() {
-        navigate("/CreateLoginQrCodesPage");
-    }
-
-    /**
-     * Handle the "Nicht verwendete QR-Codes" button click event for authorization QR codes.
-     * Navigates to the "ShowUnusedLoginQrCodesPage".
-     */
-    function onClickShowUnusedLoginQrCodes() {
-        navigate("/ShowUnusedLoginQrCodesPage");
-    }
-
-    /**
-     * Handle the "Passwort ändern" button click event.
-     * Navigates to the "ChangeAdminPasswordPage" with the username in the state.
-     */
-    function onClickChangePassword() {
+    const handleChangePassword = () => {
         navigate("/ChangeAdminPasswordPage", {
             state: { username: localStorage.getItem("Username") },
         });
-    }
+    };
 
     return (
         <div
@@ -84,78 +28,58 @@ export default function AdminSettingsPage() {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
+                padding: "20px",
+                maxWidth: "600px",
+                margin: "0 auto",
             }}
         >
-            <div style={{ flexDirection: "row", marginBottom: "50px" }}>
-                <button onClick={onClickLogout} style={{ fontSize: "12px" }}>
+            {/* Header Section */}
+            <div style={{ display: "flex", justifyContent: "space-between", width: "100%", marginBottom: "30px" }}>
+                <button onClick={handleLogout} className="action-button">
                     <IoIosLogOut /> Logout
                 </button>
-                <button
-                    onClick={onClickChangePassword}
-                    style={{ fontSize: "12px" }}
-                >
+                <button onClick={handleChangePassword} className="action-button">
                     <FaKey /> Passwort ändern
                 </button>
             </div>
-            <fieldset
-                style={{
-                    borderColor: "white",
-                    border: "1px solid black",
-                    margin: "10px",
-                    padding: "10px",
-                    borderRadius: "5px",
-                    display: "flex",
-                    flexDirection: "column",
-                }}
-            >
-                <legend>Authorizierungs Qr-Codes</legend>
-                <button
-                    onClick={onClickLoginQrCreate}
-                    style={{ width: "350px" }}
-                >
+
+            {/* Authorization QR Code Section */}
+            <fieldset className="settings-group">
+                <legend>Authorizierungs QR-Codes (Einsatzkräfte)</legend>
+                <button onClick={() => navigate("/CreateLoginQrCodesPage")} className="wide-button">
                     QR-Codes für Authorizierung erzeugen
                 </button>
-                <button
-                    onClick={onClickShowUnusedLoginQrCodes}
-                    style={{ width: "350px" }}
-                >
-                    Nicht verwendete QR-Codes
+                <button onClick={() => navigate("/ShowUnusedLoginQrCodesPage")} className="wide-button">
+                    Nicht verwendete QR-Codes anzeigen
                 </button>
             </fieldset>
-            <fieldset
-                style={{
-                    borderColor: "white",
-                    border: "1px solid black",
-                    margin: "10px",
-                    padding: "10px",
-                    borderRadius: "5px",
-                    display: "flex",
-                    flexDirection: "column",
-                }}
-            >
-                <legend>Patienten Qr-Codes</legend>
-                <button onClick={onClickQrCreate} style={{ width: "350px" }}>
+
+            {/* Patient QR Code Section */}
+            <fieldset className="settings-group">
+                <legend>Patienten QR-Codes</legend>
+                <button onClick={() => navigate("/CreatePatientQrCodePage")} className="wide-button">
                     Patienten QR-Codes erzeugen
                 </button>
-                <button
-                    onClick={onClickShowUnusedQrCodes}
-                    style={{ width: "350px" }}
-                >
-                    Nicht verwendete QR-Codes
+                <button onClick={() => navigate("/ShowUnusedPatientQrCodesPage")} className="wide-button">
+                    Nicht verwendete QR-Codes anzeigen
                 </button>
             </fieldset>
-            <button
-                onClick={onClickCreateNewAdminUser}
-                style={{ width: "350px" }}
-            >
-                Admin-User erstellen
-            </button>
-            <button
-                onClick={onClickEditOperationScene}
-                style={{ width: "350px" }}
-            >
-                Einsatzort erstellen/bearbeiten
-            </button>
+
+            {/* Operation Scene Section */}
+            <fieldset className="settings-group">
+                <legend>Einsatzort</legend>
+                <button onClick={() => navigate("/EditOperationScene")} className="wide-button">
+                    Einsatzort erstellen/bearbeiten
+                </button>
+            </fieldset>
+
+            {/* Admin User Section */}
+            <fieldset className="settings-group">
+                <legend>Admin-Management</legend>
+                <button onClick={() => navigate("/CreateNewAdminUserPage")} className="wide-button">
+                    Admin-User erstellen
+                </button>
+            </fieldset>
         </div>
     );
 }
