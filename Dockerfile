@@ -25,7 +25,7 @@ COPY . /var/www/html
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-interaction --optimize-autoloader
 
-# Expose port 8000 for Laravel
+# Expose port 80 for Laravel
 EXPOSE 80
 
 # Start Apache
