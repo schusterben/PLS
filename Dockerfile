@@ -26,10 +26,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-interaction --optimize-autoloader
 
 # Expose port 8000 for Laravel
-EXPOSE 8000
+EXPOSE 80
 
 # Start Apache
 CMD ["apache2-foreground"]
 
-CMD php artisan serve --host=0.0.0.0 --port=8000
+CMD php artisan serve --host=0.0.0.0 --port=80
 
