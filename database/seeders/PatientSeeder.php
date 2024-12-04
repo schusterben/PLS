@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\DB;
 
 class PatientSeeder extends Seeder
 {
+     /**
+     * Füllt die `patient`-Tabelle mit Beispiel-Daten, die zufällige Vitalwerte und Triage-Informationen enthalten.
+     */
     public function run()
     {
         for ($i = 0; $i < 10; $i++) {

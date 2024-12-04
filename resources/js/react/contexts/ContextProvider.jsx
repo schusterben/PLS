@@ -1,6 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 
-// Create a context to manage and share state data across components
+/**
+ * Der `StateContext` verwaltet und teilt globale Zustandswerte (z. B. Tokens) innerhalb der Anwendung.
+ * Es werden Werte bereitgestellt, die von mehreren Komponenten verwendet werden können.
+ */
 const StateContext = createContext({
     token: null,
     adminToken: null,
@@ -33,8 +36,10 @@ const validateToken = async (token) => {
     }
 };
 
-// ContextProvider component manages the state and provides it to child components
-export const ContextProvider = ({ children }) => {
+/**
+ * `ContextProvider` ist ein Komponenten-Wrapper, der den globalen Zustand (Token und Funktionen)
+ * für alle Kindkomponenten bereitstellt.
+ */export const ContextProvider = ({ children }) => {
     const [token, setTokenInternal] = useState(
         localStorage.getItem("ACCESS_TOKEN")
     );
@@ -78,5 +83,5 @@ export const ContextProvider = ({ children }) => {
         </StateContext.Provider>
     );
 };
-// Custom hook to access the context values within components
+// Benutzerdefinierter Hook zur Verwendung der Kontextwerte innerhalb von Komponenten
 export const useStateContext = () => useContext(StateContext);

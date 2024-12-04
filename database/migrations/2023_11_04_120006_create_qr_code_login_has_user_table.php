@@ -3,11 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+/**
+ * Diese Migration erstellt die Pivot-Tabelle "qr_code_login_has_user",
+ * die die Beziehung zwischen QR-Codes und Benutzern herstellt.
+ */
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Definiert die Struktur der "qr_code_login_has_user"-Tabelle.
      */
     public function up()
     {
@@ -19,7 +22,9 @@ return new class extends Migration
             $table->foreign('user_iduser')->references('iduser')->on('user');
         });
     }
-
+/**
+     * Entfernt die "qr_code_login_has_user"-Tabelle.
+     */
     public function down()
     {
         Schema::dropIfExists('qr_code_login_has_user');

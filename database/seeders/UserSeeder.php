@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Erstellt zufällige Benutzerdaten für `user`, inklusive zufälliger Koordinaten und Login-Zeitpunkte.
      *
      * @return void
      */

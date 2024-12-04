@@ -5,18 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 /**
- * The PagesController class handles requests related to static pages.
+ * Der PagesController verwaltet Anfragen für statische Seiten der Anwendung.
+ * Aktuell wird nur die Startseite (index) verwaltet, welche die 'welcome'-Ansicht lädt.
  */
 class PagesController extends Controller
 {
-    /**
-     * Display the index page.
+   /**
+     * Zeigt die Startseite an.
      *
      * @return \Illuminate\View\View
+     * Gibt die 'welcome'-Ansicht zurück, normalerweise als Startseite.
      */
     public function index()
     {
-        // Return the 'welcome' view, typically used as the homepage
+        // Gibt die 'welcome'-Ansicht zurück, die als Homepage verwendet wird
         return view('welcome');
     }
 }

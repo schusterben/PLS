@@ -1,3 +1,5 @@
+// main.jsx - Der Einstiegspunkt der React-Anwendung
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "../../css/index.css";
@@ -7,7 +9,8 @@ import { ContextProvider } from "./contexts/ContextProvider.jsx";
 import Appbar from "./components/Appbar";
 
 /**
- * Entry point of the React application.
+ * Rendert die Hauptanwendung und wickelt sie im Kontextprovider ein,
+ * um globale Zustände wie Authentifizierungsinformationen zu verwalten.
  */
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>

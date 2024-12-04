@@ -1,6 +1,8 @@
+// router.jsx - Definiert die Routen für die React-Anwendung
+
 import { createBrowserRouter } from "react-router-dom";
 
-// Import your page components
+// Import der Seitenkomponenten
 import QrAuthenticator from "./pages/QRAuthenticator";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
@@ -25,7 +27,10 @@ import ShowUnusedLoginQrCodesPage from "./pages/ShowUnusedLoginQrCodesPage";
 import CreateOperationScene from "./pages/CreateOperationScene";
 import EditOperationScene from "./pages/EditOperationScene";
 
-// Create a router configuration using createBrowserRouter
+/**
+ * Erzeugt die Routen-Konfiguration der Anwendung.
+ * Alle geschützten Routen sind über `ProtectedRoute` oder `ProtectedAdminRoute` zugänglich.
+ */
 const router = createBrowserRouter([
     {
         path: "/",

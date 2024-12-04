@@ -16,6 +16,8 @@
 .content {
     margin-top: 20%; /* Dieser Wert sollte der Höhe des .header entsprechen oder größer sein */
 }
+/* Stile für die maximale Breite und Höhe des Canvas */
+
 canvas {
     width: 100%;
     height: 100%;
@@ -79,7 +81,7 @@ button:focus-visible {
     }
 }
 
-/* CSS-Stil für die Tabelle 
+/* CSS-Stil für die Tabelle
 table {
     width: 100%;
     border-collapse: collapse;
@@ -97,7 +99,7 @@ table td {
     border: 1px solid #ccc;
 }
 
-// CSS für den scrollbaren Bereich der Tabelle 
+// CSS für den scrollbaren Bereich der Tabelle
 table tbody {
     max-height: 200px;
     overflow-y: scroll;

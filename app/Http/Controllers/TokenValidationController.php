@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 /**
- * The TokenValidationController class handles token validation.
- */
+* Die Klasse TokenValidationController ist für die Validierung von Tokens zuständig.
+*
+* Diese Controller-Klasse stellt die Basis für die Tokenvalidierung bereit, was
+* für verschiedene Authentifizierungs- und Berechtigungsprozesse innerhalb der App
+* nützlich ist. Die Funktionalität kann z.B. zur Überprüfung eines Authentifizierungstokens
+* vor dem Zugriff auf geschützte Routen verwendet werden.
+*/
 class TokenValidationController extends Controller
 {
     /**
-     * Validate a token.
+     * Validiert ein Token und gibt das Ergebnis der Überprüfung zurück.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+    * @param Request $request Die HTTP-Anfrage, die das zu validierende Token enthalten kann.
+     * @return \Illuminate\Http\JsonResponse Gibt eine JSON-Antwort mit der Gültigkeit des Tokens zurück.
      */
     public function validateToken(Request $request)
     {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 /**
- * The `BodyPart` component represents a clickable body part graphic element.
- * It allows toggling the clicked state and handles rendering based on the ID.
+ * Die `BodyPart`-Komponente repräsentiert ein anklickbares Körperelement.
+ * Der Zustand des Elements (angeklickt oder nicht) wird verwaltet, und die Anzeige wird entsprechend angepasst.
  *
  * @param {object} props - Component props.
  * @param {string} props.id - The unique identifier for the body part.

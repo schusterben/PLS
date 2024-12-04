@@ -4,7 +4,9 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Middleware\TrustProxies as Middleware;
 use Illuminate\Http\Request;
-
+/**
+ * Die TrustProxies-Middleware ermöglicht der App, Proxys zu vertrauen und die richtigen Headers für die Anfrage zu verwenden.
+ */
 class TrustProxies extends Middleware
 {
     /**

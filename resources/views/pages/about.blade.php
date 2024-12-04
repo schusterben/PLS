@@ -1,3 +1,5 @@
+<!-- Beispiel für about.blade.php, das das Layout erweitert -->
+
 @extends('layouts.app')
 
 @section('content')

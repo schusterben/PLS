@@ -6,6 +6,13 @@ use Illuminate\Support\Facades\DB;
 
 class BodySeeder extends Seeder
 {
+/**
+     * Füllt die `body`-Tabelle mit Beispiel-Daten für 10 Patienten.
+     * Für jeden Patienten werden zufällige Werte für alle Körperregionen generiert.
+     */
+
+
+
     /**
      * Run the database seeds.
      *
@@ -13,7 +20,7 @@ class BodySeeder extends Seeder
      */
     public function run()
     {
-        // Assuming you have 10 patients with IDs from 1 to 10
+        // Für die Patienten mit IDs von 1 bis 10 generieren
         for ($i = 1; $i <= 10; $i++) {
             DB::table('body')->insert([
                 'idpatient' => $i,
@@ -47,7 +54,7 @@ class BodySeeder extends Seeder
                 'mund' => rand(0, 1),
                 'hand_links_vorne' => rand(0, 1),
                 'hand_rechts_vorne' => rand(0, 1),
-                
+
                 'kopf_hinten' => rand(0, 1),
                 'hals_hinten' => rand(0, 1),
                 'ruecken_rechts' => rand(0, 1),
@@ -77,7 +84,7 @@ class BodySeeder extends Seeder
                 'schulter_links_hinten' => rand(0, 1),
                 'brustwirbel' => rand(0, 1),
                 'lendenwirbel' => rand(0, 1),
-                
+
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

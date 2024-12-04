@@ -8,23 +8,24 @@ use Illuminate\Support\Facades\Hash;
 
 
 /**
- * The UserController class manages user-related operations, including creating new admin users and changing passwords.
+ * Der UserController verwaltet benutzerbezogene Operationen,
+ * einschließlich der Erstellung neuer Admin-Benutzer und des Änderns von Passwörtern.
  */
 class UserController extends Controller
 {
     /**
-     * Create a new admin user.
+     * Erstellt einen neuen Admin-Benutzer.
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse JSON-Antwort, die den Erfolg oder Fehler der Benutzererstellung anzeigt
      */
     public function createNewAdminUser(Request $request)
     {
 
-        // Validate the incoming request data
+        // Validiert die eingehenden Daten (Username und Passwort sind erforderlich)
         $validatedData = $request->validate([
-            'username' => 'required|string|max:255',
-            'password' => 'required|string|min:6',
+            'username' => 'required|string|max:255',// Der Benutzername darf maximal 255 Zeichen lang sein
+            'password' => 'required|string|min:6', // Das Passwort muss mindestens 6 Zeichen lang sein
         ]);
 
         // Check if a user with the same username already exists
@@ -47,10 +48,10 @@ class UserController extends Controller
     }
 
     /**
-     * Change the password of an admin user.
+     * Ändert das Passwort eines Admin-Benutzers.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request HTTP-Anfrage mit aktuellem Passwort, neuem Passwort und Benutzername
+     * @return \Illuminate\Http\JsonResponse JSON-Antwort, die den Erfolg oder Fehler der Passwortaktualisierung anzeigt
      */
     public function changeAdminPassword(Request $request)
     {
