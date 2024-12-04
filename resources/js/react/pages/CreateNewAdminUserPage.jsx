@@ -9,8 +9,10 @@ const CreateNewAdminUserPage = () => {
     const [formData, setFormData] = useState({
         username: "",
         password: "",
+        confirmPassword: "",
     });
     const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
     const { adminToken } = useStateContext();
     const navigate = useNavigate();
 
@@ -29,6 +31,12 @@ const CreateNewAdminUserPage = () => {
      */
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (formData.password !== formData.confirmPassword) {
+            setErrorMessage("Die Passwörter stimmen nicht überein");
+            return;
+        }
+
         try {
             const response = await fetch("/api/createAdminUser", {
                 method: "POST",
@@ -54,7 +62,8 @@ const CreateNewAdminUserPage = () => {
             }
             if (data.user) {
                 setSuccessMessage("Benutzer wurde erfolgreich angelegt");
-                setFormData({ username: "", password: "" });
+                setFormData({ username: "", password: "", confirmPassword: "" });
+                setErrorMessage("");
             }
         } catch (error) {
             console.error("Benutzer konnte nicht angelegt werden:", error);
@@ -62,37 +71,68 @@ const CreateNewAdminUserPage = () => {
     };
 
     return (
-        <div>
-            <h2>Benutzer erstellen</h2>
+        <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
+            <h2>Neuen Admin-Benutzer erstellen</h2>
             {successMessage && (
-                <p style={{ color: "green" }}>{successMessage}</p>
+                <p style={{ color: "green", fontWeight: "bold" }}>{successMessage}</p>
+            )}
+            {errorMessage && (
+                <p style={{ color: "red", fontWeight: "bold" }}>{errorMessage}</p>
             )}
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label style={{ color: "white" }}>
-                        Username:
-                        <input
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleInputChange}
-                            required
-                        />
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ display: "block", marginBottom: "5px" }}>
+                        Benutzername:
                     </label>
+                    <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: "100%", padding: "8px" }}
+                    />
                 </div>
-                <div>
-                    <label style={{ color: "white" }}>
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ display: "block", marginBottom: "5px" }}>
                         Passwort:
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            required
-                        />
                     </label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: "100%", padding: "8px" }}
+                    />
                 </div>
-                <button type="submit">Erstellen</button>
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ display: "block", marginBottom: "5px" }}>
+                        Passwort bestätigen:
+                    </label>
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: "100%", padding: "8px" }}
+                    />
+                </div>
+                <button
+                    type="submit"
+                    style={{
+                        width: "100%",
+                        padding: "10px",
+                        backgroundColor: "#0047ab",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                    }}
+                >
+                    Benutzer erstellen
+                </button>
             </form>
         </div>
     );

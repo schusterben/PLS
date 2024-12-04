@@ -7,76 +7,64 @@ import { useNavigate } from "react-router-dom";
  * Allows users to select, modify, and create operation scenes.
  */
 export default function EditOperationScene() {
-    // Access the `navigate` function from 'react-router-dom' for route navigation.
     const navigate = useNavigate();
-
-    // State to store the data of the currently selected operation scene to edit.
-    const [sceneData, setSceneData] = useState({
-        name: "",
-        description: "",
-    });
-    // State to control the loading indicator.
+    const { adminToken } = useStateContext();
+    const [sceneData, setSceneData] = useState({ name: "", description: "" });
+    const [selectedOperationScene, setSelectedOperationScene] = useState("");
+    const [existingOperationScenes, setExistingOperationScenes] = useState([]);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(true);
 
-    // Access the `adminToken` from the context.
-    const { adminToken } = useStateContext();
-
-    // State to store the selected operation scene.
-    const [selectedOperationScene, setSelectedOperationScene] = useState("");
-
-    // State to store the list of existing operation scenes.
-    const [existingOperationScenes, setExistingOperationScenes] = useState([]);
-
-    // State to display a success message after updating an operation scene.
-    const [successMessage, setSuccessMessage] = useState("");
-
     useEffect(() => {
-        // This useEffect hook fetches existing operation scenes when the component mounts.
         const fetchExistingScenes = async () => {
+            setLoading(true);
             try {
-                const response = await fetch(
-                    "/api/getAllCurrentOperationScenes",
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${adminToken}`,
-                        },
-                    }
-                );
+                const response = await fetch("/api/getAllCurrentOperationScenes", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${adminToken}`,
+                    },
+                });
 
                 if (!response.ok) {
                     throw new Error("Network response was not ok");
                 }
 
                 const data = await response.json();
-
-                if (data.error && data.error.toUpperCase() === "UNAUTHORIZED") {
-                    navigate("/AdminLandingPage");
-                    return;
-                }
                 setExistingOperationScenes(data);
-                setLoading(false);
             } catch (error) {
-                console.error("Einsatzort konnte nicht geladen werden:", error);
+                setErrorMessage("Einsatzorte konnten nicht geladen werden.");
+                console.error("Error fetching operation scenes:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
-        // Call the `fetchExistingScenes` function when the component mounts.
         fetchExistingScenes();
-    }, []);
+    }, [adminToken]);
 
-    /**
-     * Function to navigate to the page for creating a new operation scene.
-     */
-    function onClickCreateOperationScene() {
-        navigate("/CreateOperationScene");
-    }
+    const handleSelectChange = (event) => {
+        const selectedId = event.target.value;
+        setSelectedOperationScene(selectedId);
 
-    /**
-     * Function to update the selected operation scene.
-     */
-    async function onClickUpdateOperationScene() {
+        const selectedScene = existingOperationScenes.find(
+            (scene) => scene.idoperationScene === parseInt(selectedId)
+        );
+
+        setSceneData(
+            selectedScene
+                ? { name: selectedScene.name, description: selectedScene.description || "" }
+                : { name: "", description: "" }
+        );
+    };
+
+    const handleInputChange = (field, value) => {
+        setSceneData((prevData) => ({ ...prevData, [field]: value }));
+    };
+
+    const onClickUpdateOperationScene = async () => {
         try {
             const response = await fetch("/api/createOperationScene", {
                 method: "POST",
@@ -96,158 +84,133 @@ export default function EditOperationScene() {
             }
 
             const data = await response.json();
+            setSuccessMessage("Einsatzort wurde erfolgreich aktualisiert.");
+            setErrorMessage("");
 
-            if (data.error && data.error.toUpperCase() === "UNAUTHORIZED") {
-                navigate("/AdminLandingPage");
-                return;
-            }
-            if (data.operactionScene) {
-                setSuccessMessage("Einsatzort wurde erfolgreich aktualisiert");
-                setSceneData({
-                    name: "",
-                    description: "",
-                });
-                setSelectedOperationScene("");
-            }
-            setLoading(true);
-
-            // Update the list of existing operation scenes after an update.
-            const refreshedResponse = await fetch(
-                "/api/getAllCurrentOperationScenes",
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${adminToken}`,
-                    },
-                }
-            );
-
-            if (!refreshedResponse.ok) {
-                throw new Error("Network response was not ok");
-            }
+            // Refresh the operation scenes after a successful update
+            const refreshedResponse = await fetch("/api/getAllCurrentOperationScenes", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${adminToken}`,
+                },
+            });
 
             const refreshedData = await refreshedResponse.json();
-            if (
-                refreshedData.error &&
-                refreshedData.error.toUpperCase() === "UNAUTHORIZED"
-            ) {
-                navigate("/AdminLandingPage");
-                return;
-            }
-
             setExistingOperationScenes(refreshedData);
-            setLoading(false); // Laden beendet
+            setSelectedOperationScene("");
+            setSceneData({ name: "", description: "" });
         } catch (error) {
-            console.error("Einsatzort konnte nicht angelegt werden:", error);
-        }
-    }
-
-    // Function to handle the change in the selected operation scene.
-    const handleSelectChange = (event) => {
-        const selectedId = event.target.value;
-        setSelectedOperationScene(selectedId);
-
-        const selectedScene = existingOperationScenes.find(
-            (scene) => scene.idoperationScene === parseInt(selectedId)
-        );
-        if (selectedScene) {
-            setSceneData({
-                name: selectedScene.name,
-                description:
-                    selectedScene.description == null
-                        ? ""
-                        : selectedScene.description,
-            });
-        } else {
-            setSceneData({
-                name: "",
-                description: "",
-            });
+            setErrorMessage("Einsatzort konnte nicht aktualisiert werden.");
+            console.error("Error updating operation scene:", error);
         }
     };
 
+    const onClickCreateOperationScene = () => {
+        navigate("/CreateOperationScene");
+    };
+
     return (
-        <div>
-            {loading ? (
-                <p>Lade bestehende Einsatzorte...</p>
-            ) : (
-                <div>
-                    <h1>Einsatzort bearbeiten</h1>
-                    {successMessage && (
-                        <p style={{ color: "green" }}>{successMessage}</p>
-                    )}
+        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
+            <h1>Einsatzort bearbeiten</h1>
+            {loading && <p>Lade bestehende Einsatzorte...</p>}
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+            {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+
+            {!loading && (
+                <>
+                    <label style={{ display: "block", marginBottom: "10px" }}>
+                        <strong>Einsatzort auswählen:</strong>
+                    </label>
                     <select
                         value={selectedOperationScene}
                         onChange={handleSelectChange}
                         style={{
-                            width: 800,
-                            height: 30,
-                            margin: 20,
-                            textAlign: "center",
+                            width: "100%",
+                            padding: "10px",
+                            border: "1px solid #ccc",
+                            borderRadius: "5px",
+                            marginBottom: "20px",
                         }}
                     >
                         <option value="">Wähle einen Einsatzort aus</option>
                         {existingOperationScenes.map((scene) => (
-                            <option
-                                key={scene.idoperationScene}
-                                value={scene.idoperationScene}
-                            >
+                            <option key={scene.idoperationScene} value={scene.idoperationScene}>
                                 {scene.name}
                             </option>
                         ))}
                     </select>
 
                     {selectedOperationScene && (
-                        <div>
-                            <label>
-                                Name des Einsatzorts:
+                        <>
+                            <div style={{ marginBottom: "20px" }}>
+                                <label style={{ display: "block", marginBottom: "10px" }}>
+                                    <strong>Name des Einsatzorts:</strong>
+                                </label>
                                 <input
                                     type="text"
-                                    name="name"
                                     value={sceneData.name}
-                                    onChange={(e) =>
-                                        setSceneData({
-                                            ...sceneData,
-                                            name: e.target.value,
-                                        })
-                                    }
+                                    onChange={(e) => handleInputChange("name", e.target.value)}
+                                    style={{
+                                        width: "100%",
+                                        padding: "10px",
+                                        border: "1px solid #ccc",
+                                        borderRadius: "5px",
+                                    }}
+                                    required
                                 />
-                            </label>
-                            <br />
-                            <label>
-                                Beschreibung:
-                                <br />
+                            </div>
+
+                            <div style={{ marginBottom: "20px" }}>
+                                <label style={{ display: "block", marginBottom: "10px" }}>
+                                    <strong>Beschreibung:</strong>
+                                </label>
                                 <textarea
-                                    name="description"
                                     value={sceneData.description}
-                                    onChange={(e) =>
-                                        setSceneData({
-                                            ...sceneData,
-                                            description: e.target.value,
-                                        })
-                                    }
+                                    onChange={(e) => handleInputChange("description", e.target.value)}
                                     rows={4}
-                                    cols={105}
+                                    style={{
+                                        width: "100%",
+                                        padding: "10px",
+                                        border: "1px solid #ccc",
+                                        borderRadius: "5px",
+                                    }}
                                 />
-                            </label>
+                            </div>
+
                             <button
                                 onClick={onClickUpdateOperationScene}
-                                style={{ width: "350px", margin: 10 }}
+                                style={{
+                                    width: "100%",
+                                    padding: "10px",
+                                    backgroundColor: "#0047ab",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+                                    marginBottom: "20px",
+                                }}
                             >
-                                Einsatzort updaten
+                                Einsatzort aktualisieren
                             </button>
-                        </div>
+                        </>
                     )}
-                    <br />
 
                     <button
                         onClick={onClickCreateOperationScene}
-                        style={{ width: "350px", margin: 50 }}
+                        style={{
+                            width: "100%",
+                            padding: "10px",
+                            backgroundColor: "#0047ab",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                        }}
                     >
                         Neuen Einsatzort erstellen
                     </button>
-                </div>
+                </>
             )}
         </div>
     );

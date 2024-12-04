@@ -2,22 +2,21 @@ import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import QRCode from "qrcode.react";
 import { useStateContext } from "../contexts/ContextProvider";
-import { useNavigate } from "react-router-dom";
 
 /**
  * Component for displaying and generating unused patient QR codes.
  */
 export default function ShowUnusedPatientQrCodesPage() {
-    // Access the admin token from the global state
     const { adminToken } = useStateContext();
-    const navigate = useNavigate();
     const [qrCodes, setQRCodes] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     /**
      * Fetches unused patient QR codes from the API.
      */
     useEffect(() => {
         const fetchQRCodes = async () => {
+            setLoading(true);
             try {
                 const response = await fetch("/api/getUnusedPatientQrCodes", {
                     method: "GET",
@@ -32,68 +31,80 @@ export default function ShowUnusedPatientQrCodesPage() {
                 }
 
                 const data = await response.json();
-
                 setQRCodes(data);
             } catch (error) {
                 console.error("Error fetching QR codes:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchQRCodes();
-    }, [adminToken, navigate]);
+    }, [adminToken]);
 
     /**
      * Generates a PDF document containing patient QR codes.
      */
-    async function generatePatientQRCodes() {
-        const x = 50;
-        const y = 50;
-        const size = 100;
+    const generatePatientQRCodesPDF = () => {
         const doc = new jsPDF();
 
-        const qrCodeElements = document.querySelectorAll("[id^='qrcode-']");
-
-        qrCodeElements.forEach((element, index) => {
-            if (index !== 0) {
-                doc.addPage();
-            }
-
-            const qrCodeDataURL = element.toDataURL("image/png");
-            doc.addImage(qrCodeDataURL, "PNG", x, y, size, size);
+        qrCodes.forEach((code, index) => {
+            if (index !== 0) doc.addPage();
+            const qrCodeDataURL = document.getElementById(`qrcode-${index}`).toDataURL("image/png");
+            doc.text(`Patient QR Code #${index + 1}`, 20, 20);
+            doc.addImage(qrCodeDataURL, "PNG", 50, 30, 100, 100);
         });
 
-        doc.save("qrcode_pdf.pdf");
-    }
+        doc.save("patient_qrcodes.pdf");
+    };
 
     return (
-        <div
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-            }}
-        >
-            <h2>
-                Folgende QR-Codes wurden bis jetzt noch bei keinem Patienten
-                verwendet
-            </h2>
-            <button onClick={generatePatientQRCodes}>Als PDF drucken</button>
-            <div>
-                {qrCodes.map((code, index) => (
-                    <div
-                        key={index}
+        <div style={{ textAlign: "center", padding: "20px" }}>
+            <h2>Folgende QR-Codes wurden bis jetzt noch bei keinem Patienten verwendet</h2>
+            {loading ? (
+                <p>QR Codes werden geladen...</p>
+            ) : (
+                <>
+                    <button
+                        onClick={generatePatientQRCodesPDF}
                         style={{
-                            backgroundColor: "#ffffff",
-                            padding: "10px",
-                            marginBottom: "10px",
-                            marginTop: "10px",
-                            width: "100%",
+                            marginBottom: "20px",
+                            padding: "10px 20px",
+                            backgroundColor: "#0047ab",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
                         }}
                     >
-                        <QRCode id={`qrcode-${index}`} value={code} />
+                        Als PDF drucken
+                    </button>
+                    <div
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                            gap: "20px",
+                            marginTop: "20px",
+                        }}
+                    >
+                        {qrCodes.map((code, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    backgroundColor: "#f9f9f9",
+                                    padding: "10px",
+                                    border: "1px solid #ddd",
+                                    borderRadius: "8px",
+                                    textAlign: "center",
+                                }}
+                            >
+                                <QRCode id={`qrcode-${index}`} value={code} size={150} />
+                                <p style={{ marginTop: "10px" }}>QR Code #{index + 1}</p>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                </>
+            )}
         </div>
     );
 }

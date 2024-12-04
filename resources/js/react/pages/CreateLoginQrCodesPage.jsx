@@ -11,23 +11,28 @@ export default function CreateLoginQrCodesPage() {
     const { adminToken } = useStateContext();
     const [requestedQrCount, setRequestedQrCount] = useState(0);
     const [qrCodes, setQRCodes] = useState([]);
-    const [buttonClicked, setButtonClicked] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
     /**
      * Handle changes in the requested QR code count input.
      * @param {Object} event - The input change event.
      */
-    function handleRequestedQrCountChange(event) {
-        if (!isNaN(event.target.value) && event.target.value >= 0) {
-            setRequestedQrCount(event.target.value);
+    const handleRequestedQrCountChange = (event) => {
+        const value = event.target.value;
+        if (!isNaN(value) && value >= 0) {
+            setRequestedQrCount(value);
+        } else {
+            setErrorMessage("Bitte geben Sie eine gültige Anzahl ein.");
         }
-    }
+    };
 
     useEffect(() => {
-        if (requestedQrCount > 0 && buttonClicked) {
+        if (requestedQrCount > 0 && loading) {
             const fetchQRCodes = async () => {
                 try {
+                    setErrorMessage(""); // Clear any existing error messages
                     const response = await fetch("/api/generateLoginQRCodes", {
                         method: "POST",
                         headers: {
@@ -38,7 +43,7 @@ export default function CreateLoginQrCodesPage() {
                     });
 
                     if (!response.ok) {
-                        throw new Error("Network response was not ok");
+                        throw new Error("Fehler beim Abrufen der Daten.");
                     }
 
                     const data = await response.json();
@@ -55,82 +60,121 @@ export default function CreateLoginQrCodesPage() {
                         setQRCodes(data.qrcodes);
                     }
                 } catch (error) {
-                    console.error("Error fetching QR codes:", error);
+                    setErrorMessage(
+                        "Es gab einen Fehler bei der Erstellung der QR-Codes. Bitte versuchen Sie es erneut."
+                    );
+                } finally {
+                    setLoading(false); // Stop loading spinner
                 }
             };
 
             fetchQRCodes();
-            setButtonClicked(false);
         }
-    }, [buttonClicked, adminToken, navigate, requestedQrCount]);
+    }, [loading, adminToken, navigate, requestedQrCount]);
 
     /**
      * Create and save QR codes as a PDF.
      */
-    async function printQrCodesToPDF() {
-        const x = 50;
-        const y = 50;
-        const size = 100;
+    const printQrCodesToPDF = () => {
         const doc = new jsPDF();
 
-        const qrCodeElements = document.querySelectorAll("[id^='qrcode-']");
-
-        qrCodeElements.forEach((element, index) => {
-            if (index !== 0) {
-                doc.addPage();
-            }
-            doc.setFontSize(25);
-            doc.text("Login", x + 40, y - 10);
-            const qrCodeDataURL = element.toDataURL("image/png");
-            doc.addImage(qrCodeDataURL, "PNG", x, y, size, size);
+        qrCodes.forEach((code, index) => {
+            if (index !== 0) doc.addPage();
+            const qrCodeDataURL = document.getElementById(`qrcode-${index}`).toDataURL("image/png");
+            doc.text(`Login QR Code #${index + 1}`, 20, 20);
+            doc.addImage(qrCodeDataURL, "PNG", 50, 30, 100, 100);
         });
 
-        doc.save("qrcode_pdf.pdf");
-    }
+        doc.save("login_qrcodes.pdf");
+    };
 
     /**
-     * Handle the click event to generate patient QR codes.
+     * Handle the click event to generate login QR codes.
      */
-    function generatePatientQRCodes() {
-        setButtonClicked(true);
-    }
+    const generateLoginQRCodes = () => {
+        if (requestedQrCount > 0) {
+            setLoading(true); // Start loading spinner
+            setQRCodes([]); // Clear previous QR codes
+        } else {
+            setErrorMessage("Bitte geben Sie eine gültige Anzahl ein.");
+        }
+    };
 
     return (
-        <div
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-            }}
-        >
+        <div style={{ textAlign: "center", padding: "20px" }}>
             <h2>QR-Codes für die Authentifizierung generieren</h2>
-            <p>Bitte auswählen, wie viele QR-Codes generiert werden sollen</p>
+            <p>Wählen Sie die Anzahl der zu generierenden QR-Codes aus.</p>
+
             <input
-                style={{ width: "300px" }}
+                style={{
+                    width: "300px",
+                    padding: "10px",
+                    marginBottom: "10px",
+                    border: "1px solid #ccc",
+                    borderRadius: "5px",
+                }}
                 type="number"
                 id="requestedQrCountInput"
                 value={requestedQrCount}
                 onChange={handleRequestedQrCountChange}
-                placeholder="Bitte hier die Anzahl eingeben"
+                placeholder="Anzahl eingeben"
             />
-            <button onClick={generatePatientQRCodes}>
+            <br />
+
+            <button
+                onClick={generateLoginQRCodes}
+                style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#0047ab",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    marginRight: "10px",
+                    cursor: "pointer",
+                }}
+            >
                 QR-Codes generieren
             </button>
-            <button onClick={printQrCodesToPDF}>Als PDF drucken</button>
 
-            <div>
+            <button
+                onClick={printQrCodesToPDF}
+                style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#0047ab",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                }}
+                disabled={qrCodes.length === 0}
+            >
+                Als PDF drucken
+            </button>
+
+            {loading && <p style={{ color: "#0047ab" }}>QR-Codes werden generiert...</p>}
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                    gap: "20px",
+                    marginTop: "20px",
+                }}
+            >
                 {qrCodes.map((code, index) => (
                     <div
                         key={index}
                         style={{
-                            backgroundColor: "#ffffff",
+                            backgroundColor: "#f9f9f9",
                             padding: "10px",
-                            marginBottom: "10px",
-                            marginTop: "10px",
-                            width: "100%",
+                            border: "1px solid #ddd",
+                            borderRadius: "8px",
+                            textAlign: "center",
                         }}
                     >
-                        <QRCode id={`qrcode-${index}`} value={code} />
+                        <QRCode id={`qrcode-${index}`} value={code} size={150} />
+                        <p>QR Code #{index + 1}</p>
                     </div>
                 ))}
             </div>

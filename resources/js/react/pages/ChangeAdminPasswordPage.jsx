@@ -36,9 +36,7 @@ const ChangeAdminPasswordPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (formData.newpassword !== formData.checknewpassword) {
-            console.log("Passwords do not match");
             setFailMessage("Die neuen Passwörter stimmen nicht überein");
-
             return;
         } else {
             try {
@@ -70,72 +68,90 @@ const ChangeAdminPasswordPage = () => {
                     });
                 }
                 if (!response.ok) {
-                    throw new Error("Network response was not ok");
+                    throw new Error("Fehler im Netz");
                 }
             } catch (error) {
-                console.error("Benutzer konnte nicht angelegt werden:", error);
+                console.error("Fehler beim Ändern des Passworts:", error);
             }
         }
     };
 
     return (
-        <div>
+        <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
             <h2>Passwort für den Benutzer {usernameFromLocalStorage} ändern</h2>
             {successMessage && (
-                <p style={{ color: "green" }}>{successMessage}</p>
+                <p style={{ color: "green", fontWeight: "bold" }}>{successMessage}</p>
             )}
-            {failMessage && <p style={{ color: "red" }}>{failMessage}</p>}
+            {failMessage && (
+                <p style={{ color: "red", fontWeight: "bold" }}>{failMessage}</p>
+            )}
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label style={{ color: "white" }}>
-                        Username:
-                        <input
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleInputChange}
-                            required
-                            readOnly="true"
-                        />
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ display: "block", marginBottom: "5px" }}>
+                        Benutzername:
                     </label>
+                    <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        readOnly
+                        style={{ width: "100%", padding: "8px" }}
+                    />
                 </div>
-                <div>
-                    <label style={{ color: "white" }}>
-                        aktuelles Passwort:
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            required
-                        />
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ display: "block", marginBottom: "5px" }}>
+                        Passwort:
                     </label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: "100%", padding: "8px" }}
+                    />
                 </div>
-                <div>
-                    <label style={{ color: "white" }}>
-                        neues Passwort:
-                        <input
-                            type="password"
-                            name="newpassword"
-                            value={formData.newpassword}
-                            onChange={handleInputChange}
-                            required
-                        />
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ display: "block", marginBottom: "5px" }}>
+                        Neues Passwort:
                     </label>
+                    <input
+                        type="password"
+                        name="newpassword"
+                        value={formData.newpassword}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: "100%", padding: "8px" }}
+                    />
                 </div>
-                <div>
-                    <label style={{ color: "white" }}>
-                        neues Passwort wiederholen:
-                        <input
-                            type="password"
-                            name="checknewpassword"
-                            value={formData.checknewpassword}
-                            onChange={handleInputChange}
-                            required
-                        />
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ display: "block", marginBottom: "5px" }}>
+                        Neues Passwort wiederholen:
                     </label>
+                    <input
+                        type="password"
+                        name="checknewpassword"
+                        value={formData.checknewpassword}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: "100%", padding: "8px" }}
+                    />
                 </div>
-                <button type="submit">Erstellen</button>
+                <button
+                    type="submit"
+                    style={{
+                        width: "100%",
+                        padding: "10px",
+                        backgroundColor: "#0047ab",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                    }}
+                >
+                    Passwort ändern
+                </button>
             </form>
         </div>
     );
