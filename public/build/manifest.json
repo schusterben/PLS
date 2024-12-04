@@ -32,6 +32,11 @@
     "file": "assets/marker-icon-574c3a5c.png",
     "src": "node_modules/leaflet/dist/images/marker-icon.png"
   },
+  "resources/css/app.css": {
+    "file": "assets/app-04490b11.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
   "resources/css/index.css": {
     "file": "assets/index-f9898b68.css",
     "isEntry": true,
