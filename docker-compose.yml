@@ -1,12 +1,11 @@
-version: '3.8'
 
 services:
     # Laravel application
-    laravel_app:
+    backend:
         build:
             context: .
             dockerfile: Dockerfile
-        container_name: laravel_app
+        container_name: backend
         restart: unless-stopped
         working_dir: /var/www
         volumes:
