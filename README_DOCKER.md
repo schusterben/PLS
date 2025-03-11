@@ -24,7 +24,7 @@ Um ein Dockerimage zu generieren, müssen folgende Befehle im Terminal ausgefüh
 -   npm run build
 -   docker-compose build
   - docker-compose up -d
-  - docker-compose exec backend php artisan migrate
+  - docker-compose exec lavarel_app php artisan migrate #Um Backend-Konfiguration mitzuziehen
 
 ## Dockerfiles
 
