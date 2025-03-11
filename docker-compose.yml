@@ -19,7 +19,7 @@ services:
             - DB_USERNAME=${DB_USERNAME}
             - DB_PASSWORD=${DB_PASSWORD}
         ports:
-            - "8000:80"
+            - "8080:80"
         depends_on:
             - mysql_db
 
