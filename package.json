@@ -19,7 +19,7 @@
         "bootstrap": "^5.3.2",
         "html5-qrcode": "^2.3.8",
         "jsonwebtoken": "^9.0.2",
-        "jspdf": "^2.5.1",
+        "jspdf": "^3.0.1",
         "leaflet": "^1.9.4",
         "qrcode.react": "^3.1.0",
         "react": "^18.2.0",
