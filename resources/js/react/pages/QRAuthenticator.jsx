@@ -23,7 +23,7 @@ export default function QrAuthenticator() {
     // This effect is used to initialize and start the QR code scanner when the component mounts.
     useEffect(() => {
         if (!scanner?.getState()) {
-            const config = { fps: 5, qrbox: { width: 150, height: 150 } };
+            const config = { fps: 10, qrbox: { width: 450, height: 450 } };
             scanner = new Html5Qrcode("reader");
 
             scanner
