@@ -2,7 +2,7 @@ p# PLS
 
 ## Voraussetzungen
 
--   PHP (Version 8.1 oder höher)
+-   PHP (Version 8.2 oder höher)
 -   Node.js (Version 10)
 -   composer
 -   MySQL
