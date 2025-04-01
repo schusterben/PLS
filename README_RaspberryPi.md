@@ -4,47 +4,52 @@ Dieses Repository enthält eine Laravel-Anwendung, die als Docker-Image auf eine
 
 ## 🚀 Voraussetzungen
 
-- Ein Raspberry Pi mit **Docker** installiert
+- Ein Raspberry Pi mit **Docker** und **Docker Compose** installiert
 - SSH-Zugriff auf den Raspberry Pi
-- Das Docker-Image der Laravel-App (`pls-laravel_app.tar`)
+- Internetverbindung auf dem Raspberry Pi
 
 ## 🔧 Installation & Starten der Anwendung
 
-### 1️⃣ **Docker auf dem Raspberry Pi installieren (falls noch nicht geschehen)**
-Falls Docker noch nicht installiert ist, führe folgende Befehle aus:
+### 1️⃣ **Raspberry Pi vorbereiten**
+Falls Docker noch nicht installiert ist, kann es mit folgenden Befehlen eingerichtet werden:
 
 ```bash
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 ```
 
-Füge den Benutzer zur Docker-Gruppe hinzu (damit Docker ohne `sudo` genutzt werden kann):
+Füge den aktuellen Benutzer zur Docker-Gruppe hinzu (damit Docker ohne `sudo` genutzt werden kann):
+
 ```bash
 sudo usermod -aG docker $USER
 ```
+
 Dann einmal **ausloggen und wieder einloggen**, damit die Änderungen wirksam werden.
 
-### 2️⃣ **Image auf den Raspberry Pi kopieren**
-Falls sich das Docker-Image auf einem anderen Rechner befindet, kannst du es per `scp` auf den Raspberry Pi übertragen:
+Docker Compose installieren:
 
 ```bash
-scp pls-laravel_app.tar pi@raspberrypi.local:/home/pi/
+sudo apt update
+sudo apt install -y docker-compose
 ```
 
-### 3️⃣ **Docker-Image laden**
-Auf dem Raspberry Pi anmelden und das Image in Docker laden:
-```bash
-sudo docker load -i /home/pi/pls-laravel_app.tar
-```
-
-### 4️⃣ **Container starten**
-Führe folgenden Befehl aus, um die Laravel-App als Container zu starten:
+### 2️⃣ **Repository klonen und Anwendung einrichten**
+Das Setup-Skript (`setup.sh`) automatisiert die Installation. Führe folgende Befehle aus:
 
 ```bash
-sudo docker run -d --name laravel-app -p 8080:80 pls-laravel_app
+curl -o setup.sh https://raw.githubusercontent.com/schusterben/PLS/dev_sage/setup.sh
+chmod +x setup.sh
+./setup.sh
 ```
 
-### 5️⃣ **App im Browser öffnen**
+Das Skript erledigt folgende Schritte:
+- Klont das Repository
+- Wechselt in den richtigen Branch
+- Installiert Composer- und Node.js-Abhängigkeiten
+- Startet die Docker-Container mit `docker-compose`
+- Führt die Datenbankmigrationen aus
+
+### 3️⃣ **App im Browser öffnen**
 Sobald der Container läuft, kann die App im Browser aufgerufen werden:
 
 ```
@@ -55,19 +60,25 @@ Oder (falls du die IP-Adresse des Raspberry Pi kennst):
 http://<RaspberryPi-IP>:8080
 ```
 
-## 🛑 Container stoppen & löschen
-Falls du den Container stoppen möchtest:
+## 🛑 Container verwalten
+
+### Container stoppen:
 ```bash
-sudo docker stop laravel-app
+docker-compose down
 ```
 
-Falls du ihn komplett entfernen möchtest:
+### Container neu starten:
 ```bash
-sudo docker rm laravel-app
+docker-compose up -d
+```
+
+### Logs ansehen:
+```bash
+docker-compose logs -f
 ```
 
 ## 🔄 Raspberry Pi sicher herunterfahren
-Wenn du den Raspberry Pi abschalten möchtest, bevor du ihn vom Strom trennst:
+Falls du den Raspberry Pi abschalten möchtest:
 ```bash
 sudo shutdown -h now
 ```
@@ -76,15 +87,15 @@ sudo shutdown -h now
 
 ### Alle laufenden Container anzeigen
 ```bash
-sudo docker ps
+docker ps
 ```
 
 ### Alle Container (auch gestoppte) anzeigen
 ```bash
-sudo docker ps -a
+docker ps -a
 ```
 
 ### Alle Docker-Images anzeigen
 ```bash
-sudo docker images
+docker images
 ```
