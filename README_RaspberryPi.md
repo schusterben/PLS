@@ -39,7 +39,7 @@ Das Setup-Skript (`setup.sh`) automatisiert die Installation. Führe folgende Be
 ```bash
 curl -o setup.sh https://raw.githubusercontent.com/schusterben/PLS/dev_sage/setup.sh
 chmod +x setup.sh
-./setup.sh
+sudo ./setup.sh
 ```
 
 Das Skript erledigt folgende Schritte:
