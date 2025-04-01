@@ -17,7 +17,7 @@ docker run --rm -v $(pwd):/app composer:latest composer require tymon/jwt-auth
 
 # Node.js-Abhängigkeiten installieren
 echo "Installing Node.js dependencies..."
-docker run --rm -v $(pwd):/app -w /app node:18 npm install
+sudo docker run --rm -v $(pwd):/app -w /app node:18 npm install
 docker run --rm -v $(pwd):/app -w /app node:18 npm install vite --save-dev
 
 # Docker-Container starten
@@ -26,6 +26,10 @@ docker-compose up -d --build
 
 # Datenbankmigrationen ausführen
 echo "Running database migrations..."
-docker-compose exec laravel_app php artisan migrate
+sudo docker-compose exec laravel_app php artisan migrate
+
+sudo chmod -R 775 storage bootstrap/cache
+sudo chown -R www-data:www-data storage bootstrap/cache
+ 
 
 echo "Setup complete! Your application is now running."
