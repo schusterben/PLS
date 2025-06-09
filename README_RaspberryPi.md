@@ -1,101 +1,84 @@
-# 📌 Laravel App mit Docker auf Raspberry Pi
+📦 Laravel-Projekt mit fertigen Docker-Images auf dem Raspberry Pi
+Dieses Setup zeigt, wie du eine Laravel-App mit vorgebauten Docker-Images auf einem Raspberry Pi installierst und startest – ganz ohne Image-Building auf dem Pi.
 
-Dieses Repository enthält eine Laravel-Anwendung, die als Docker-Image auf einem Raspberry Pi bereitgestellt werden kann.
+🔧 Voraussetzungen
+Raspberry Pi mit Raspberry Pi OS
 
-## 🚀 Voraussetzungen
+Docker & Docker Compose
 
-- Ein Raspberry Pi mit **Docker** und **Docker Compose** installiert
-- SSH-Zugriff auf den Raspberry Pi
-- Internetverbindung auf dem Raspberry Pi
+Zwei vorbereitete Docker-Image-Dateien:
 
-## 🔧 Installation & Starten der Anwendung
+laravel_app.tar
 
-### 1️⃣ **Raspberry Pi vorbereiten**
-Falls Docker noch nicht installiert ist, kann es mit folgenden Befehlen eingerichtet werden:
+mysql_db.tar
 
-```bash
+Projektverzeichnis mit:
+
+docker-compose.yml
+
+.env
+
+leerem Ordner laravel_app/
+
+🚀 Schritt-für-Schritt-Anleitung
+✅ 1. Docker & Docker Compose auf dem Raspberry Pi installieren
+bash
+Kopieren
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
-```
-
-Füge den aktuellen Benutzer zur Docker-Gruppe hinzu (damit Docker ohne `sudo` genutzt werden kann):
-
-```bash
 sudo usermod -aG docker $USER
-```
+Dann: ausloggen und neu einloggen
 
-Dann einmal **ausloggen und wieder einloggen**, damit die Änderungen wirksam werden.
+Installiere Docker Compose:
 
-Docker Compose installieren:
-
-```bash
+bash
+Kopieren
 sudo apt update
 sudo apt install -y docker-compose
-```
+📁 2. Projektstruktur vorbereiten (auf deinem Rechner)
+Stelle sicher, dass dein Projekt z. B. so aussieht:
 
-### 2️⃣ **Repository klonen und Anwendung einrichten**
-Das Setup-Skript (`setup.sh`) automatisiert die Installation. Führe folgende Befehle aus:
-
-```bash
-curl -o setup.sh https://raw.githubusercontent.com/schusterben/PLS/dev_sage/setup.sh
-chmod +x setup.sh
-./setup.sh
-```
-
-Das Skript erledigt folgende Schritte:
-- Klont das Repository
-- Wechselt in den richtigen Branch
-- Installiert Composer- und Node.js-Abhängigkeiten
-- Startet die Docker-Container mit `docker-compose`
-- Führt die Datenbankmigrationen aus
-
-### 3️⃣ **App im Browser öffnen**
-Sobald der Container läuft, kann die App im Browser aufgerufen werden:
-
-```
+bash
+Kopieren
+docker_setup/
+├── docker-compose.yml
+├── .env
+├── laravel_app/         ← leerer Ordner für Laravel-Volume
+├── laravel_app.tar
+├── mysql_db.tar
+🧳 3. Projekt & Images auf den Raspberry Pi übertragen
+bash
+Kopieren
+scp -r docker_setup pi@<RPI-IP>:/home/pi/
+📦 4. Docker-Images auf dem Raspberry Pi laden
+bash
+Kopieren
+cd ~/docker_setup
+docker load -i laravel_app.tar
+docker load -i mysql_db.tar
+⚙️ 5. Container starten
+bash
+Kopieren
+docker compose up -d
+🗃️ 6. Datenbank-Migrationen ausführen
+bash
+Kopieren
+docker compose exec laravel_app php artisan migrate
+🖥️ Zugriff auf die App
 http://raspberrypi.local:8080
-```
-Oder (falls du die IP-Adresse des Raspberry Pi kennst):
-```
-http://<RaspberryPi-IP>:8080
-```
 
-## 🛑 Container verwalten
+oder: http://<RPI-IP>:8080
 
-### Container stoppen:
-```bash
-docker-compose down
-```
+🛑 Container verwalten
+Aktion	Befehl
+Container stoppen	docker compose down
+Container starten	docker compose up -d
+Logs ansehen	docker compose logs -f
+Migration zurücksetzen	docker compose exec laravel_app php artisan migrate:fresh
 
-### Container neu starten:
-```bash
-docker-compose up -d
-```
-
-### Logs ansehen:
-```bash
-docker-compose logs -f
-```
-
-## 🔄 Raspberry Pi sicher herunterfahren
-Falls du den Raspberry Pi abschalten möchtest:
-```bash
-sudo shutdown -h now
-```
-
-## 💡 Nützliche Docker-Befehle
-
-### Alle laufenden Container anzeigen
-```bash
-docker ps
-```
-
-### Alle Container (auch gestoppte) anzeigen
-```bash
-docker ps -a
-```
-
-### Alle Docker-Images anzeigen
-```bash
-docker images
-```
+🧠 Nützliche Docker-Befehle
+bash
+Kopieren
+docker ps          # Laufende Container anzeigen
+docker ps -a       # Alle Container (auch gestoppte)
+docker images      # Lokale Docker-Images anzeigen
