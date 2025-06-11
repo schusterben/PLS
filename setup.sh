@@ -19,6 +19,10 @@ echo "Installing Node.js dependencies..."
 sudo docker run --rm -v $(pwd):/app -w /app node:18 npm install
 docker run --rm -v $(pwd):/app -w /app node:18 npm install vite --save-dev
 
+# Laravel Docker Image lokal erstellen
+echo "Building Laravel Docker image..."
+docker build -t pls-laravel_app:latest .
+
 # Docker-Container starten
 echo "Starting Docker containers..."
 docker-compose up -d --build
