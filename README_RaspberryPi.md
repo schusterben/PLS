@@ -1,101 +1,102 @@
-# 📌 Laravel App mit Docker auf Raspberry Pi
+📦 Laravel-Projekt mit fertigen Docker-Images auf dem Raspberry Pi
+Dieses Setup zeigt, wie du eine Laravel-App mit vorgebauten Docker-Images auf einem Raspberry Pi installierst und startest – ganz ohne Image-Building auf dem Pi.
 
-Dieses Repository enthält eine Laravel-Anwendung, die als Docker-Image auf einem Raspberry Pi bereitgestellt werden kann.
+🔧 Voraussetzungen
+Raspberry Pi mit Raspberry Pi OS
 
-## 🚀 Voraussetzungen
+Docker & Docker Compose
 
-- Ein Raspberry Pi mit **Docker** und **Docker Compose** installiert
-- SSH-Zugriff auf den Raspberry Pi
-- Internetverbindung auf dem Raspberry Pi
+Zwei vorbereitete Docker-Image-Dateien:
 
-## 🔧 Installation & Starten der Anwendung
+laravel_app.tar
 
-### 1️⃣ **Raspberry Pi vorbereiten**
-Falls Docker noch nicht installiert ist, kann es mit folgenden Befehlen eingerichtet werden:
+mysql_db.tar
 
+Projektverzeichnis mit:
+
+docker-compose.yml
+
+.env
+
+leerem Ordner laravel_app/
+
+🚀 Schritt-für-Schritt-Anleitung
+✅ 1. Docker & Docker Compose auf dem Raspberry Pi installieren
 ```bash
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
-```
-
-Füge den aktuellen Benutzer zur Docker-Gruppe hinzu (damit Docker ohne `sudo` genutzt werden kann):
-
-```bash
 sudo usermod -aG docker $USER
 ```
+Dann: ausloggen und neu einloggen
 
-Dann einmal **ausloggen und wieder einloggen**, damit die Änderungen wirksam werden.
-
-Docker Compose installieren:
+Installiere Docker Compose:
 
 ```bash
 sudo apt update
 sudo apt install -y docker-compose
 ```
 
-### 2️⃣ **Repository klonen und Anwendung einrichten**
-Das Setup-Skript (`setup.sh`) automatisiert die Installation. Führe folgende Befehle aus:
+📁 2. Projektstruktur vorbereiten (auf deinem Rechner)
+Stelle sicher, dass dein Projekt z. B. so aussieht:
 
 ```bash
-curl -o setup.sh https://raw.githubusercontent.com/schusterben/PLS/dev_sage/setup.sh
-chmod +x setup.sh
-./setup.sh
+
+docker_setup/
+├── docker-compose.yml
+├── .env
+├── laravel_app/         ← leerer Ordner für Laravel-Volume
+├── laravel_app.tar
+├── mysql_db.tar
+```
+🧳 3. Projekt & Images auf den Raspberry Pi übertragen
+
+```bash
+scp -r docker_setup pi@<RPI-IP>:/home/pi/
 ```
 
-Das Skript erledigt folgende Schritte:
-- Klont das Repository
-- Wechselt in den richtigen Branch
-- Installiert Composer- und Node.js-Abhängigkeiten
-- Startet die Docker-Container mit `docker-compose`
-- Führt die Datenbankmigrationen aus
+📦 4. Docker-Images auf dem Raspberry Pi laden
 
-### 3️⃣ **App im Browser öffnen**
-Sobald der Container läuft, kann die App im Browser aufgerufen werden:
-
+```bash
+cd ~/docker_setup
+docker load -i laravel_app.tar
+docker load -i mysql_db.tar
 ```
+
+⚙️ 5. Container starten
+
+```bash
+docker compose up -d
+```
+
+🗃️ 6. Datenbank-Migrationen ausführen
+
+```bash
+docker compose exec laravel_app php artisan migrate
+```
+🖥️ Zugriff auf die App
 http://raspberrypi.local:8080
-```
-Oder (falls du die IP-Adresse des Raspberry Pi kennst):
-```
-http://<RaspberryPi-IP>:8080
-```
 
-## 🛑 Container verwalten
+oder: http://<RPI-IP>:8080
 
-### Container stoppen:
+🛑 Container verwalten
+Aktion	Befehl
+Container stoppen
 ```bash
-docker-compose down
+docker compose down
 ```
-
-### Container neu starten:
+Container starten
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
-
-### Logs ansehen:
+Logs ansehen
 ```bash
-docker-compose logs -f
+docker compose logs -f
 ```
+Migration zurücksetzen	docker compose exec laravel_app php artisan migrate:fresh
 
-## 🔄 Raspberry Pi sicher herunterfahren
-Falls du den Raspberry Pi abschalten möchtest:
+🧠 Nützliche Docker-Befehle
 ```bash
-sudo shutdown -h now
-```
-
-## 💡 Nützliche Docker-Befehle
-
-### Alle laufenden Container anzeigen
-```bash
-docker ps
-```
-
-### Alle Container (auch gestoppte) anzeigen
-```bash
-docker ps -a
-```
-
-### Alle Docker-Images anzeigen
-```bash
-docker images
+docker ps          # Laufende Container anzeigen
+docker ps -a       # Alle Container (auch gestoppte)
+docker images      # Lokale Docker-Images anzeigen
 ```
