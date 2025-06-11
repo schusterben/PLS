@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * The QrCodePatient class represents the model for patient QR codes.
  */
-class QrCodePatient extends Model
+class QRCodePatient extends Model
 {
     // Specifies the table associated with this model
     protected $table = 'qr_code_patient';
