@@ -20,7 +20,7 @@ function SituationRoomTable() {
     /**
      * Fetches persons' data including their positions from the API.
      */
-    useEffect(() => {
+    const fetchPersons = useCallback(() => {
         fetch("/api/persons", {
             method: "POST",
             headers: {
@@ -41,7 +41,21 @@ function SituationRoomTable() {
                 console.error("Error fetching persons:", error);
                 setIsLoading(false);
             });
-    }, []);
+    }, [token, operationScene]);
+
+    /**
+     * Polling to refresh the table
+     */
+    useEffect(() => {
+        // fetch data
+        fetchPersons();
+
+        // poll every 2 seconds
+        const interval = setInterval(fetchPersons, 2000);
+
+        // unmount component
+        return () => clearInterval(interval);
+    }, [fetchPersons]);
 
     /**
      * Updates the map's center based on the positions of persons.
