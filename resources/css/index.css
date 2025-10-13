@@ -1,4 +1,3 @@
-/* ===== Base / Reset ===== */
 * { box-sizing: border-box; }
 
 html, body, #root { height: 100%; }
@@ -18,24 +17,21 @@ html, body, #root { height: 100%; }
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  /* >>> Appbar-Parameter: Höhe HIER zentral pflegen <<< */
   --appbar-height: 64px;
   --appbar-z: 1100;
 
-  /* (Optional) Linkfarben */
   --link: #646cff;
   --link-hover: #535bf2;
 }
 
 body {
-  margin: 0;                 /* <— verhindert abgeschnittene Appbar/Overflow */
+  margin: 0;                 
   min-width: 320px;
   min-height: 100vh;
-  text-align: left;          /* keine globale Zentrierung */
-  display: block;            /* wichtig: NICHT flex + center */
+  text-align: left;          
+  display: block;            
 }
 
-/* ===== Appbar (falls nicht in eigener CSS-Datei) ===== */
 .header {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -49,7 +45,7 @@ body {
   height: var(--appbar-height);
   padding: 0 20px;
 
-  background-color: #0048fd;   /* deine Farben */
+  background-color: #0048fd;   
   color: #ffffff;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
@@ -57,13 +53,13 @@ body {
 .logo img {
   display: block;
   max-height: calc(var(--appbar-height) - 12px);
-  margin: 0; /* keine Offsets nach oben */
+  margin: 0; 
 }
 
 .links {
   display: flex;
   gap: 20px;
-  overflow: hidden;    /* schützt vor Overflow bei vielen Links */
+  overflow: hidden;    
 }
 
 .links a {
@@ -73,7 +69,7 @@ body {
   font-weight: 700;
   padding: 6px 10px;
   border-radius: 6px;
-  white-space: nowrap; /* verhindert Zeilenumbruch, z. B. „Home“ */
+  white-space: nowrap; 
   transition: color .2s, background-color .2s;
 }
 
@@ -83,18 +79,14 @@ body {
   color: #ffcc00;
 }
 
-/* ===== Content-Bereich unter die fixe Appbar schieben ===== */
 .content {
-  /* WICHTIG: Kein margin-top in %, sondern exakte Höhe der Appbar */
   padding-top: var(--appbar-height);
 }
 
-/* Optional für Seiten-Wrapper, die volle Höhe nutzen sollen */
 .page-root {
   min-height: calc(100vh - var(--appbar-height));
 }
 
-/* ===== Typografie / Elemente ===== */
 a {
   font-weight: 500;
   color: var(--link);
@@ -123,14 +115,12 @@ button:hover { border-color: #646cff; }
 button:focus,
 button:focus-visible { outline: 4px auto -webkit-focus-ring-color; }
 
-/* ===== Canvas Defaults (verhindert Überlauf hinter der Appbar) ===== */
 canvas {
   display: block;
   max-width: 100%;
-  height: auto; /* statt 100%, damit es nicht unter die Appbar läuft */
+  height: auto; 
 }
 
-/* ===== Light-Scheme ===== */
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

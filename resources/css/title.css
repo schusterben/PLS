@@ -4,16 +4,16 @@
   --text-color: #ffffff;
   --hover-color: #003580;
 
-  --appbar-height: 72px; /* Höhe an dein Logo anpassen */
+  --appbar-height: 72px; 
   --appbar-z: 1100;
 }
 
 .header {
-  position: fixed;           /* fix am oberen Bildschirmrand */
+  position: fixed;          
   top: 0;
   left: 0;
-  right: 0;                  /* sorgt für volle Breite */
-  width: 100%;               /* Sicherheit */
+  right: 0;                  
+  width: 100%;               
   z-index: var(--appbar-z);
 
   display: flex;
@@ -55,12 +55,10 @@
   color: var(--secondary-color);
 }
 
-/* Content nach unten verschieben, sonst liegt es hinter der Appbar */
 .content {
   padding-top: var(--appbar-height);
 }
 
-/* Seiten-Root: Höhe anpassen, damit nichts überlappt */
 .page-root {
   min-height: calc(100vh - var(--appbar-height));
 }

@@ -1,24 +1,20 @@
 :root{
-  /* Höhe muss zu deiner Appbar passen */
   --appbar-height: 64px;
   --card-max: 1100px;
 
-  /* Farben aus deinem Theme */
   --primary: #0048fd;
   --secondary: #ffcc00;
   --text-on-primary: #ffffff;
   --hover: #003580;
 
-  /* Login-/Accent-Farben aus deinem Stil */
   --accent: #b30000;
   --accent-dark: #990000;
 
-  --bg: #242424;        /* dark body */
-  --card-bg: #f5f5f5;   /* helle Card wie bei Login */
+  --bg: #242424;        
+  --card-bg: #f5f5f5;   
   --muted: #6b7280;
 }
 
-/* Seite unterhalb der Appbar */
 .qr-auth-shell{
   min-height: calc(100vh - var(--appbar-height));
   padding: clamp(12px, 2.5vh, 20px) 16px 24px;
@@ -28,7 +24,6 @@
   background: transparent;
 }
 
-/* Karte */
 .qr-card{
   width: 100%;
   max-width: var(--card-max);
@@ -41,7 +36,6 @@
   padding: clamp(16px, 2.5vw, 28px);
 }
 
-/* Headerbereich */
 .qr-card-header{
   display: flex;
   gap: 16px;
@@ -69,7 +63,6 @@
   gap: 8px;
 }
 
-/* Layout: Info links, Scanner rechts (stacked auf Mobile) */
 .qr-layout{
   display: grid;
   grid-template-columns: 1fr;
@@ -113,7 +106,6 @@
   border: 1px solid #fecdd3;
 }
 
-/* Scannerbereich */
 .qr-scanner{
   display: flex;
   flex-direction: column;
@@ -123,10 +115,10 @@
 .qr-reader{
   width: 100%;
   max-width: 420px;
-  aspect-ratio: 1 / 1;        /* immer quadratisch */
+  aspect-ratio: 1 / 1;        
   border-radius: 12px;
   overflow: hidden;
-  background: #111;           /* Placeholder-Hintergrund */
+  background: #111;           
   box-shadow:
     0 1px 2px rgba(0,0,0,0.06),
     0 10px 20px rgba(0,0,0,0.08);
@@ -143,7 +135,6 @@
   margin-top: 10px;
 }
 
-/* Buttons */
 .btn{
   height: 40px;
   padding: 0 14px;
@@ -173,4 +164,77 @@
 }
 .btn-ghost:hover{
   background: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;          
+    --card-bg: #111827;     
+    --muted: #9ca3af;       
+
+    --primary: #93c5fd;     
+    --secondary: #60a5fa;
+    --hover: #2563eb;
+    --text-on-primary: #0b1220;
+
+    --accent: #b30000;
+    --accent-dark: #990000;
+  }
+
+  .qr-auth-shell {
+    background: var(--bg);
+    color-scheme: dark;
+  }
+
+  .qr-card {
+    background: var(--card-bg);
+    border-color: #7f1d1d;
+    box-shadow:
+      0 2px 6px rgba(0,0,0,0.35),
+      0 12px 28px rgba(0,0,0,0.45);
+  }
+
+  .qr-card-header {
+    border-bottom-color: rgba(255,255,255,0.08);
+  }
+
+  .qr-title { color: #f3f4f6; }
+  .qr-subtitle { color: var(--muted); }
+
+  .qr-section-title { color: #e5e7eb; }
+  .qr-list { color: #d1d5db; }
+
+  .qr-alert {
+    background: rgba(220,38,38,0.15);
+    border-color: rgba(239,68,68,0.4);
+    color: #fca5a5;
+  }
+
+  .qr-reader {
+    background: #0f172a;
+    border-color: rgba(255,255,255,0.08);
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.3),
+      0 10px 20px rgba(0,0,0,0.5);
+  }
+
+  /* Buttons */
+  .btn-secondary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--text-on-primary);
+  }
+  .btn-secondary:hover {
+    background: var(--hover);
+    border-color: var(--hover);
+  }
+
+  .btn-ghost {
+    background: #1f2937;
+    color: #e5e7eb;
+    border-color: #374151;
+  }
+  .btn-ghost:hover {
+    background: #374151;
+  }
 }

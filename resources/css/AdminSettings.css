@@ -1,0 +1,278 @@
+
+   :root {
+    --bg: #f7f7f8;
+    --card: #ffffff;
+    --ink: #111827;
+    --ink-2: #4b5563;
+    --border: #e5e7eb;
+    --brand: #111827;         
+    --brand-2: #374151;
+    --focus: 2px solid #111827;
+    --radius: 14px;
+    --shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  
+    --size-1: 4px;
+    --size-2: 8px;
+    --size-3: 12px;
+    --size-4: 16px;
+    --size-5: 20px;
+    --size-6: 24px;
+  
+    --pad-card: clamp(14px, 2.4vw, 22px);
+    --pad-page: clamp(16px, 3vw, 28px);
+  
+    --ring: 0 0 0 3px rgba(17, 24, 39, 0.25);
+  }
+  
+
+  *,
+  *::before,
+  *::after { box-sizing: border-box; }
+  
+  .admin-settings {
+    min-block-size: 100dvh;
+    background: var(--bg);
+    color: var(--ink);
+    padding: var(--pad-page);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+    border-radius: calc(var(--radius) - 4px);
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  
+  @media (prefers-contrast: more) {
+    :focus-visible { box-shadow: 0 0 0 4px #000000; }
+  }
+  
+ 
+  .admin-shell {
+    max-inline-size: 960px;
+    margin-inline: auto;
+    display: grid;
+    gap: var(--size-5);
+    container-type: inline-size; 
+    container-name: shell;
+  }
+  
+  .admin-header {
+    display: flex;
+    gap: var(--size-3);
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .actions {
+    display: flex;
+    gap: var(--size-3);
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    --btn-h: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-3);
+    inline-size: auto;
+    min-inline-size: 44px;                  
+    block-size: var(--btn-h);
+    padding-inline: 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--ink);
+    font-weight: 600;
+    letter-spacing: .2px;
+    box-shadow: var(--shadow);
+    transition:
+      transform .06s ease,
+      background-color .18s ease,
+      border-color .18s ease,
+      box-shadow .18s ease;
+    will-change: transform;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  @media (any-hover: hover) {
+    .btn:hover { background: #f3f4f6; }
+  }
+  
+  .btn:active { transform: translateY(1px) scale(0.995); }
+  
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: .55;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  .btn--primary {
+    background: var(--brand);
+    color: #fff;
+    border-color: var(--brand);
+  }
+  @media (any-hover: hover) {
+    .btn--primary:hover { background: var(--brand-2); }
+  }
+  .btn--primary:focus-visible { box-shadow: var(--ring), inset 0 0 0 1px #fff; }
+  
+  .wide-btn { inline-size: 100%; }
+  
+  .settings-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: var(--pad-card);
+    display: grid;
+    gap: var(--size-4);
+  }
+  
+  .settings-title {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--size-3);
+    align-items: start;
+  }
+  
+  @container shell (min-width: 560px) {
+    .card-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @container shell (min-width: 880px) {
+    .card-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  
+  .muted {
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  
+  fieldset.reset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-inline-size: 0;
+  }
+  
+  .is-condensed .settings-card { padding: clamp(10px, 1.6vw, 16px); }
+  .is-condensed .card-grid { gap: var(--size-2); }
+  .is-condensed .btn { --btn-h: 38px; padding-inline: 12px; }
+  
+  .is-armed .settings-card { box-shadow: 0 0 0 2px var(--brand), var(--shadow); }
+  .is-idle  .settings-card { opacity: .98; }
+  
+@media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117;
+      --card: #111827;
+      --ink: #e5e7eb;
+      --ink-2: #9ca3af;
+      --border: #1f2937;
+      --brand: #93c5fd;    
+      --brand-2: #60a5fa;
+      --ring: 0 0 0 3px rgba(147, 197, 253, 0.35);
+      --shadow: 0 8px 22px rgba(0,0,0,0.45);
+    }
+  
+    .admin-settings { 
+      background: var(--bg);
+      color: var(--ink);
+      color-scheme: dark; 
+    }
+  
+    .settings-card {
+      background: var(--card);
+      border-color: var(--border);
+      box-shadow: var(--shadow);
+    }
+  
+    .settings-title,
+    .muted { color: var(--ink-2); }
+  
+    .btn {
+      background: var(--card);
+      color: var(--ink);
+      border-color: var(--border);
+      box-shadow: var(--shadow);
+    }
+  
+    .btn--primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #0b1220;
+    }
+  
+    @media (any-hover: hover) {
+      .btn:hover { background: #0f172a; }
+      .btn--primary:hover { background: var(--brand-2); }
+    }
+  }
+  
+  .dark :root,
+  .dark {
+    --bg: #0d1117;
+    --card: #111827;
+    --ink: #e5e7eb;
+    --ink-2: #9ca3af;
+    --border: #1f2937;
+    --brand: #93c5fd;
+    --brand-2: #60a5fa;
+    --ring: 0 0 0 3px rgba(147, 197, 253, 0.35);
+    --shadow: 0 8px 22px rgba(0,0,0,0.45);
+  }
+  
+  .dark .admin-settings { 
+    background: var(--bg);
+    color: var(--ink);
+    color-scheme: dark;
+  }
+  
+  .dark .settings-card {
+    background: var(--card);
+    border-color: var(--border);
+    box-shadow: var(--shadow);
+  }
+  
+  .dark .settings-title,
+  .dark .muted { color: var(--ink-2); }
+  
+  .dark .btn {
+    background: var(--card);
+    color: var(--ink);
+    border-color: var(--border);
+    box-shadow: var(--shadow);
+  }
+  
+  .dark .btn--primary {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #0b1220;
+  }
+  
+  @media (any-hover: hover) {
+    .dark .btn:hover { background: #0f172a; }
+    .dark .btn--primary:hover { background: var(--brand-2); }
+  }
+  
