@@ -1,134 +1,158 @@
 import { Html5Qrcode } from "html5-qrcode";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useStateContext } from "./../contexts/ContextProvider";
+import "./../../../css/QrAuthenticator.css";
 
-/**
- * QrAuthenticator component for authenticating users using QR codes.
- */
 export default function QrAuthenticator() {
-    const [cameraBlocked, setCameraBlocked] = useState(false);
-    const [accessGranted, setaccessGranted] = useState(false);
-    const { token, setToken } = useStateContext();
+  const [cameraBlocked, setCameraBlocked] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(false);
+  const [scanError, setScanError] = useState("");
+  const [isStarting, setIsStarting] = useState(true);
 
-    const navigate = useNavigate();
-    let scanner;
+  const { setToken, token } = useStateContext();
+  const navigate = useNavigate();
 
-    const csrfToken = document.getElementById("root").getAttribute("data-csrf");
+  const scannerRef = useRef(null);            // Html5Qrcode-Instanz
+  const isMountedRef = useRef(false);
 
-    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-        onScanSuccess(decodedText, decodedResult);
+  const csrfToken = document.getElementById("root")?.getAttribute("data-csrf") || "";
+
+  const startScanner = async () => {
+    try {
+      if (scannerRef.current?.getState()) return; // läuft schon
+
+      // Instanz erstellen, falls nicht vorhanden
+      if (!scannerRef.current) {
+        scannerRef.current = new Html5Qrcode("qr-reader");
+      }
+
+      const config = { fps: 10, qrbox: { width: 320, height: 320 } };
+
+      await scannerRef.current.start(
+        { facingMode: "environment" },
+        config,
+        onScanSuccess,
+        (errMsg) => setScanError(String(errMsg || "Scan-Fehler"))
+      );
+
+      setIsStarting(false);
+      setCameraBlocked(false);
+      setScanError("");
+    } catch (err) {
+      setIsStarting(false);
+      setCameraBlocked(true);
+      setScanError(String(err?.message || err || "Kamera konnte nicht gestartet werden."));
+      // Sauber schließen, falls Start fehlgeschlagen ist
+      try { await scannerRef.current?.stop(); } catch {}
+      try { await scannerRef.current?.clear(); } catch {}
+    }
+  };
+
+  const stopScanner = async () => {
+    try {
+      if (scannerRef.current?.getState()) {
+        await scannerRef.current.stop();
+      }
+      await scannerRef.current?.clear();
+    } catch {}
+  };
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    startScanner();
+
+    // Cleanup beim Unmount
+    return () => {
+      isMountedRef.current = false;
+      stopScanner();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    // This effect is used to initialize and start the QR code scanner when the component mounts.
-    useEffect(() => {
-        if (!scanner?.getState()) {
-            const config = { fps: 10, qrbox: { width: 450, height: 450 } };
-            scanner = new Html5Qrcode("reader");
+  const handleAdminLogin = () => {
+    navigate("/AdminLandingPage");
+  };
 
-            scanner
-                .start(
-                    { facingMode: "environment" },
-                    config,
-                    qrCodeSuccessCallback
-                )
-                .catch((error) => {
-                    setCameraBlocked(true);
-                    console.warn(`Code scan error = ${error}`);
-                });
-        }
-    }, []);
+  const onScanSuccess = async (decodedText /*, decodedResult */) => {
+    try {
+      setScanError("");
 
-    useEffect(() => {
-        const handleBeforeUnload = (e) => {
-            scanner.stop();
-        };
+      const res = await fetch("/api/qr-login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": csrfToken,
+        },
+        body: JSON.stringify({ qr_code: decodedText }),
+      });
 
-        window.addEventListener("beforeunload", handleBeforeUnload);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
 
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, []);
+      if (data?.status?.toLowerCase() === "success" && data?.token) {
+        setToken(data.token);
+        await stopScanner();
+        if (!isMountedRef.current) return;
+        setAccessGranted(true);
+      } else {
+        setScanError("Ungültiger QR-Code. Bitte erneut scannen.");
+      }
+    } catch (e) {
+      setScanError("Netzwerk- oder Serverfehler. Bitte später erneut versuchen.");
+      console.error(e);
+    }
+  };
 
-    /**
-     * Handle the click event for the "Anmelden als Admin" button.
-     * Navigates to the admin landing page.
-     */
-    const handleAdminLogin = () => {
-        navigate("/AdminLandingPage");
-    };
+  // Falls schon eingeloggt, direkt weiter
+  if (token || accessGranted) return <Navigate to="/RoleSelection" />;
 
-    /**
-     * Handle the successful QR code scan result.
-     * Sends the decoded QR code to the server for authentication.
-     * @param {string} decodedText - The decoded QR code text.
-     * @param {object} decodedResult - The decoded QR code result.
-     */
-    const onScanSuccess = (decodedText, decodedResult) => {
-        fetch("/api/qr-login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": csrfToken,
-            },
-            body: JSON.stringify({ qr_code: decodedText }), // Send the decoded QR code
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                // Hier kannst du auf die Antwort von Laravel reagieren
-                if (data.status.toLowerCase() === "success" && data.token) {
-                    setToken(data.token);
-                    scanner.stop();
-                    setaccessGranted(true);
-                } else {
-                        console.error("Ungültiger QR-Code");
-                }
-            })
-            .catch((error) => console.error("Fetch error:", error));
-    };
-
-    return (
-        <div className={"container"}>
-            <h1 style = {{ marginBottom: "10px", textAlign: "center" }}>
-                Willkommen im PLS-System
-            </h1>
-            <p style = {{ marginBottom: "20px", textAlign: "center" }}>
-                <h2>Hinweis:</h2>
-                <strong>Admin:</strong> Erstellen Sie zunächst einen Einsatzort und generieren Sie bei Bedarf QR-Codes
-                für die Authorisierung der Einsatzkräfte und Patienten.
-                <br/>
-                <button
-                    onClick={handleAdminLogin}
-                    className="admin-button"
-                    title="Admins erstellen zuerst einen Einsatzort und bei Bedarf QR-Codes für Einsatzkräfte und Patienten."
-                >
-                    Adminanmeldung
-                </button>
-                <br/>
-                <br/>
-                <strong>Einsatzkräfte:</strong> Nutzen Sie Ihren QR-Code für die Anmeldung.
+  return (
+    <div className="qr-auth-shell">
+      <div className="qr-card">
+        <header className="qr-card-header">
+          <div>
+            <h1 className="qr-title">Willkommen im PLS-System</h1>
+            <p className="qr-subtitle">
+              Scannen Sie Ihren QR-Code, um sich als Einsatzkraft anzumelden.
             </p>
-            <div className="actions">
+          </div>
 
-                <div
-                    id="reader"
-                    title="Scannen Sie Ihren QR-Code, um sich als Einsatzkraft zu registrieren."
-                ></div>
-            </div>
+          <div className="qr-actions">
+          </div>
+        </header>
 
-            {cameraBlocked && (
-                <p style={{color: "red", fontWeight: "bold" }}>
-                    Der Zugriff auf die Kamera wurde verweigert. Bitte erlauben
-                    Sie den Zugriff auf die Kamera über die Einstellungen.
-                </p>
+        <div className="qr-layout">
+          <section className="qr-info">
+            <h2 className="qr-section-title">Hinweis</h2>
+            <ul className="qr-list">
+              <li><strong>Admin:</strong> Einsatzort erstellen, QR-Codes generieren.</li>
+              <li><strong>Einsatzkräfte:</strong> QR-Code vor die Kamera halten.</li>
+              <li>Stellen Sie sicher, dass die Kamera-Berechtigung erteilt ist.</li>
+            </ul>
+
+            {(cameraBlocked || scanError) && (
+              <div className="qr-alert" role="alert">
+                {cameraBlocked
+                  ? "Zugriff auf die Kamera wurde verweigert. Bitte erlauben Sie den Kamerazugriff in den Browser-Einstellungen."
+                  : scanError}
+              </div>
             )}
-            {accessGranted && <Navigate to="/RoleSelection" />}
+          </section>
+
+          <section className="qr-scanner">
+            <div id="qr-reader" className={`qr-reader ${isStarting ? "is-starting" : ""}`} />
+            <div className="qr-scanner-actions">
+              <button type="button" className="btn btn-ghost" onClick={startScanner}>
+                Kamera starten
+              </button>
+              <button type="button" className="btn btn-ghost" onClick={stopScanner}>
+                Kamera stoppen
+              </button>
+            </div>
+          </section>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

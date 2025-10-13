@@ -1,41 +1,66 @@
 :root {
-    --primary-color: #0048fd; /* Beispielhafte Farben vom Logo */
-    --secondary-color: #ffcc00;
-    --text-color: #ffffff;
-    --hover-color: #003580;
+  --primary-color: #0048fd;
+  --secondary-color: #ffcc00;
+  --text-color: #ffffff;
+  --hover-color: #003580;
+
+  --appbar-height: 72px; /* Höhe an dein Logo anpassen */
+  --appbar-z: 1100;
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: fixed;           /* fix am oberen Bildschirmrand */
+  top: 0;
+  left: 0;
+  right: 0;                  /* sorgt für volle Breite */
+  width: 100%;               /* Sicherheit */
+  z-index: var(--appbar-z);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  height: var(--appbar-height);
+  padding: 0 20px;
+
+  background-color: var(--primary-color);
+  color: var(--text-color);
+
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .logo img {
-    margin-top: 10px; /* Abstand vom oberen Rand */
-    max-height: 70px;
+  max-height: calc(var(--appbar-height) - 8px);
+  display: block;
 }
 
 .links {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20%;
 }
 
 .links a {
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: bold;
-    transition: color 0.3s, background-color 0.3s;
-    padding: 5px 10px;
-    border-radius: 5px;
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: color 0.3s, background-color 0.3s;
+  padding: 6px 12px;
+  border-radius: 6px;
 }
 
-.links a:hover {
-    background-color: var(--hover-color);
-    color: var(--secondary-color);
+.links a:hover,
+.links a:focus-visible {
+  background-color: var(--hover-color);
+  color: var(--secondary-color);
+}
+
+/* Content nach unten verschieben, sonst liegt es hinter der Appbar */
+.content {
+  padding-top: var(--appbar-height);
+}
+
+/* Seiten-Root: Höhe anpassen, damit nichts überlappt */
+.page-root {
+  min-height: calc(100vh - var(--appbar-height));
 }
