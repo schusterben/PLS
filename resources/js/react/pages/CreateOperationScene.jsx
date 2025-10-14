@@ -1,133 +1,106 @@
 import React, { useState } from "react";
 import { useStateContext } from "../contexts/ContextProvider";
+import "./../../../css/CreateOperationScene.css";
 
 /**
  * Component for creating a new operation scene.
  */
 export default function CreateOperationScene() {
-    const [sceneData, setSceneData] = useState({
-        name: "",
-        description: "",
-    });
-    const { adminToken } = useStateContext();
-    const [successMessage, setSuccessMessage] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+  const [sceneData, setSceneData] = useState({ name: "", description: "" });
+  const { adminToken } = useStateContext();
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-    /**
-     * Handle changes in the input fields.
-     * @param {Object} event - The input change event.
-     */
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setSceneData({ ...sceneData, [name]: value });
-    };
+  /** Handle changes in the input fields. */
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setSceneData({ ...sceneData, [name]: value });
+  };
 
-    /**
-     * Handle form submission to create a new operation scene.
-     * @param {Object} event - The form submit event.
-     */
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+  /** Handle form submission to create a new operation scene. */
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setSuccessMessage("");
+    setErrorMessage("");
 
-        try {
-            const response = await fetch("/api/createOperationScene", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${adminToken}`,
-                },
-                body: JSON.stringify(sceneData),
-            });
+    try {
+      const response = await fetch("/api/createOperationScene", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify(sceneData),
+      });
 
-            if (!response.ok) {
-                throw new Error("Fehler beim Senden der Anfrage.");
-            }
+      if (!response.ok) throw new Error("Fehler beim Senden der Anfrage.");
 
-            const data = await response.json();
+      const data = await response.json();
 
-            if (data.error && data.error.toUpperCase() === "UNAUTHORIZED") {
-                setErrorMessage("Nicht autorisiert. Bitte melden Sie sich erneut an.");
-                return;
-            }
+      if (data.error && data.error.toUpperCase() === "UNAUTHORIZED") {
+        setErrorMessage("Nicht autorisiert. Bitte melden Sie sich erneut an.");
+        return;
+      }
 
-            if (data.operactionScene) {
-                setSuccessMessage("Einsatzort wurde erfolgreich erstellt.");
-                setSceneData({
-                    name: "",
-                    description: "",
-                });
-            }
-        } catch (error) {
-            setErrorMessage(
-                "Einsatzort konnte nicht angelegt werden. Bitte versuchen Sie es erneut."
-            );
-        }
-    };
+      if (data.operactionScene || data.success) {
+        setSuccessMessage("Einsatzort wurde erfolgreich erstellt.");
+        setSceneData({ name: "", description: "" });
+      } else {
+        setErrorMessage("Einsatzort konnte nicht erstellt werden.");
+      }
+    } catch (error) {
+      setErrorMessage("Einsatzort konnte nicht angelegt werden. Bitte versuchen Sie es erneut.");
+    }
+  };
 
-    return (
-        <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px", textAlign: "center" }}>
-            <h1>Neuen Einsatzort erstellen</h1>
-            {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+  return (
+    <div className="scene-create-page">
+      <h1 className="scene-title">Neuen Einsatzort erstellen</h1>
 
-            <p style={{ marginBottom: "20px" }}>
-                Der Einsatzort steht nach Erstellung 20 Tage in der Liste der Einsatzorte zur Auswahl.
-            </p>
+      {successMessage && <p className="scene-status success">{successMessage}</p>}
+      {errorMessage && <p className="scene-status error">{errorMessage}</p>}
 
-            <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
-                <label style={{ display: "block", marginBottom: "10px" }}>
-                    <strong>Name des Einsatzorts:</strong>
-                    <input
-                        type="text"
-                        name="name"
-                        value={sceneData.name}
-                        onChange={handleInputChange}
-                        placeholder="Name des Einsatzorts eingeben"
-                        style={{
-                            width: "100%",
-                            padding: "10px",
-                            marginTop: "5px",
-                            border: "1px solid #ccc",
-                            borderRadius: "5px",
-                        }}
-                        required
-                    />
-                </label>
+      <p className="scene-hint">
+        Der Einsatzort steht nach Erstellung <strong>20 Tage</strong> in der Liste der Einsatzorte zur Auswahl.
+      </p>
 
-                <label style={{ display: "block", marginBottom: "20px" }}>
-                    <strong>Beschreibung:</strong>
-                    <textarea
-                        name="description"
-                        value={sceneData.description}
-                        onChange={handleInputChange}
-                        rows={4}
-                        placeholder="Beschreibung des Einsatzorts eingeben"
-                        style={{
-                            width: "100%",
-                            padding: "10px",
-                            marginTop: "5px",
-                            border: "1px solid #ccc",
-                            borderRadius: "5px",
-                        }}
-                        required
-                    />
-                </label>
-
-                <button
-                    type="submit"
-                    style={{
-                        padding: "10px 20px",
-                        backgroundColor: "#0047ab",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                        fontSize: "16px",
-                    }}
-                >
-                    Einsatzort erstellen
-                </button>
-            </form>
+      <form onSubmit={handleSubmit} className="scene-form">
+        <div className="scene-input-group">
+          <label htmlFor="sceneName" className="scene-label">
+            Name des Einsatzorts:
+          </label>
+          <input
+            id="sceneName"
+            type="text"
+            name="name"
+            value={sceneData.name}
+            onChange={handleInputChange}
+            placeholder="Name des Einsatzorts eingeben"
+            className="scene-input"
+            required
+          />
         </div>
-    );
+
+        <div className="scene-input-group">
+          <label htmlFor="sceneDescription" className="scene-label">
+            Beschreibung:
+          </label>
+          <textarea
+            id="sceneDescription"
+            name="description"
+            value={sceneData.description}
+            onChange={handleInputChange}
+            rows={4}
+            placeholder="Beschreibung des Einsatzorts eingeben"
+            className="scene-textarea"
+            required
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary full">
+          Einsatzort erstellen
+        </button>
+      </form>
+    </div>
+  );
 }

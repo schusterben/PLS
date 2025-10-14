@@ -1,0 +1,135 @@
+:root {
+  --admin-primary: #0048fd;
+  --admin-primary-hover: #003580;
+  --admin-text-on-primary: #ffffff;
+  --admin-bg: #f7f7f8;
+  --admin-card: #ffffff;
+  --admin-border: #e5e7eb;
+  --admin-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  --admin-ink: #111827;
+  --admin-ink-2: #4b5563;
+  --admin-radius: 10px;
+}
+
+/* ===== Page Layout ===== */
+.admin-create-page {
+  min-height: calc(100vh - var(--appbar-height, 64px));
+  background: var(--admin-bg);
+  color: var(--admin-ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 4vw, 32px);
+}
+
+.admin-title {
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: var(--admin-ink);
+  text-align: center;
+}
+
+/* ===== Form Card ===== */
+.admin-form {
+  background: var(--admin-card);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow);
+  padding: clamp(20px, 2vw, 28px);
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ===== Input Fields ===== */
+.admin-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-label {
+  font-weight: 700;
+  color: var(--admin-ink);
+}
+
+.admin-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.admin-input:focus {
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px rgba(0, 72, 253, 0.2);
+}
+
+/* ===== Buttons ===== */
+.btn {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: var(--admin-radius);
+  border: 1px solid transparent;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.02s ease, background-color 0.18s ease,
+    border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--admin-primary);
+  color: var(--admin-text-on-primary);
+  border-color: var(--admin-primary);
+  box-shadow: var(--admin-shadow);
+}
+
+.btn-primary:hover {
+  background: var(--admin-primary-hover);
+  border-color: var(--admin-primary-hover);
+}
+
+.btn.full {
+  width: 100%;
+}
+
+/* ===== Status Messages ===== */
+.admin-status {
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.admin-status.error {
+  color: #dc2626;
+}
+
+.admin-status.success {
+  color: #16a34a;
+}
+
+/* ===== Dark Mode ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --admin-bg: #0d1117;
+    --admin-card: #111827;
+    --admin-border: #1f2937;
+    --admin-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+    --admin-ink: #e5e7eb;
+    --admin-ink-2: #9ca3af;
+    --admin-primary: #93c5fd;
+    --admin-primary-hover: #2563eb;
+    --admin-text-on-primary: #0b1220;
+  }
+}

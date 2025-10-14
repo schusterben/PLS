@@ -1,0 +1,130 @@
+/* ===== Design Tokens (Light default) ===== */
+:root {
+  --qr-primary: #0048fd;
+  --qr-primary-hover: #003580;
+  --qr-text-on-primary: #ffffff;
+
+  /* Light theme */
+  --qr-bg: #f7f7f8;
+  --qr-card: #ffffff;
+  --qr-border: #e5e7eb;
+  --qr-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+
+  --qr-ink: #111827;
+  --qr-ink-2: #4b5563;
+
+  --qr-radius: 12px;
+  --qr-pad: clamp(16px, 2.4vw, 24px);
+  --qr-grid-min: 220px;
+}
+
+/* Dark mode (system only) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --qr-bg: #0d1117;
+    --qr-card: #111827;
+    --qr-border: #1f2937;
+    --qr-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+
+    --qr-ink: #e5e7eb;
+    --qr-ink-2: #9ca3af;
+
+    /* Optional: leichte Anpassung der Primärfarbe auf dunkel */
+    --qr-primary: #93c5fd;
+    --qr-primary-hover: #2563eb;
+    --qr-text-on-primary: #0b1220;
+  }
+}
+
+/* ===== Page ===== */
+.qr-show-page {
+  min-height: calc(100vh - var(--appbar-height, 64px));
+  background: var(--qr-bg);
+  color: var(--qr-ink);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;    /* vertikal zentriert */
+  align-items: center;        /* horizontal zentriert */
+  text-align: center;
+  gap: 24px;
+  padding: clamp(20px, 4vw, 32px);
+}
+
+/* ===== Titel ===== */
+.qr-show-title {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 800;
+  color: var(--qr-ink);
+}
+
+/* ===== Status ===== */
+.qr-status { font-size: 1rem; font-weight: 600; }
+.qr-status.info { color: var(--qr-primary); }
+
+/* ===== Actions (Buttons mittig) ===== */
+.qr-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.btn {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: transform .02s ease, background-color .18s ease,
+              border-color .18s ease, box-shadow .18s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn[disabled] { opacity: .6; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--qr-primary);
+  color: var(--qr-text-on-primary);
+  border-color: var(--qr-primary);
+  box-shadow: var(--qr-shadow);
+}
+.btn-primary:hover {
+  background: var(--qr-primary-hover);
+  border-color: var(--qr-primary-hover);
+}
+
+/* ===== QR Grid (3 pro Reihe bei genug Platz) ===== */
+.qr-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--qr-grid-min), 1fr));
+  gap: 24px;
+  justify-content: center;
+  width: 100%;
+  max-width: 960px;
+}
+
+/* ===== QR Card ===== */
+.qr-card {
+  background: var(--qr-card);
+  border: 1px solid var(--qr-border);
+  border-radius: var(--qr-radius);
+  box-shadow: var(--qr-shadow);
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qr-caption {
+  margin-top: 8px;
+  color: var(--qr-ink-2);
+  font-weight: 600;
+}

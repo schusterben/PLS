@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import QRCode from "qrcode.react";
 import { useStateContext } from "../contexts/ContextProvider";
+import "./../../../css/ShowUnusedQrCodes.css";
 
 export default function ShowUnusedLoginQrCodesPage() {
     const { adminToken } = useStateContext();
@@ -35,26 +36,46 @@ export default function ShowUnusedLoginQrCodesPage() {
         const doc = new jsPDF();
         qrCodes.forEach((code, index) => {
             if (index !== 0) doc.addPage();
-            const qrCodeDataURL = document.getElementById(`qrcode-${index}`).toDataURL();
+            const qrCodeDataURL = document
+                .getElementById(`qrcode-${index}`)
+                .toDataURL();
             doc.text(`Login QR Code #${index + 1}`, 20, 20);
             doc.addImage(qrCodeDataURL, "PNG", 50, 30, 100, 100);
         });
-        doc.save("qrcodes.pdf");
+        doc.save("login_qrcodes.pdf");
     };
 
     return (
-        <div style={{ textAlign: "center", padding: "20px" }}>
-            <h2>Folgende QR-Codes können zum Authorisieren verwendet werden</h2>
+        <div className="qr-show-page">
+            <h2 className="qr-show-title">
+                Folgende QR-Codes können zum Authentifizieren verwendet werden
+            </h2>
+
             {loading ? (
-                <p>QR Codes werden geladen...</p>
+                <p className="qr-status info">QR-Codes werden geladen...</p>
             ) : (
                 <>
-                    <button onClick={generateLoginQRCodesPDF}>Als PDF drucken</button>
-                    <div style={{ display: "grid", gap: "20px", marginTop: "20px" }}>
+                    <div className="qr-actions">
+                        <button
+                            className="btn btn-primary"
+                            onClick={generateLoginQRCodesPDF}
+                            disabled={qrCodes.length === 0}
+                        >
+                            Als PDF drucken
+                        </button>
+                    </div>
+
+                    <div className="qr-grid">
                         {qrCodes.map((code, index) => (
-                            <div key={index} style={{ textAlign: "center" }}>
-                                <QRCode id={`qrcode-${index}`} value={code} size={150} />
-                                <p>QR Code #{index + 1}</p>
+                            <div className="qr-card" key={index}>
+                                <QRCode
+                                    id={`qrcode-${index}`}
+                                    value={code}
+                                    size={150}
+                                />
+                                <p className="qr-caption">
+                                    QR Code #{index + 1}
+                                </p>
                             </div>
                         ))}
                     </div>
