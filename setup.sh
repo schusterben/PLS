@@ -5,9 +5,8 @@ set -e
 
 # Repository klonen
 echo "Cloning repository..."
-git clone https://github.com/schusterben/PLS.git
+git clone https://github.com/schusterben/PLS.git --branch dev_sage
 cd PLS
-git checkout dev_sage
 
 # Composer-Abhängigkeiten installieren
 echo "Installing Composer dependencies..."
