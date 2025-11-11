@@ -1,0 +1,181 @@
+:root {
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --row-alt: rgba(255, 255, 255, 0.03);
+  --row-hover: rgba(255, 255, 255, 0.06);
+  --header-bg: rgba(0, 0, 0, 0.25);
+  --shadow: 0 6px 18px rgba(0,0,0,0.25);
+  --chip-default: #374151;
+  --chip-ok: #16a34a;
+  --chip-no: #ef4444;
+  --chip-warn: #f59e0b;
+  --text-dim: rgba(255,255,255,0.75);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --card-bg: rgba(0,0,0,0.02);
+    --card-border: rgba(0,0,0,0.08);
+    --row-alt: rgba(0,0,0,0.02);
+    --row-hover: rgba(0,0,0,0.05);
+    --header-bg: rgba(255,255,255,0.7);
+    --text-dim: rgba(0,0,0,0.6);
+  }
+}
+
+.situation-room {
+  position: relative;
+  top: 0;
+  width: 100%;
+  max-width: 1400px;
+  margin: 24px auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.table-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  backdrop-filter: blur(6px);
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.table-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.table-header .meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.table-header .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+}
+
+.table-container {
+  overflow: auto;
+  max-height: 52vh;
+}
+
+.sr-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 880px; 
+  table-layout: auto;
+}
+
+.sr-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--header-bg);
+  backdrop-filter: blur(6px);
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--card-border);
+  white-space: nowrap;
+}
+
+.sr-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--card-border);
+  vertical-align: middle;
+}
+
+.sr-table tbody tr:nth-child(odd) {
+  background: var(--row-alt);
+}
+
+.sr-table tbody tr:hover {
+  background: var(--row-hover);
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  letter-spacing: 0.2px;
+}
+
+.truncate {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: #fff;
+  background: var(--chip-default);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.chip.neutral {
+  background: var(--chip-default);
+  color: #fff;
+}
+
+.chip.triage {
+  color: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  text-transform: capitalize;
+}
+
+.map-wrapper {
+  height: 380px;
+  width: 100%;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
+.map-wrapper .leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+.sr-loading,
+.sr-empty {
+  margin: 16px auto;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-dim);
+}
