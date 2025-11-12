@@ -25,7 +25,7 @@ docker build -t pls-laravel_app:latest .
 
 # Docker-Container starten
 echo "Starting Docker containers..."
-docker-compose up -d --build
+docker compose up -d --build
 
 # Warten bis Container hochfährt
 echo "Warte bis Container hochfährt"
@@ -33,7 +33,7 @@ sleep 10
 
 # Datenbankmigrationen ausführen
 echo "Running database migrations..."
-sudo docker-compose exec laravel_app php artisan migrate
+sudo docker compose exec laravel_app php artisan migrate
 
 sudo chmod -R 775 storage bootstrap/cache
 sudo chown -R www-data:www-data storage bootstrap/cache
