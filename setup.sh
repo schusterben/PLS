@@ -29,7 +29,7 @@ docker compose up -d --build
 
 # Warten bis Container hochfährt
 echo "Warte bis Container hochfährt"
-sleep 10
+sleep 15
 
 # Datenbankmigrationen ausführen
 echo "Running database migrations..."
