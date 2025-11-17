@@ -1,4 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useLocation } from "react-router-dom";
@@ -17,6 +22,59 @@ function SituationRoomTable() {
   const [mapCenter, setMapCenter] = useState([48.2715, 16.403]);
   const { token } = useStateContext();
   const operationScene = location.state?.operationScene;
+
+  // Sichtbarkeit der Karte
+  const [isMapVisible, setIsMapVisible] = useState(true);
+
+  // Sichtbarkeit der Spalten
+  const [visibleColumns, setVisibleColumns] = useState({
+    nummer: true,
+    atmung: true,
+    blutung: true,
+    triage: true,
+    transport: true,
+    dringend: true,
+    name: true,
+    longitude: true,
+    latitude: true,
+    created: true,
+    updated: true,
+  });
+
+  const COLUMN_LABELS = {
+    nummer: "Nummer",
+    atmung: "Atmung",
+    blutung: "Blutung",
+    triage: "Triage",
+    transport: "Transport",
+    dringend: "Dringend",
+    name: "Name",
+    longitude: "Longitude",
+    latitude: "Latitude",
+    created: "Erfasst",
+    updated: "Letztes Update",
+  };
+
+  const toggleColumn = (key) => {
+    setVisibleColumns((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  // Dropdown-Status + Klick außerhalb
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef(null);
+
+  useEffect(() => {
+    const onClickOutside = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
 
   /**
    * Updates the map's center based on the positions of persons.
@@ -147,16 +205,53 @@ function SituationRoomTable() {
       ));
 
   if (isLoading) return <p className="sr-loading">Lädt...</p>;
-  if (!persons.length) return <p className="sr-empty">Keine Personen gefunden.</p>;
+  if (!persons.length)
+    return <p className="sr-empty">Keine Personen gefunden.</p>;
 
   return (
     <div className="situation-room">
       <div className="table-card">
         <div className="table-header">
           <h2>Übersicht</h2>
-          <div className="meta">
-            <span className="dot" />
-            <span>Live aktualisiert</span>
+
+          <div className="table-header-right">
+            <div className="meta">
+              <span className="dot" />
+              <span>Live aktualisiert</span>
+            </div>
+
+            <div className="filter-wrapper" ref={filterRef}>
+              <button
+                type="button"
+                className="filter-button"
+                onClick={() => setIsFilterOpen((v) => !v)}
+              >
+                Filter
+                <span className="filter-button__caret">
+                  {isFilterOpen ? "▴" : "▾"}
+                </span>
+              </button>
+
+              {isFilterOpen && (
+                <div className="filter-dropdown">
+                  <div className="filter-dropdown__header">
+                    Spalten auswählen
+                  </div>
+                  <div className="filter-dropdown__body">
+                    {Object.keys(visibleColumns).map((key) => (
+                      <label key={key} className="filter-dropdown__item">
+                        <input
+                          type="checkbox"
+                          checked={visibleColumns[key]}
+                          onChange={() => toggleColumn(key)}
+                        />
+                        <span>{COLUMN_LABELS[key]}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -164,57 +259,87 @@ function SituationRoomTable() {
           <table className="sr-table">
             <thead>
               <tr>
-                <th>Nummer</th>
-                <th>Atmung</th>
-                <th>Blutung</th>
-                <th>Triage</th>
-                <th>Transport</th>
-                <th>Dringend</th>
-                <th>Name</th>
-                <th>Longitude</th>
-                <th>Latitude</th>
-                <th>Erfasst</th>
-                <th>Letztes&nbsp;Update</th>
+                {visibleColumns.nummer && <th>Nummer</th>}
+                {visibleColumns.atmung && <th>Atmung</th>}
+                {visibleColumns.blutung && <th>Blutung</th>}
+                {visibleColumns.triage && <th>Triage</th>}
+                {visibleColumns.transport && <th>Transport</th>}
+                {visibleColumns.dringend && <th>Dringend</th>}
+                {visibleColumns.name && <th>Name</th>}
+                {visibleColumns.longitude && <th>Longitude</th>}
+                {visibleColumns.latitude && <th>Latitude</th>}
+                {visibleColumns.created && <th>Erfasst</th>}
+                {visibleColumns.updated && <th>Letztes&nbsp;Update</th>}
               </tr>
             </thead>
             <tbody>
               {persons.map((person) => (
                 <tr key={person.idpatient}>
-                  <td className="mono">{person.idpatient}</td>
-                  <td>
-                    <span className="chip neutral">
-                      {person.atmung ? "Ja" : "Nein"}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="chip neutral">
-                      {person.blutung ? "Ja" : "Nein"}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className="chip triage"
-                      style={{ backgroundColor: getBackgroundColor(person.triagefarbe) }}
-                      title={person.triagefarbe}
-                    >
-                      {person.triagefarbe ?? "—"}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="chip neutral">
-                      {person.transport ? "Ja" : "Nein"}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="chip neutral">
-                      {person.dringend ? "Ja" : "Nein"}
-                    </span>
-                  </td>
-                  <td className="truncate">{person.name || "N/A"}</td>
-                  <td className="mono">{person.longitude_patient ?? "N/A"}</td>
-                  <td className="mono">{person.latitude_patient ?? "N/A"}</td>
-                  <td className="nowrap">{person.created_at}</td>
-                  <td className="nowrap">{person.updated_at}</td>
+                  {visibleColumns.nummer && (
+                    <td className="mono">{person.idpatient}</td>
+                  )}
+                  {visibleColumns.atmung && (
+                    <td>
+                      <span className="chip neutral">
+                        {person.atmung ? "Ja" : "Nein"}
+                      </span>
+                    </td>
+                  )}
+                  {visibleColumns.blutung && (
+                    <td>
+                      <span className="chip neutral">
+                        {person.blutung ? "Ja" : "Nein"}
+                      </span>
+                    </td>
+                  )}
+                  {visibleColumns.triage && (
+                    <td>
+                      <span
+                        className="chip triage"
+                        style={{
+                          backgroundColor: getBackgroundColor(
+                            person.triagefarbe
+                          ),
+                        }}
+                        title={person.triagefarbe}
+                      >
+                        {person.triagefarbe ?? "—"}
+                      </span>
+                    </td>
+                  )}
+                  {visibleColumns.transport && (
+                    <td>
+                      <span className="chip neutral">
+                        {person.transport ? "Ja" : "Nein"}
+                      </span>
+                    </td>
+                  )}
+                  {visibleColumns.dringend && (
+                    <td>
+                      <span className="chip neutral">
+                        {person.dringend ? "Ja" : "Nein"}
+                      </span>
+                    </td>
+                  )}
+                  {visibleColumns.name && (
+                    <td className="truncate">{person.name || "N/A"}</td>
+                  )}
+                  {visibleColumns.longitude && (
+                    <td className="mono">
+                      {person.longitude_patient ?? "N/A"}
+                    </td>
+                  )}
+                  {visibleColumns.latitude && (
+                    <td className="mono">
+                      {person.latitude_patient ?? "N/A"}
+                    </td>
+                  )}
+                  {visibleColumns.created && (
+                    <td className="nowrap">{person.created_at}</td>
+                  )}
+                  {visibleColumns.updated && (
+                    <td className="nowrap">{person.updated_at}</td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -222,15 +347,38 @@ function SituationRoomTable() {
         </div>
       </div>
 
-      <div className="map-wrapper">
-        <MapContainer center={mapCenter} zoom={13}>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          {renderMarkers()}
-        </MapContainer>
-      </div>
+      {/* Karte nur anzeigen, wenn isMapVisible == true */}
+      {isMapVisible && (
+        <div className="map-wrapper">
+          <button
+            type="button"
+            className="map-toggle map-toggle--overlay"
+            onClick={() => setIsMapVisible(false)}
+            title="Karte ausblenden"
+          >
+            ✕
+          </button>
+
+          <MapContainer center={mapCenter} zoom={13}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            {renderMarkers()}
+          </MapContainer>
+        </div>
+      )}
+
+      {!isMapVisible && (
+        <button
+          type="button"
+          className="map-toggle map-toggle--floating"
+          onClick={() => setIsMapVisible(true)}
+          title="Karte einblenden"
+        >
+          🗺️
+        </button>
+      )}
     </div>
   );
 }
