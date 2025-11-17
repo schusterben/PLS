@@ -306,3 +306,32 @@
 .filter-dropdown__item input[type="checkbox"] {
   cursor: pointer;
 }
+
+.nummer-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.15s ease, filter 0.15s ease;
+}
+
+.nummer-link:hover {
+  color: #3b82f6; 
+  filter: brightness(1.2);
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: light) {
+  .nummer-link {
+    color: var(--text-dim);
+  }
+
+  .nummer-link:hover {
+    color: #1d4ed8; 
+  }
+}
+

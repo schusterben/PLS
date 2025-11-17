@@ -6,7 +6,7 @@ import React, {
 } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 import "../../../css/MarkerStyles.css";
 import "./../../../css/SituationRoomTable.css";
@@ -22,6 +22,18 @@ function SituationRoomTable() {
   const [mapCenter, setMapCenter] = useState([48.2715, 16.403]);
   const { token } = useStateContext();
   const operationScene = location.state?.operationScene;
+  const navigate = useNavigate();
+
+  // Zum Ambu Formular
+   const handleNummerClick = (person) => {
+    navigate("/AmbulanzForm", {
+      state: {
+        patientId: person.idpatient,
+        patient: person,
+        operationScene,
+      },
+    });
+  };
 
   // Sichtbarkeit der Karte
   const [isMapVisible, setIsMapVisible] = useState(true);
@@ -276,7 +288,15 @@ function SituationRoomTable() {
               {persons.map((person) => (
                 <tr key={person.idpatient}>
                   {visibleColumns.nummer && (
-                    <td className="mono">{person.idpatient}</td>
+                    <td className="mono">
+                      <button
+                        type="button"
+                        className="nummer-link"
+                        onClick={() => handleNummerClick(person)}
+                      >
+                        {person.idpatient}
+                      </button>
+                    </td>
                   )}
                   {visibleColumns.atmung && (
                     <td>

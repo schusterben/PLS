@@ -26,6 +26,7 @@ import CreateLoginQrCodesPage from "./pages/CreateLoginQrCodesPage";
 import ShowUnusedLoginQrCodesPage from "./pages/ShowUnusedLoginQrCodesPage";
 import CreateOperationScene from "./pages/CreateOperationScene";
 import EditOperationScene from "./pages/EditOperationScene";
+import AmbulanzForm from "./pages/AmbulanzForm"
 
 /**
  * Erzeugt die Routen-Konfiguration der Anwendung.
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
     {
         path: "/SituationRoomTable",
         element: <ProtectedRoute element={<SituationRoomTable />} />,
+    },
+    {
+        path: "/AmbulanzForm",
+        element: <ProtectedRoute element={<AmbulanzForm />} />,
     },
     {
         path: "/AdminSettingsPage",

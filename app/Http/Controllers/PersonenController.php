@@ -159,6 +159,27 @@ class PersonenController extends Controller
             $person->blutung = $bloodStopable;
         }
 
+        if ($request->has('name')) {
+            $person->name = $request->input('name');
+        }
+
+        if ($request->has('transport')) {
+            $person->transport = (bool) $request->input('transport');
+        }
+
+        if ($request->has('dringend')) {
+            $person->dringend = (bool) $request->input('dringend');
+        }
+
+        if ($request->has('kontaminiert')) {
+            $person->kontaminiert = (bool) $request->input('kontaminiert');
+        }
+
+        if ($request->has('radialispuls')) {
+            $person->radialispuls = (bool) $request->input('radialispuls');
+        }
+
+
         $person->save();
 
 
