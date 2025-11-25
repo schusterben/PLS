@@ -1,34 +1,20 @@
+@import "./theme.css";
+
 :root {
-  --role-primary: #0048fd;
-  --role-primary-hover: #003580;
-  --role-text-on-primary: #ffffff;
+  --role-primary: var(--accent-blue);
+  --role-primary-hover: #2563eb;
+  --role-text-on-primary: #0b1220;
 
-  --role-bg: #f7f7f8;
-  --role-card: #ffffff;
-  --role-border: #e5e7eb;
-  --role-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  --role-bg: var(--app-bg);
+  --role-card: var(--card-bg);
+  --role-border: var(--card-border);
+  --role-shadow: var(--shadow);
 
-  --role-ink: #111827;
-  --role-ink-2: #4b5563;
+  --role-ink: var(--text-strong);
+  --role-ink-2: var(--text-dim);
 
   --role-radius: 12px;
   --role-pad: clamp(16px, 2.4vw, 24px);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --role-bg: #0d1117;
-    --role-card: #111827;
-    --role-border: #1f2937;
-    --role-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
-
-    --role-ink: #e5e7eb;
-    --role-ink-2: #9ca3af;
-
-    --role-primary: #93c5fd;
-    --role-primary-hover: #2563eb;
-    --role-text-on-primary: #0b1220;
-  }
 }
 
 .role-page {
@@ -76,17 +62,10 @@
   padding: 0 12px;
   border: 1px solid var(--role-border);
   border-radius: 10px;
-  background: #fff;
-  color: #111;
+  background: var(--surface-strong);
+  color: var(--role-ink);
   outline: none;
   transition: border-color .18s ease, box-shadow .18s ease;
-}
-@media (prefers-color-scheme: dark) {
-  .role-select {
-    background: #0f172a;
-    color: #e5e7eb;
-    border-color: var(--role-border);
-  }
 }
 .role-select:focus {
   border-color: var(--role-primary);

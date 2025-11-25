@@ -1,0 +1,42 @@
+:root {
+  --app-bg: linear-gradient(160deg, #2f2f2f 0%, #2b2323 55%, #4b4b4b 100%);
+  --app-bg-light: #f7f7f8;
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --row-alt: rgba(255, 255, 255, 0.025);
+  --row-hover: rgba(255, 255, 255, 0.08);
+  --header-bg: rgba(24, 25, 28, 0.551);
+  --shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+  --chip-default: #374151;
+  --chip-ok: #16a34a;
+  --chip-no: #ef4444;
+  --chip-warn: #f59e0b;
+  --accent-blue: #3b82f6;
+  --accent-green: #22c55e;
+  --accent-yellow: #f6c751;
+  --accent-red: #ef4444;
+  --accent-dark: #111827;
+  --text-strong: #f8fbff;
+  --text-dim: rgba(255, 255, 255, 0.75);
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --surface-strong: rgba(7, 11, 19, 0.9);
+  --glass-blur: blur(18px);
+  --filter-bg: rgba(199, 199, 199, 0);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --app-bg: var(--app-bg-light);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-border: rgba(15, 23, 42, 0.08);
+    --row-alt: rgba(15, 23, 42, 0.035);
+    --row-hover: rgba(15, 23, 42, 0.08);
+    --header-bg: rgba(255, 255, 255, 0.8);
+    --shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+    --text-strong: #111827;
+    --text-dim: rgba(15, 23, 42, 0.75);
+    --text-muted: rgba(15, 23, 42, 0.6);
+    --surface-strong: rgba(255, 255, 255, 0.92);
+    --glass-blur: blur(14px);
+  }
+}

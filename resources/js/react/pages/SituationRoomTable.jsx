@@ -67,6 +67,15 @@ function SituationRoomTable() {
     updated: "Letztes Update",
   };
 
+  const TRIAGE_COLOR_ORDER = [
+    "rot",
+    "gelb",
+    "grün",
+    "blau",
+    "schwarz",
+  ];
+
+
   const toggleColumn = (key) => {
     setVisibleColumns((prev) => ({
       ...prev,
@@ -100,12 +109,12 @@ function SituationRoomTable() {
     let lonSum = 0;
 
     for (const p of people) {
-      const hasCoords =
-        p?.latitude_patient != null && p?.longitude_patient != null;
+      const lat = getNumericValue(p?.latitude_patient);
+      const lon = getNumericValue(p?.longitude_patient);
 
-      if (hasCoords) {
-        latSum += parseFloat(p.latitude_patient);
-        lonSum += parseFloat(p.longitude_patient);
+      if (lat !== null && lon !== null) {
+        latSum += lat;
+        lonSum += lon;
         count++;
       }
     }
@@ -179,6 +188,55 @@ function SituationRoomTable() {
     }
   };
 
+  const EMPTY_PLACEHOLDER = "-";
+
+  const sanitizeValue = (value) => {
+    if (value === null || value === undefined) return null;
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (!trimmed || trimmed.toLowerCase() === "null") {
+        return null;
+      }
+      return trimmed;
+    }
+    return value;
+  };
+
+  const displayValue = (value) => {
+    const clean = sanitizeValue(value);
+    if (clean === null) return EMPTY_PLACEHOLDER;
+    return `${clean}`;
+  };
+
+  const getNumericValue = (value) => {
+    const clean = sanitizeValue(value);
+    if (clean === null) return null;
+    const numeric = typeof clean === "number" ? clean : parseFloat(clean);
+    return Number.isNaN(numeric) ? null : numeric;
+  };
+
+  const interpretBoolean = (value) => {
+    const clean = sanitizeValue(value);
+    if (clean === null) return null;
+    if (typeof clean === "string") {
+      const lower = clean.toLowerCase();
+      if (["1", "true", "ja", "yes"].includes(lower)) return true;
+      if (["0", "false", "nein", "no"].includes(lower)) return false;
+      if (lower === "null") return null;
+    }
+    if (typeof clean === "number") {
+      if (clean === 1) return true;
+      if (clean === 0) return false;
+    }
+    return Boolean(clean);
+  };
+
+  const displayBoolean = (value) => {
+    const interpreted = interpretBoolean(value);
+    if (interpreted === null) return EMPTY_PLACEHOLDER;
+    return interpreted ? "Ja" : "Nein";
+  };
+
   /**
    * Creates a custom marker icon with the specified color.
    */
@@ -190,20 +248,38 @@ function SituationRoomTable() {
       iconAnchor: [15, 42],
     });
 
-  /**
-   * Renders markers for each person with position data.
+  /*
+    Formats ISO timestamps into a readable date & time string.
+   */
+  const formatTimestamp = (value) => {
+    const clean = sanitizeValue(value);
+    if (clean === null) return EMPTY_PLACEHOLDER;
+    const date = new Date(clean);
+    if (Number.isNaN(date.getTime())) {
+      return EMPTY_PLACEHOLDER;
+    }
+    return date.toLocaleString("de-DE", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
+
+  /*
+    Renders markers for each person with position data.
    */
   const renderMarkers = () =>
     persons
       .filter(
-        (p) => p?.latitude_patient != null && p?.longitude_patient != null
+        (p) =>
+          getNumericValue(p?.latitude_patient) !== null &&
+          getNumericValue(p?.longitude_patient) !== null
       )
       .map((person) => (
         <Marker
           key={person.idpatient}
           position={[
-            parseFloat(person.latitude_patient),
-            parseFloat(person.longitude_patient),
+            getNumericValue(person.latitude_patient),
+            getNumericValue(person.longitude_patient),
           ]}
           icon={createMarkerIcon(getBackgroundColor(person.triagefarbe))}
         >
@@ -219,6 +295,32 @@ function SituationRoomTable() {
   if (isLoading) return <p className="sr-loading">Lädt...</p>;
   if (!persons.length)
     return <p className="sr-empty">Keine Personen gefunden.</p>;
+
+  const summaryData = (() => {
+    const total = persons.length;
+    const triageCounters = persons.reduce((acc, person) => {
+      const key =
+        sanitizeValue(person.triagefarbe)?.toLowerCase() || "keine";
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const items = TRIAGE_COLOR_ORDER.map((colorKey) => {
+      const value = triageCounters[colorKey] || 0;
+      const label =
+        colorKey === "keine"
+          ? "Ohne Triage"
+          : colorKey.charAt(0).toUpperCase() + colorKey.slice(1);
+
+      return {
+        key: colorKey,
+        label,
+        value,
+      };
+    }).filter((entry) => entry.value > 0);
+
+    return { total, items };
+  })();
 
   return (
     <div className="situation-room">
@@ -301,69 +403,98 @@ function SituationRoomTable() {
                   {visibleColumns.atmung && (
                     <td>
                       <span className="chip neutral">
-                        {person.atmung ? "Ja" : "Nein"}
+                        {displayBoolean(person.atmung)}
                       </span>
                     </td>
                   )}
                   {visibleColumns.blutung && (
                     <td>
                       <span className="chip neutral">
-                        {person.blutung ? "Ja" : "Nein"}
+                        {displayBoolean(person.blutung)}
                       </span>
                     </td>
                   )}
                   {visibleColumns.triage && (
                     <td>
-                      <span
-                        className="chip triage"
-                        style={{
-                          backgroundColor: getBackgroundColor(
-                            person.triagefarbe
-                          ),
-                        }}
-                        title={person.triagefarbe}
-                      >
-                        {person.triagefarbe ?? "—"}
-                      </span>
+                      {(() => {
+                        const triageValue = sanitizeValue(
+                          person.triagefarbe
+                        );
+                        return (
+                          <span
+                            className="chip triage"
+                            style={{
+                              backgroundColor: getBackgroundColor(
+                                triageValue
+                              ),
+                            }}
+                            title={displayValue(person.triagefarbe)}
+                          >
+                            {displayValue(person.triagefarbe)}
+                          </span>
+                        );
+                      })()}
                     </td>
                   )}
                   {visibleColumns.transport && (
                     <td>
                       <span className="chip neutral">
-                        {person.transport ? "Ja" : "Nein"}
+                        {displayBoolean(person.transport)}
                       </span>
                     </td>
                   )}
                   {visibleColumns.dringend && (
                     <td>
                       <span className="chip neutral">
-                        {person.dringend ? "Ja" : "Nein"}
+                        {displayBoolean(person.dringend)}
                       </span>
                     </td>
                   )}
                   {visibleColumns.name && (
-                    <td className="truncate">{person.name || "N/A"}</td>
+                    <td className="truncate">{displayValue(person.name)}</td>
                   )}
                   {visibleColumns.longitude && (
                     <td className="mono">
-                      {person.longitude_patient ?? "N/A"}
+                      {displayValue(person.longitude_patient)}
                     </td>
                   )}
                   {visibleColumns.latitude && (
                     <td className="mono">
-                      {person.latitude_patient ?? "N/A"}
+                      {displayValue(person.latitude_patient)}
                     </td>
                   )}
                   {visibleColumns.created && (
-                    <td className="nowrap">{person.created_at}</td>
+                    <td className="nowrap">
+                      {formatTimestamp(person.created_at)}
+                    </td>
                   )}
                   {visibleColumns.updated && (
-                    <td className="nowrap">{person.updated_at}</td>
+                    <td className="nowrap">
+                      {formatTimestamp(person.updated_at)}
+                    </td>
                   )}
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="table-summary table-summary--bottom">
+          <strong>Total: {summaryData.total}</strong>
+          {summaryData.items.length === 0 ? (
+            <span className="summary-chip summary-chip--keine">
+              Ohne Triage: 0
+            </span>
+          ) : (
+            summaryData.items.map(({ key, label, value }) => (
+              <span
+                key={key}
+                className={`summary-chip summary-chip--${key}`}
+              >
+                {label}: {value}
+              </span>
+            ))
+          )}
         </div>
       </div>
 

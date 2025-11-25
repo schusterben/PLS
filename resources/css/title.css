@@ -1,8 +1,10 @@
+@import "./theme.css";
+
 :root {
-  --primary-color: #0048fd;
-  --secondary-color: #ffcc00;
-  --text-color: #ffffff;
-  --hover-color: #003580;
+  --primary-color: var(--accent-blue);
+  --secondary-color: var(--chip-warn);
+  --text-color: var(--text-strong);
+  --hover-color: var(--row-hover);
 
   --appbar-height: 72px; 
   --appbar-z: 1100;

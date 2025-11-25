@@ -1,18 +1,20 @@
+@import "./theme.css";
+
 :root{
   --appbar-height: 64px;
   --card-max: 1100px;
 
-  --primary: #0048fd;
-  --secondary: #ffcc00;
-  --text-on-primary: #ffffff;
-  --hover: #003580;
+  --primary: var(--accent-blue);
+  --secondary: var(--chip-warn);
+  --text-on-primary: #0b1220;
+  --hover: #2563eb;
 
-  --accent: #b30000;
-  --accent-dark: #990000;
+  --accent: var(--chip-no);
+  --accent-dark: #b91c1c;
 
-  --bg: #242424;        
-  --card-bg: #f5f5f5;   
-  --muted: #6b7280;
+  --bg: var(--app-bg);        
+  --card-bg: var(--card-bg);   
+  --muted: var(--text-dim);
 }
 
 .qr-auth-shell{
@@ -21,18 +23,16 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: transparent;
+  background: var(--bg);
 }
 
 .qr-card{
   width: 100%;
   max-width: var(--card-max);
   background: var(--card-bg);
-  border: 1px solid #c10d0d;
+  border: 1px solid var(--card-border);
   border-radius: 12px;
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.08),
-    0 12px 28px rgba(0,0,0,0.12);
+  box-shadow: var(--shadow);
   padding: clamp(16px, 2.5vw, 28px);
 }
 
@@ -42,19 +42,19 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
+  border-bottom: 1px solid var(--card-border);
 }
 
 .qr-title{
   margin: 0 0 4px 0;
   font-size: clamp(20px, 2.4vw, 28px);
-  color: #111;
+  color: var(--text-strong);
   font-weight: 800;
 }
 
 .qr-subtitle{
   margin: 0;
-  color: #4b5563;
+  color: var(--muted);
   font-size: clamp(14px, 1.8vw, 16px);
 }
 
@@ -85,7 +85,7 @@
 
 .qr-section-title{
   margin: 4px 0;
-  color: #111;
+  color: var(--text-strong);
   font-weight: 700;
   font-size: 1.1rem;
 }
@@ -93,7 +93,7 @@
 .qr-list{
   margin: 0;
   padding-left: 18px;
-  color: #374151;
+  color: var(--muted);
   line-height: 1.55;
 }
 
@@ -101,9 +101,9 @@
   margin-top: 10px;
   padding: 10px 12px;
   border-radius: 8px;
-  background: #fff1f2;
-  color: #b00020;
-  border: 1px solid #fecdd3;
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--accent);
+  border: 1px solid rgba(239, 68, 68, 0.4);
 }
 
 .qr-scanner{
@@ -118,11 +118,9 @@
   aspect-ratio: 1 / 1;        
   border-radius: 12px;
   overflow: hidden;
-  background: #111;           
-  box-shadow:
-    0 1px 2px rgba(0,0,0,0.06),
-    0 10px 20px rgba(0,0,0,0.08);
-  border: 2px solid rgba(0,0,0,0.07);
+  background: var(--surface-strong);           
+  box-shadow: var(--shadow);
+  border: 2px solid var(--card-border);
 }
 
 .qr-reader.is-starting{
@@ -158,83 +156,12 @@
 }
 
 .btn-ghost{
-  background: #ffffff;
-  color: #111;
-  border: 1px solid #e5e7eb;
+  background: var(--card-bg);
+  color: var(--text-strong);
+  border: 1px solid var(--card-border);
 }
 .btn-ghost:hover{
-  background: #f3f4f6;
+  background: var(--row-hover);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d1117;          
-    --card-bg: #111827;     
-    --muted: #9ca3af;       
-
-    --primary: #93c5fd;     
-    --secondary: #60a5fa;
-    --hover: #2563eb;
-    --text-on-primary: #0b1220;
-
-    --accent: #b30000;
-    --accent-dark: #990000;
-  }
-
-  .qr-auth-shell {
-    background: var(--bg);
-    color-scheme: dark;
-  }
-
-  .qr-card {
-    background: var(--card-bg);
-    border-color: #7f1d1d;
-    box-shadow:
-      0 2px 6px rgba(0,0,0,0.35),
-      0 12px 28px rgba(0,0,0,0.45);
-  }
-
-  .qr-card-header {
-    border-bottom-color: rgba(255,255,255,0.08);
-  }
-
-  .qr-title { color: #f3f4f6; }
-  .qr-subtitle { color: var(--muted); }
-
-  .qr-section-title { color: #e5e7eb; }
-  .qr-list { color: #d1d5db; }
-
-  .qr-alert {
-    background: rgba(220,38,38,0.15);
-    border-color: rgba(239,68,68,0.4);
-    color: #fca5a5;
-  }
-
-  .qr-reader {
-    background: #0f172a;
-    border-color: rgba(255,255,255,0.08);
-    box-shadow:
-      0 1px 2px rgba(0,0,0,0.3),
-      0 10px 20px rgba(0,0,0,0.5);
-  }
-
-  /* Buttons */
-  .btn-secondary {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: var(--text-on-primary);
-  }
-  .btn-secondary:hover {
-    background: var(--hover);
-    border-color: var(--hover);
-  }
-
-  .btn-ghost {
-    background: #1f2937;
-    color: #e5e7eb;
-    border-color: #374151;
-  }
-  .btn-ghost:hover {
-    background: #374151;
-  }
-}
+/* Shared theme handles color scheme */

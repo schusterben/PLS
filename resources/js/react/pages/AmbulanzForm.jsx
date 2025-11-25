@@ -44,11 +44,11 @@ function AmbulanzForm() {
   const [formData, setFormData] = useState({
     name: "",
     triagefarbe: "",
-    atmung: false,
-    blutung: false,
-    transport: false,
-    dringend: false,
-    kontaminiert: false,
+    atmung: null,
+    blutung: null,
+    transport: null,
+    dringend: null,
+    kontaminiert: null,
     latitude_patient: "",
     longitude_patient: "",
     created_at: "",
@@ -60,11 +60,26 @@ function AmbulanzForm() {
       setFormData({
         name: patient.name || "",
         triagefarbe: patient.triagefarbe || "",
-        atmung: !!patient.atmung,
-        blutung: !!patient.blutung,
-        transport: !!patient.transport,
-        dringend: !!patient.dringend,
-        kontaminiert: !!patient.kontaminiert,
+        atmung:
+          patient.atmung === null || patient.atmung === undefined
+            ? null
+            : Boolean(patient.atmung),
+        blutung:
+          patient.blutung === null || patient.blutung === undefined
+            ? null
+            : Boolean(patient.blutung),
+        transport:
+          patient.transport === null || patient.transport === undefined
+            ? null
+            : Boolean(patient.transport),
+        dringend:
+          patient.dringend === null || patient.dringend === undefined
+            ? null
+            : Boolean(patient.dringend),
+        kontaminiert:
+          patient.kontaminiert === null || patient.kontaminiert === undefined
+            ? null
+            : Boolean(patient.kontaminiert),
         latitude_patient: patient.latitude_patient ?? "",
         longitude_patient: patient.longitude_patient ?? "",
         created_at: patient.created_at || "",
@@ -148,9 +163,9 @@ function AmbulanzForm() {
 
   const triageColorKey = getTriageClassKey(formData.triagefarbe);
 
-  const triagePillClass = triageColorKey
-    ? `triage-pill--${triageColorKey}`
-    : "triage-pill--unset";
+  const triageHighlightClass = triageColorKey
+    ? `triage-flash--${triageColorKey}`
+    : "triage-flash--unset";
 
   const triageLabel = formData.triagefarbe
     ? `${formData.triagefarbe.charAt(0).toUpperCase()}${formData.triagefarbe.slice(
@@ -193,10 +208,16 @@ function AmbulanzForm() {
     }));
   };
 
-  const handleCheckboxChange = (field) => (e) => {
+  const handleBooleanSelect = (field) => (e) => {
+    const value = e.target.value;
     setFormData((prev) => ({
       ...prev,
-      [field]: e.target.checked,
+      [field]:
+        value === ""
+          ? null
+          : value === "true"
+          ? true
+          : false,
     }));
   };
 
@@ -206,20 +227,46 @@ function AmbulanzForm() {
 
     setSaveStatus("saving");
 
+    const sanitizedName =
+      typeof formData.name === "string" ? formData.name.trim() : "";
+
+    const normalizeValue = (raw) => {
+      if (raw === null || raw === undefined) return null;
+      if (typeof raw === "string") {
+        const trimmed = raw.trim();
+        return trimmed === "" || trimmed === "-" ? null : trimmed;
+      }
+      return raw;
+    };
+
+    const parseCoordinate = (raw) => {
+      const normalized = normalizeValue(raw);
+      if (normalized === null) return null;
+      const parsed = parseFloat(normalized);
+      return Number.isNaN(parsed) ? null : parsed;
+    };
+
+    const normalizeBoolean = (raw) => {
+      if (raw === null || raw === undefined) return null;
+      if (typeof raw === "string") {
+        const trimmed = raw.trim();
+        if (trimmed === "" || trimmed === "-") return null;
+        if (trimmed.toLowerCase() === "true") return true;
+        if (trimmed.toLowerCase() === "false") return false;
+      }
+      return raw;
+    };
+
     const payload = {
-      triageColor: formData.triagefarbe || null,
-      lat:
-        formData.latitude_patient === ""
-          ? null
-          : parseFloat(formData.latitude_patient),
-      lng:
-        formData.longitude_patient === ""
-          ? null
-          : parseFloat(formData.longitude_patient),
-      respiration: formData.atmung,
-      bloodStopable: formData.blutung,
-      // name, transport, dringend, kontaminiert sind im UI schon da,
-      // werden aber noch nicht an die API geschickt.
+      triageColor: normalizeValue(formData.triagefarbe),
+      lat: parseCoordinate(formData.latitude_patient),
+      lng: parseCoordinate(formData.longitude_patient),
+      respiration: normalizeBoolean(formData.atmung),
+      bloodStopable: normalizeBoolean(formData.blutung),
+      name: normalizeValue(sanitizedName),
+      transport: normalizeBoolean(formData.transport),
+      dringend: normalizeBoolean(formData.dringend),
+      kontaminiert: normalizeBoolean(formData.kontaminiert),
     };
 
     try {
@@ -262,6 +309,16 @@ function AmbulanzForm() {
     );
   }
 
+  const formatForDisplay = (value) => {
+    if (!value) return "-";
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return value;
+    return parsed.toLocaleString("de-DE", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
+
   return (
     <div className="ambulanz-page" role="main" aria-labelledby="ambulanzTitle">
       <div className="ambulanz-card">
@@ -283,23 +340,25 @@ function AmbulanzForm() {
                 </span>
               )}
 
-              <span className="meta-chip">
-                <span className="meta-label">Letztes Update</span>
-                <span className="meta-value">
-                  {formData.updated_at || "—"}
-                </span>
+              <span className="meta-chip meta-chip--wide">
+                <div className="meta-stack">
+                  <span className="meta-label">Letztes Update</span>
+                  <span className="meta-value">
+                    {formatForDisplay(formData.updated_at || "—")}
+                  </span>
+                </div>
               </span>
+                <div className={`triage-flash ${triageHighlightClass}`}>
+                  <span className="triage-flash-dot" aria-hidden="true" />
+                  <div className="triage-flash-text">
+                    <span className="triage-flash-label">Triage</span>
+                    <span className="triage-flash-value">{triageLabel}</span>
+                  </div>
+                </div>
             </div>
           </div>
 
           <div className="ambulanz-header-right">
-            <div className="triage-pill-wrapper">
-              <span className="meta-label">Triage</span>
-              <span className={`triage-pill ${triagePillClass}`}>
-                {triageLabel}
-              </span>
-            </div>
-
             <div className="ambulanz-header-actions">
               <button
                 type="button"
@@ -366,25 +425,28 @@ function AmbulanzForm() {
             </div>
 
             <div className="status-grid" role="group" aria-label="Patientenstatus">
-              {statusFields.map((field) => {
-                const isActive = Boolean(formData[field.key]);
-                return (
-                  <label
-                    key={field.key}
-                    className={`status-toggle ${
-                      isActive ? "status-toggle--active" : ""
-                    }`}
+              {statusFields.map((field) => (
+                <div key={field.key} className="status-select">
+                  <label htmlFor={`status-${field.key}`}>{field.label}</label>
+                  <select
+                    id={`status-${field.key}`}
+                    className="ambulanz-select"
+                    value={
+                      formData[field.key] === null ||
+                      formData[field.key] === undefined
+                        ? ""
+                        : formData[field.key]
+                        ? "true"
+                        : "false"
+                    }
+                    onChange={handleBooleanSelect(field.key)}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isActive}
-                      onChange={handleCheckboxChange(field.key)}
-                    />
-                    <span className="status-toggle-check" aria-hidden="true" />
-                    <span>{field.label}</span>
-                  </label>
-                );
-              })}
+                    <option value="">-</option>
+                    <option value="true">Ja</option>
+                    <option value="false">Nein</option>
+                  </select>
+                </div>
+              ))}
             </div>
 
             <div className="section-divider">
@@ -398,48 +460,32 @@ function AmbulanzForm() {
             </div>
 
             <div className="info-card-grid">
-              <div className="info-card">
-                <label htmlFor="latitude_patient">Breitengrad</label>
-                <input
-                  id="latitude_patient"
-                  type="text"
-                  className="ambulanz-input"
-                  value={formData.latitude_patient}
-                  onChange={handleInputChange("latitude_patient")}
-                />
+              <div className="info-card info-card--compact">
+                <p className="info-card-label">Breitengrad</p>
+                <span className="info-card-value">
+                  {formData.latitude_patient || "-"}
+                </span>
               </div>
 
-              <div className="info-card">
-                <label htmlFor="longitude_patient">Längengrad</label>
-                <input
-                  id="longitude_patient"
-                  type="text"
-                  className="ambulanz-input"
-                  value={formData.longitude_patient}
-                  onChange={handleInputChange("longitude_patient")}
-                />
+              <div className="info-card info-card--compact">
+                <p className="info-card-label">Längengrad</p>
+                <span className="info-card-value">
+                  {formData.longitude_patient || "-"}
+                </span>
               </div>
 
-              <div className="info-card">
-                <label htmlFor="created_at">Erfasst</label>
-                <input
-                  id="created_at"
-                  type="text"
-                  className="ambulanz-input ambulanz-input--readonly"
-                  value={formData.created_at}
-                  readOnly
-                />
+              <div className="info-card info-card--compact">
+                <p className="info-card-label">Erfasst</p>
+                <span className="info-card-value">
+                  {formatForDisplay(formData.created_at)}
+                </span>
               </div>
 
-              <div className="info-card">
-                <label htmlFor="updated_at">Letztes Update</label>
-                <input
-                  id="updated_at"
-                  type="text"
-                  className="ambulanz-input ambulanz-input--readonly"
-                  value={formData.updated_at}
-                  readOnly
-                />
+              <div className="info-card info-card--compact">
+                <p className="info-card-label">Letztes Update</p>
+                <span className="info-card-value">
+                  {formatForDisplay(formData.updated_at)}
+                </span>
               </div>
             </div>
           </section>
@@ -533,6 +579,30 @@ function AmbulanzForm() {
                   </p>
                 </>
               )}
+            </div>
+          </section>
+          {/* Ambu Section fürs Nacherfassen*/}
+          <section className="ambulanz-section ambulanz-section--full">
+            <header className="section-head">
+              <div>
+                <h3 className="ambulanz-section-title">Ambulanzbogen</h3>
+                <p className="section-subtitle">
+                  Nacherfassen des Ambu Bogens
+                </p>
+              </div>
+            </header>
+
+            {/* Hier kommt dann alles vom Ambubogen rein */}
+            <div className="info-fields">
+              <div className="form-field">
+                <label>Versicherungsnummer</label>
+                <input className="ambulanz-input" type="text" />
+              </div>
+
+              <div className="form-field">
+                <label>Adresse</label>
+                <input className="ambulanz-input" type="text" />
+              </div>
             </div>
           </section>
         </div>

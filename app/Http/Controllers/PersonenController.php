@@ -149,34 +149,38 @@ class PersonenController extends Controller
             $person->latitude_patient = $lat;
         }
 
-        $respiration = $request->input('respiration');
-        if ($respiration !== null) {
-            $person->atmung = $respiration;
+        if ($request->exists('respiration')) {
+            $respiration = $request->input('respiration');
+            $person->atmung = is_null($respiration) ? null : (bool) $respiration;
         }
 
-        $bloodStopable = $request->input('bloodStopable');
-        if ($bloodStopable !== null) {
-            $person->blutung = $bloodStopable;
+        if ($request->exists('bloodStopable')) {
+            $bloodStopable = $request->input('bloodStopable');
+            $person->blutung = is_null($bloodStopable) ? null : (bool) $bloodStopable;
         }
 
-        if ($request->has('name')) {
+        if ($request->exists('name')) {
             $person->name = $request->input('name');
         }
 
-        if ($request->has('transport')) {
-            $person->transport = (bool) $request->input('transport');
+        if ($request->exists('transport')) {
+            $transport = $request->input('transport');
+            $person->transport = is_null($transport) ? null : (bool) $transport;
         }
 
-        if ($request->has('dringend')) {
-            $person->dringend = (bool) $request->input('dringend');
+        if ($request->exists('dringend')) {
+            $dringend = $request->input('dringend');
+            $person->dringend = is_null($dringend) ? null : (bool) $dringend;
         }
 
-        if ($request->has('kontaminiert')) {
-            $person->kontaminiert = (bool) $request->input('kontaminiert');
+        if ($request->exists('kontaminiert')) {
+            $kontaminiert = $request->input('kontaminiert');
+            $person->kontaminiert = is_null($kontaminiert) ? null : (bool) $kontaminiert;
         }
 
-        if ($request->has('radialispuls')) {
-            $person->radialispuls = (bool) $request->input('radialispuls');
+        if ($request->exists('radialispuls')) {
+            $radialispuls = $request->input('radialispuls');
+            $person->radialispuls = is_null($radialispuls) ? null : (bool) $radialispuls;
         }
 
 

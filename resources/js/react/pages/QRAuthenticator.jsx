@@ -142,14 +142,6 @@ export default function QrAuthenticator() {
 
           <section className="qr-scanner">
             <div id="qr-reader" className={`qr-reader ${isStarting ? "is-starting" : ""}`} />
-            <div className="qr-scanner-actions">
-              <button type="button" className="btn btn-ghost" onClick={startScanner}>
-                Kamera starten
-              </button>
-              <button type="button" className="btn btn-ghost" onClick={stopScanner}>
-                Kamera stoppen
-              </button>
-            </div>
           </section>
         </div>
       </div>

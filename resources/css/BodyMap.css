@@ -1,11 +1,13 @@
+@import "./theme.css";
+
 .bodyparts-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   padding-top: 40px;
-  background-color: #f7f7f8;
-  color: #111827;
+  background: var(--app-bg);
+  color: var(--text-strong);
   min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
@@ -16,16 +18,16 @@
   font-size: clamp(1.8rem, 2.2vw, 2.4rem);
   font-weight: 800;
   margin-bottom: 16px;
-  color: #111827;
+  color: var(--text-strong);
 }
 
 .body-svg {
   width: min(480px, 90%);
   height: auto;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  box-shadow: var(--shadow);
   padding: 16px;
   cursor: default;
 }
@@ -36,14 +38,14 @@
 }
 
 .bodypart {
-  fill: #808080;
-  stroke: black;
+  fill: var(--chip-default);
+  stroke: var(--card-border);
   stroke-width: 1;
   transition: fill 0.2s ease, transform 0.1s ease;
 }
 
 .bodypart.clicked {
-  fill: red;
+  fill: var(--chip-no);
 }
 
 .bodypart:hover {
@@ -55,9 +57,9 @@
   margin-top: 24px;
   padding: 12px 20px;
   border-radius: 10px;
-  border: 1px solid #0048fd;
-  background-color: #0048fd;
-  color: #ffffff;
+  border: 1px solid var(--accent-blue);
+  background-color: var(--accent-blue);
+  color: #0b1220;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
@@ -65,7 +67,7 @@
 }
 
 .bodyparts-container button:hover {
-  background-color: #003580;
+  background-color: #1d4ed8;
 }
 
 .bodyparts-container button:active {
@@ -74,28 +76,5 @@
 
 .bodyparts-container p {
   font-size: 1.1rem;
-  color: #4b5563;
-}
-
-@media (prefers-color-scheme: dark) {
-  .bodyparts-container {
-    background-color: #0d1117;
-    color: #e5e7eb;
-  }
-
-  .body-svg {
-    background: #111827;
-    border-color: #1f2937;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
-  }
-
-  .bodyparts-container button {
-    background-color: #93c5fd;
-    color: #0b1220;
-    border-color: #93c5fd;
-  }
-
-  .bodyparts-container button:hover {
-    background-color: #2563eb;
-  }
+  color: var(--text-dim);
 }

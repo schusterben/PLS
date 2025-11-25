@@ -1,40 +1,23 @@
+@import "./theme.css";
+
 :root {
-  --triage-primary: #0048fd;
-  --triage-primary-hover: #003580;
-  --triage-text-on-primary: #ffffff;
+  --triage-primary: var(--accent-blue);
+  --triage-primary-hover: #2563eb;
+  --triage-text-on-primary: #0b1220;
 
-  --triage-danger: #ef4444;
-  --triage-danger-hover: #dc2626;
+  --triage-danger: var(--chip-no);
+  --triage-danger-hover: #b91c1c;
 
-  --triage-bg: #f7f7f8;
-  --triage-card: #ffffff;
-  --triage-border: #e5e7eb;
-  --triage-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  --triage-bg: var(--app-bg);
+  --triage-card: var(--card-bg);
+  --triage-border: var(--card-border);
+  --triage-shadow: var(--shadow);
 
-  --triage-ink: #111827;
-  --triage-ink-2: #4b5563;
+  --triage-ink: var(--text-strong);
+  --triage-ink-2: var(--text-dim);
 
   --triage-radius: 12px;
   --triage-pad: clamp(16px, 2.4vw, 24px);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --triage-bg: #0d1117;
-    --triage-card: #111827;
-    --triage-border: #1f2937;
-    --triage-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
-
-    --triage-ink: #e5e7eb;
-    --triage-ink-2: #9ca3af;
-
-    --triage-primary: #93c5fd;
-    --triage-primary-hover: #2563eb;
-    --triage-text-on-primary: #0b1220;
-
-    --triage-danger: #f87171;
-    --triage-danger-hover: #ef4444;
-  }
 }
 
 .triage-page {
@@ -122,15 +105,15 @@
 }
 
 .btn-ghost {
-  background: #ffffff;
-  color: #111827;
+  background: var(--card-bg);
+  color: var(--triage-ink);
   border: 1px solid var(--triage-border);
 }
-.btn-ghost:hover { background: #f3f4f6; }
+.btn-ghost:hover { background: var(--row-hover); }
 
 .btn-danger {
   background: var(--triage-danger);
-  color: #ffffff;
+  color: var(--triage-text-on-primary);
   border-color: var(--triage-danger);
   box-shadow: var(--triage-shadow);
 }
@@ -145,15 +128,15 @@
   padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 8px;
-  background-color: #2563eb;
-  color: white;
+  background-color: var(--triage-primary);
+  color: var(--triage-text-on-primary);
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .back-to-triage-btn:hover {
-  background-color: #1d4ed8;
+  background-color: var(--triage-primary-hover);
 }
 
 .triage-badge {
@@ -165,21 +148,21 @@
 }
 
 .triage-badge.green {
-  color: #16a34a;
-  background: rgba(22, 163, 74, 0.08);
+  color: var(--chip-ok);
+  background: rgba(34, 197, 94, 0.12);
 }
 .triage-badge.black {
-  color: #111827;
+  color: var(--accent-dark);
   background: rgba(17, 24, 39, 0.08);
 }
 
 .triage-badge.red {
-  color: #dc2626;
-  background: rgba(220, 38, 38, 0.10);
+  color: var(--chip-no);
+  background: rgba(220, 38, 38, 0.1);
 }
 .triage-badge.yellow {
-  color: #ca8a04;             
-  background: rgba(202, 138, 4, 0.12);
+  color: #fbbf24;             
+  background: rgba(251, 191, 36, 0.12);
 }
 
 .triage-fab {
@@ -194,14 +177,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  color: #111827;
+  background: var(--card-bg);
+  color: var(--triage-ink);
   border: 1px solid var(--triage-border);
   box-shadow: var(--triage-shadow);
   cursor: pointer;
   transition: transform .08s ease, background-color .18s ease;
 }
-.triage-fab:hover { background: #f3f4f6; }
+.triage-fab:hover { background: var(--row-hover); }
 .triage-fab:active { transform: translateY(1px); }
 
 .triage-gps {
@@ -225,4 +208,4 @@
 .triage-status {
   font-weight: 600;
 }
-.triage-status.error { color: #dc2626; }
+.triage-status.error { color: var(--chip-no); }

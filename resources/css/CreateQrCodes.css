@@ -1,20 +1,21 @@
+@import "./theme.css";
+
 /* ===== Design Tokens (Light default) ===== */
 :root {
-  --qr-primary: #0048fd;
-  --qr-primary-hover: #003580;
-  --qr-text-on-primary: #ffffff;
+  --qr-primary: var(--accent-blue);
+  --qr-primary-hover: #2563eb;
+  --qr-text-on-primary: #0b1220;
 
-  --qr-accent: #b30000;
-  --qr-accent-dark: #990000;
+  --qr-accent: var(--chip-no);
+  --qr-accent-dark: #b91c1c;
 
-  /* Light Theme */
-  --qr-bg: #f7f7f8;
-  --qr-ink: #111827;
-  --qr-ink-2: #4b5563;
+  --qr-bg: var(--app-bg);
+  --qr-ink: var(--text-strong);
+  --qr-ink-2: var(--text-dim);
 
-  --qr-card: #ffffff;
-  --qr-border: #e5e7eb;
-  --qr-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  --qr-card: var(--card-bg);
+  --qr-border: var(--card-border);
+  --qr-shadow: var(--shadow);
 
   --qr-radius: 12px;
   --qr-gap: 16px;
@@ -23,23 +24,7 @@
   --qr-grid-min: 210px;
 }
 
-/* ===== Dark mode (system only) ===== */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --qr-bg: #0d1117;
-    --qr-ink: #e5e7eb;
-    --qr-ink-2: #9ca3af;
-
-    --qr-card: #111827;
-    --qr-border: #1f2937;
-    --qr-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
-
-    /* leichte Anpassung der Primärfarbe auf dunkel */
-    --qr-primary: #93c5fd;
-    --qr-primary-hover: #2563eb;
-    --qr-text-on-primary: #0b1220;
-  }
-}
+/* Theme handles light/dark via shared variables */
 
 /* ===== Page ===== */
 .qr-create-page {
@@ -99,19 +84,10 @@
   padding: 0 12px;
   border: 1px solid var(--qr-border);
   border-radius: 10px;
-  background: #fff;
-  color: #111;
+  background: var(--surface-strong);
+  color: var(--text-strong);
   outline: none;
   transition: border-color .18s ease, box-shadow .18s ease;
-}
-
-/* Input – Dark-Override */
-@media (prefers-color-scheme: dark) {
-  .qr-input {
-    background: #0f172a;
-    color: #e5e7eb;
-    border-color: var(--qr-border);
-  }
 }
 
 .qr-input:focus {
@@ -165,24 +141,12 @@
 }
 
 .btn-ghost {
-  background: #ffffff;
-  color: #111;
+  background: var(--card-bg);
+  color: var(--text-strong);
   border: 1px solid var(--qr-border);
 }
 .btn-ghost:hover {
-  background: #f3f4f6;
-}
-
-/* Ghost – Dark-Override */
-@media (prefers-color-scheme: dark) {
-  .btn-ghost {
-    background: #1f2937;
-    color: #e5e7eb;
-    border-color: #374151;
-  }
-  .btn-ghost:hover {
-    background: #374151;
-  }
+  background: var(--row-hover);
 }
 
 /* ===== Status ===== */
@@ -194,7 +158,7 @@
   gap: 8px;
 }
 .qr-status.info { color: var(--qr-primary-hover); }
-.qr-status.error { color: #dc2626; }
+.qr-status.error { color: var(--chip-no); }
 
 /* Tiny spinner */
 .spinner {

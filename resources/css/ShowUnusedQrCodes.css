@@ -1,39 +1,22 @@
+@import "./theme.css";
+
 /* ===== Design Tokens (Light default) ===== */
 :root {
-  --qr-primary: #0048fd;
-  --qr-primary-hover: #003580;
-  --qr-text-on-primary: #ffffff;
+  --qr-primary: var(--accent-blue);
+  --qr-primary-hover: #2563eb;
+  --qr-text-on-primary: #0b1220;
 
-  /* Light theme */
-  --qr-bg: #f7f7f8;
-  --qr-card: #ffffff;
-  --qr-border: #e5e7eb;
-  --qr-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  --qr-bg: var(--app-bg);
+  --qr-card: var(--card-bg);
+  --qr-border: var(--card-border);
+  --qr-shadow: var(--shadow);
 
-  --qr-ink: #111827;
-  --qr-ink-2: #4b5563;
+  --qr-ink: var(--text-strong);
+  --qr-ink-2: var(--text-dim);
 
   --qr-radius: 12px;
   --qr-pad: clamp(16px, 2.4vw, 24px);
   --qr-grid-min: 220px;
-}
-
-/* Dark mode (system only) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --qr-bg: #0d1117;
-    --qr-card: #111827;
-    --qr-border: #1f2937;
-    --qr-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
-
-    --qr-ink: #e5e7eb;
-    --qr-ink-2: #9ca3af;
-
-    /* Optional: leichte Anpassung der Primärfarbe auf dunkel */
-    --qr-primary: #93c5fd;
-    --qr-primary-hover: #2563eb;
-    --qr-text-on-primary: #0b1220;
-  }
 }
 
 /* ===== Page ===== */

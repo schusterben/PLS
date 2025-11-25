@@ -1,12 +1,13 @@
+@import "./theme.css";
+
 /* Haupt-Root-Stileinstellung für die globale Typografie und Darstellung */
 
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424; /* Hintergrundfarbe für dunklen Modus */
+    color: var(--text-strong);
+    background: var(--app-bg);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -14,13 +15,13 @@
     -webkit-text-size-adjust: 100%;
 
     /* Farbvariablen */
-    --primary-color: #646cff;
-    --secondary-color: #535bf2;
-    --background-light: #ffffff;
-    --background-dark: #242424;
-    --text-light: #213547;
-    --button-bg-dark: #1a1a1a;
-    --button-border-hover: #646cff;
+    --primary-color: var(--accent-blue);
+    --secondary-color: #2563eb;
+    --background-light: var(--app-bg);
+    --background-dark: var(--app-bg);
+    --text-light: var(--text-strong);
+    --button-bg-dark: rgba(15, 23, 42, 0.8);
+    --button-border-hover: var(--accent-blue);
 }
 
 /* Grundlegender Stil für Links */
@@ -41,7 +42,7 @@ body {
     min-width: 320px;
     min-height: 100vh;
     background-color: var(--background-dark);
-    color: rgba(255, 255, 255, 0.87);
+    color: var(--text-light);
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -92,9 +93,9 @@ button:focus-visible {
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background-color: var(--primary-color);
-    color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--header-bg);
+    color: var(--text-light);
+    box-shadow: var(--shadow);
 }
 
 .logo img {
@@ -120,6 +121,6 @@ button:focus-visible {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 .links a:hover {
-    background-color: var(--secondary-color);
-    color: var(--background-light);
+    background-color: var(--row-hover);
+    color: var(--secondary-color);
 }

@@ -1,34 +1,20 @@
+@import "./theme.css";
+
 :root {
-  --scan-primary: #0048fd;
-  --scan-primary-hover: #003580;
-  --scan-text-on-primary: #ffffff;
+  --scan-primary: var(--accent-blue);
+  --scan-primary-hover: #2563eb;
+  --scan-text-on-primary: #0b1220;
 
-  --scan-bg: #f7f7f8;
-  --scan-card: #ffffff;
-  --scan-border: #e5e7eb;
-  --scan-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  --scan-bg: var(--app-bg);
+  --scan-card: var(--card-bg);
+  --scan-border: var(--card-border);
+  --scan-shadow: var(--shadow);
 
-  --scan-ink: #111827;
-  --scan-ink-2: #4b5563;
+  --scan-ink: var(--text-strong);
+  --scan-ink-2: var(--text-dim);
 
   --scan-radius: 12px;
   --scan-pad: clamp(16px, 2.4vw, 24px);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --scan-bg: #0d1117;
-    --scan-card: #111827;
-    --scan-border: #1f2937;
-    --scan-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
-
-    --scan-ink: #e5e7eb;
-    --scan-ink-2: #9ca3af;
-
-    --scan-primary: #93c5fd;
-    --scan-primary-hover: #2563eb;
-    --scan-text-on-primary: #0b1220;
-  }
 }
 
 .scan-page {
@@ -75,10 +61,8 @@
   border-radius: 12px;
   overflow: hidden;
   border: 2px solid var(--scan-border);
-  background: #0f172a;     
-  box-shadow:
-    0 1px 2px rgba(0,0,0,0.06),
-    0 10px 20px rgba(0,0,0,0.08);
+  background: var(--surface-strong);     
+  box-shadow: var(--shadow);
 }
 
 .scan-status {
@@ -86,7 +70,7 @@
 }
 
 .scan-status.error {
-  color: #dc2626;
+  color: var(--chip-no);
 }
 
 .btn {
