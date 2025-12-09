@@ -70,34 +70,35 @@ export default function TriagePage3() {
       console.error("Keine Patienten-ID verfügbar");
       return;
     }
-    if (!position.loaded || position.error) {
-      console.error("Koordinaten sind nicht verfügbar.");
-      return;
-    }
+
+    const coords =
+      position.loaded && !position.error
+        ? position.coordinates
+        : { lat: null, lng: null };
 
     let requestBody;
     switch (color) {
       case "rot":
         requestBody = {
           triageColor: color,
-          lat: position.coordinates.lat,
-          lng: position.coordinates.lng,
+          lat: coords.lat,
+          lng: coords.lng,
           bloodStopable: false,
         };
         break;
       case "gelb":
         requestBody = {
           triageColor: color,
-          lat: position.coordinates.lat,
-          lng: position.coordinates.lng,
+          lat: coords.lat,
+          lng: coords.lng,
           bloodStopable: true,
         };
         break;
       default:
         requestBody = {
           triageColor: color,
-          lat: position.coordinates.lat,
-          lng: position.coordinates.lng,
+          lat: coords.lat,
+          lng: coords.lng,
         };
     }
 

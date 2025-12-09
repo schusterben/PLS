@@ -67,13 +67,16 @@ export default function TriagePage2() {
   /** Update triage color (rot) */
   const updateTriageColor = async (color) => {
     if (!patientId) return console.error("Keine Patienten-ID verfügbar");
-    if (!position.loaded || position.error)
-      return console.error("Koordinaten sind nicht verfügbar.");
+
+    const coords =
+      position.loaded && !position.error
+        ? position.coordinates
+        : { lat: null, lng: null };
 
     const requestBody = {
       triageColor: color,
-      lat: position.coordinates.lat,
-      lng: position.coordinates.lng,
+      lat: coords.lat,
+      lng: coords.lng,
       respiration: false,
     };
 
@@ -103,9 +106,14 @@ export default function TriagePage2() {
 
   /** Button handler – Atmung suffizient (weiter zur Page 3) */
   const handleNextPage = async () => {
+    const coords =
+      position.loaded && !position.error
+        ? position.coordinates
+        : { lat: null, lng: null };
+
     const requestBody = {
-      lat: position.coordinates.lat,
-      lng: position.coordinates.lng,
+      lat: coords.lat,
+      lng: coords.lng,
       respiration: true,
     };
 
