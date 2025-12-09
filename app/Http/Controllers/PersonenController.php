@@ -35,10 +35,22 @@ class PersonenController extends Controller
     public function index(Request $request)
     {
         // Extrahiert die ID der Einsatzszene aus der Anfrage
-        $operationScene =
-            json_decode($request->input('operationScene'), true);
+        $operationSceneRaw = $request->input('operationScene');
+        $operationScene = is_string($operationSceneRaw)
+            ? json_decode($operationSceneRaw, true)
+            : $operationSceneRaw;
 
-        $operationSceneId = $operationScene['idoperationScene'];
+        // Unterstützt sowohl JSON-Objekt als auch reine ID
+        $operationSceneId = null;
+        if (is_array($operationScene) && isset($operationScene['idoperationScene'])) {
+            $operationSceneId = $operationScene['idoperationScene'];
+        } elseif (is_numeric($operationScene)) {
+            $operationSceneId = (int) $operationScene;
+        }
+
+        if ($operationSceneId === null) {
+            return response()->json(['message' => 'operationSceneId fehlt oder ist ungültig'], 400);
+        }
 
         // Abfrage aller Patienten, die mit der angegebenen Einsatzszene verknüpft sind
         $patients = QRCodePatient::join('patient', 'qr_code_patient.patient_idpatient', '=', 'patient.idpatient')
@@ -202,8 +214,17 @@ class PersonenController extends Controller
      // Holt den QR-Code und die Einsatzszenen-Daten aus der Anfrage
 
         $qrCode = $request->input('qr_code');
-        $operationScene =
-            json_decode($request->input('operationScene'), true);
+        $operationSceneRaw = $request->input('operationScene');
+        $operationScene = is_string($operationSceneRaw)
+            ? json_decode($operationSceneRaw, true)
+            : $operationSceneRaw;
+
+        $operationSceneId = null;
+        if (is_array($operationScene) && isset($operationScene['idoperationScene'])) {
+            $operationSceneId = $operationScene['idoperationScene'];
+        } elseif (is_numeric($operationScene)) {
+            $operationSceneId = (int) $operationScene;
+        }
 
 
         // Überprüft, ob der QR-Code in der qr_code_patient-Tabelle existiert
@@ -213,8 +234,7 @@ class PersonenController extends Controller
             // Wenn der QR-Code einem Patienten zugeordnet ist, gibt die Patienten-ID zurück
             if ($qrCodePatient->patient_idpatient) {
                 // Übergabe der PatientenId
-                if ($operationScene) {
-                    $operationSceneId = $operationScene['idoperationScene'];
+                if ($operationSceneId) {
                     $qrCodePatient->operationScene_id = $operationSceneId;
                     $qrCodePatient->save();
                 }
@@ -236,13 +256,13 @@ class PersonenController extends Controller
 
                 // Verknüpft den Patienten mit dem QR-Code und ggf. der Einsatzszene
                 $qrCodePatient->patient_idpatient = $patient->idpatient;
-                if ($operationScene) {
-                    $qrCodePatient->operationScene_id = $operationScene['idoperationScene'];
+                if ($operationSceneId) {
+                    $qrCodePatient->operationScene_id = $operationSceneId;
                 }
                 $qrCodePatient->save();
 
                 // Return the ID of the newly created patient
-                return response()->json(['patientId' => $patient->id]);
+                return response()->json(['patientId' => $patient->idpatient]);
             }
         } else {
             // Return an error message if the QR code is not found

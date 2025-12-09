@@ -12,6 +12,7 @@ use App\Http\Controllers\UserController;
 use Tymon\JWTAuth\Validators\TokenValidator;
 use App\Http\Controllers\BodyPartController;
 use App\Http\Controllers\OperationSceneController;
+use App\Http\Controllers\AmbuController;
 
 
 /*
@@ -50,6 +51,9 @@ Route::middleware(['jwt'])->group(function () {
   Route::post('/persons/{person}/respiration', [PersonenController::class, 'updateRespiration']);
 
   Route::put('/save-body-part', [BodyPartController::class, 'saveBodyPart']);
+  Route::get('/ambu/{idpatient}', [AmbuController::class, 'showByPatient']);
+  Route::post('/ambu/{idpatient}', [AmbuController::class, 'upsert']);
+  Route::put('/ambu/{idpatient}', [AmbuController::class, 'upsert']);
 });
 
 

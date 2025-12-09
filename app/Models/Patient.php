@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Ambu;
 
 
 /**
@@ -60,5 +61,10 @@ class Patient extends Model
     public function body()
     {
         return $this->hasOne(Body::class, 'idpatient', 'idpatient');
+    }
+
+    public function ambu()
+    {
+        return $this->hasOne(Ambu::class, 'idpatient', 'idpatient');
     }
 }
