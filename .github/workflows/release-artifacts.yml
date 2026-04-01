@@ -1,0 +1,49 @@
+name: Release Artifacts (No Docker)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: client-app/package-lock.json
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build frontend
+        working-directory: client-app
+        run: |
+          npm ci
+          npm run build
+
+      - name: Publish backend
+        run: dotnet publish src/PLS.Api/PLS.Api.csproj -c Release -o out/backend
+
+      - name: Prepare artifact structure
+        run: |
+          mkdir -p out/release
+          cp -r out/backend out/release/backend
+          cp -r client-app/dist out/release/frontend-dist
+          cp docker-compose.yml out/release/
+          cp -r mosquitto out/release/mosquitto
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pls-release-${{ github.ref_name }}
+          path: out/release
