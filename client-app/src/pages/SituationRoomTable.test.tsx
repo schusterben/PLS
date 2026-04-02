@@ -29,6 +29,22 @@ vi.mock('../api/endpoints', () => ({
         created_at: '2026-03-26T10:00:00.000Z',
         updated_at: '2026-03-26T10:01:00.000Z',
       },
+      {
+        idpatient: 10,
+        atmung: true,
+        blutung: false,
+        radialispuls: null,
+        triagefarbe: 'orange',
+        transport: false,
+        dringend: false,
+        kontaminiert: false,
+        name: 'Erika',
+        longitude_patient: 16.41,
+        latitude_patient: 48.28,
+        user_iduser: null,
+        created_at: '2026-03-26T10:02:00.000Z',
+        updated_at: '2026-03-26T10:03:00.000Z',
+      },
     ],
   }),
 }));
@@ -74,4 +90,17 @@ it('navigates to page 1 on click and keyboard activation', async () => {
   navigateMock.mockReset();
   fireEvent.keyDown(row, { key: 'Enter' });
   expect(navigateMock).toHaveBeenCalledWith('/AmbulanzprotokollPage1/9', { state: { operationSceneId: 55 } });
+});
+
+it('renders invalid triage values explicitly', async () => {
+  render(
+    <MemoryRouter initialEntries={[{ pathname: '/SituationRoomTable', state: { operationSceneId: 55 } }]}>
+      <Routes>
+        <Route path="/SituationRoomTable" element={<SituationRoomTable />} />
+      </Routes>
+    </MemoryRouter>
+  );
+
+  expect(await screen.findByText('Ungültig: orange')).toBeInTheDocument();
+  expect(screen.getAllByText('1 Ungültig').length).toBeGreaterThan(0);
 });

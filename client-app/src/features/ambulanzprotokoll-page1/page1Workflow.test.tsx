@@ -198,3 +198,77 @@ it('finalizes and clears the local draft', async () => {
   expect(window.localStorage.getItem('ambdoku:page1:patient:7')).toBeNull();
   expect(result.current.exportJson).toContain('"incident"');
 });
+
+it('keeps a locally finalized draft when server finalize fails and retries on reconnect', async () => {
+  getPage1Mock.mockResolvedValue({ data: null });
+  putPage1Mock.mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({
+    data: buildRecord({
+      status: 'finalized',
+      finalizedAt: '2026-01-02T12:00:00.000Z',
+      updatedAt: '2026-01-02T12:00:00.000Z',
+    }),
+  });
+
+  const { result } = renderHook(() =>
+    useAmbulanzprotokollPage1Workflow({ patientId: 7, operationSceneId: 11, token: 'token' })
+  );
+
+  await act(async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+
+  await act(async () => {
+    await result.current.finalize();
+  });
+
+  const locallySaved = JSON.parse(window.localStorage.getItem('ambdoku:page1:patient:7') ?? 'null');
+  expect(locallySaved?.status).toBe('finalized');
+  expect(result.current.status).toBe('finalized');
+  expect(result.current.syncState).toBe('saved-local');
+
+  await act(async () => {
+    window.dispatchEvent(new Event('online'));
+    await Promise.resolve();
+  });
+
+  expect(putPage1Mock).toHaveBeenCalledTimes(2);
+  expect(putPage1Mock.mock.calls[1][1]).toEqual(
+    expect.objectContaining({ status: 'finalized' })
+  );
+});
+
+it('normalizes medication rows from hydrated data to the canonical 8-row shape', async () => {
+  getPage1Mock.mockResolvedValue({
+    data: buildRecord({
+      formState: {
+        ...buildRecord({}).formState,
+        medications_administered: [
+          { medikament: 'A', dosis: '1', art: 'iv', uhrzeit: '08:00', extra: 'x' } as never,
+          { medikament: 'B', dosis: '2', art: 'po', uhrzeit: '' } as never,
+          ...Array.from({ length: 8 }, (_, index) => ({
+            medikament: `X${index}`,
+            dosis: `${index}`,
+            art: 'x',
+            uhrzeit: null,
+          })),
+        ],
+      },
+    }),
+  });
+  putPage1Mock.mockResolvedValue({ data: null });
+
+  const { result } = renderHook(() =>
+    useAmbulanzprotokollPage1Workflow({ patientId: 7, operationSceneId: 11, token: 'token' })
+  );
+
+  await act(async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+
+  const meds = result.current.form.getValues().medications_administered;
+  expect(meds).toHaveLength(8);
+  expect(meds[0]).toEqual({ medikament: 'A', dosis: '1', art: 'iv', uhrzeit: '08:00' });
+  expect(meds[1]).toEqual({ medikament: 'B', dosis: '2', art: 'po', uhrzeit: null });
+});

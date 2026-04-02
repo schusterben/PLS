@@ -1,5 +1,5 @@
-import { useEffect, useState, type CSSProperties } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useWatch, type FieldPath, type UseFormReturn } from 'react-hook-form';
 import { useAuthStore } from '../stores/authStore';
 import {
@@ -8,7 +8,13 @@ import {
   type Page1ZoneId,
 } from '../features/ambulanzprotokoll-page1/page1FieldSchema';
 import { resolvePage1ZoneBindings } from '../features/ambulanzprotokoll-page1/page1FieldBindings';
-import type { Page1State } from '../features/ambulanzprotokoll-page1/page1State';
+import {
+  createMedicationAdministration,
+  MAX_MEDICATION_ROWS,
+  normalizeMedicationAdministrations,
+  type BodyMapMarker,
+  type Page1State,
+} from '../features/ambulanzprotokoll-page1/page1State';
 import { useAmbulanzprotokollPage1Workflow } from '../features/ambulanzprotokoll-page1/page1Workflow';
 import '../styles/ambulanzprotokoll-page1.css';
 
@@ -142,6 +148,236 @@ function renderOptionList(
   );
 }
 
+// ── Body map ──────────────────────────────────────────────────────────────────
+
+const MARKER_COLORS: Record<string, string> = {
+  wunde: '#e53e3e',
+  fraktur: '#dd6b20',
+  schmerz: '#d69e2e',
+  prellung: '#805ad5',
+  amputation: '#2b6cb0',
+  verbrennung: '#c05621',
+  luxation: '#276749',
+};
+
+function markerColor(marker: string): string {
+  return MARKER_COLORS[marker] ?? '#555';
+}
+
+function HumanFigure() {
+  return (
+    <>
+      <circle cx="30" cy="10" r="8" className="ambd-figure-part" />
+      <rect x="19" y="20" width="22" height="40" rx="3" className="ambd-figure-part" />
+      <rect x="7" y="22" width="11" height="30" rx="4" className="ambd-figure-part" />
+      <rect x="42" y="22" width="11" height="30" rx="4" className="ambd-figure-part" />
+      <rect x="19" y="61" width="10" height="44" rx="4" className="ambd-figure-part" />
+      <rect x="31" y="61" width="10" height="44" rx="4" className="ambd-figure-part" />
+    </>
+  );
+}
+
+function BodyMapField({
+  bind,
+  form,
+  markerOptions,
+  value,
+}: {
+  bind: string;
+  form: UseFormReturn<PageState>;
+  markerOptions: Page1FieldOption[];
+  value: BodyMapMarker[];
+}) {
+  const [activeMarker, setActiveMarker] = useState<string>(markerOptions[0]?.value ?? 'wunde');
+  const path = bind as FieldPath<PageState>;
+
+  function handleSvgClick(view: 'front' | 'back', e: React.MouseEvent<SVGSVGElement>) {
+    const svg = e.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+    const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+    const nextValue: BodyMapMarker[] = [...value, { view, marker: activeMarker, x, y }];
+    form.setValue(path, nextValue as never, { shouldDirty: true, shouldTouch: true });
+  }
+
+  function removeMarker(idx: number) {
+    const nextValue = value.filter((_, i) => i !== idx);
+    form.setValue(path, nextValue as never, { shouldDirty: true, shouldTouch: true });
+  }
+
+  return (
+    <div className="ambd-body-map">
+      <div className="ambd-body-map-figures">
+        {(['front', 'back'] as const).map((view) => {
+          const viewMarkers = value
+            .map((m, i) => ({ ...m, idx: i }))
+            .filter((m) => m.view === view);
+          return (
+            <div key={view} className="ambd-body-map-fig-wrap">
+              <span className="ambd-body-map-fig-label">{view === 'front' ? 'Vorne' : 'Hinten'}</span>
+              <svg
+                className="ambd-body-map-svg"
+                viewBox="0 0 60 110"
+                onClick={(e) => handleSvgClick(view, e)}
+                role="img"
+                aria-label={`Körperkarte ${view === 'front' ? 'Vorderseite' : 'Rückseite'} — klicken zum Markieren`}
+              >
+                <HumanFigure />
+                {viewMarkers.map((m) => (
+                  <circle
+                    key={m.idx}
+                    cx={m.x * 0.6}
+                    cy={m.y * 1.1}
+                    r="3"
+                    fill={markerColor(m.marker)}
+                    stroke="#fff"
+                    strokeWidth="0.5"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeMarker(m.idx);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                    role="button"
+                    aria-label={`Markierung ${m.marker} entfernen`}
+                  />
+                ))}
+              </svg>
+            </div>
+          );
+        })}
+      </div>
+      <div className="ambd-body-map-legend">
+        {markerOptions.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className={
+              activeMarker === option.value ? 'ambd-legend-btn ambd-legend-btn--active' : 'ambd-legend-btn'
+            }
+            onClick={() => setActiveMarker(option.value)}
+          >
+            <span
+              className="ambd-legend-dot"
+              style={{ background: markerColor(option.value) }}
+              aria-hidden="true"
+            />
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Signature canvas ──────────────────────────────────────────────────────────
+
+function SignatureCanvas({
+  bind,
+  form,
+  value,
+}: {
+  bind: string;
+  form: UseFormReturn<PageState>;
+  value: string | null;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isDrawing = useRef(false);
+  const path = bind as FieldPath<PageState>;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (value) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src = value;
+    }
+  }, [value]);
+
+  function getPoint(e: React.PointerEvent<HTMLCanvasElement>) {
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (canvas.width / rect.width),
+      y: (e.clientY - rect.top) * (canvas.height / rect.height),
+    };
+  }
+
+  function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
+    isDrawing.current = true;
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const pt = getPoint(e);
+    ctx.beginPath();
+    ctx.moveTo(pt.x, pt.y);
+  }
+
+  function handlePointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
+    if (!isDrawing.current) return;
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    const pt = getPoint(e);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#111';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineTo(pt.x, pt.y);
+    ctx.stroke();
+  }
+
+  function commitSignature() {
+    if (!isDrawing.current) return;
+    isDrawing.current = false;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    form.setValue(path, canvas.toDataURL('image/png') as never, { shouldDirty: true, shouldTouch: true });
+  }
+
+  function handleClear() {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    form.setValue(path, null as never, { shouldDirty: true, shouldTouch: true });
+  }
+
+  return (
+    <div className="ambd-signature">
+      <canvas
+        ref={canvasRef}
+        className="ambd-signature-canvas"
+        width={240}
+        height={72}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={commitSignature}
+        onPointerLeave={commitSignature}
+      />
+      <button type="button" className="ambd-signature-clear" onClick={handleClear}>
+        Löschen
+      </button>
+    </div>
+  );
+}
+
+// ── Field rendering ───────────────────────────────────────────────────────────
+
+const PUPILLEN_ROWS = [
+  'eng',
+  'mittel',
+  'weit',
+  'entrundet',
+  'prompte Lichtreflexe',
+  'verlangsamte Lichtreflexe',
+  'lichtstarr',
+] as const;
+
 function renderFieldControl(field: Page1FieldSpec, draft: PageState, form: UseFormReturn<PageState>) {
   const value = readBindValue(draft, field.bind);
   const path = field.bind as FieldPath<PageState>;
@@ -221,22 +457,61 @@ function renderFieldControl(field: Page1FieldSpec, draft: PageState, form: UseFo
       return renderOptionList(form, field.bind, field.options, selected, field.type === 'radio_group_inline', 'radio');
     }
     case 'matrix_checkbox': {
-      const matrix = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+      const matrixVal =
+        value && typeof value === 'object' && !Array.isArray(value)
+          ? (value as { R?: string[]; L?: string[] })
+          : {};
+      const rValues = matrixVal.R ?? [];
+      const lValues = matrixVal.L ?? [];
+      const columns = field.options ?? [];
+
       return (
-        <div className="ambd-matrix-checkbox" data-bind={field.bind}>
-          <div className="ambd-matrix-checkbox-head">
-            {(field.options ?? []).map((option) => (
-              <span key={option.value}>{option.label}</span>
+        <div className="ambd-pupillen-matrix">
+          <div className="ambd-pupillen-head">
+            <span />
+            {columns.map((col) => (
+              <span key={col.value} className="ambd-pupillen-col-label">
+                {col.label}
+              </span>
             ))}
           </div>
-          <div className="ambd-matrix-checkbox-body">
-            {Object.entries(matrix).map(([row, entries]) => (
-              <div key={row} className="ambd-matrix-checkbox-row">
-                <span>{row}</span>
-                <span className="ambd-paper-line">{Array.isArray(entries) ? entries.join(', ') : ''}</span>
-              </div>
-            ))}
-          </div>
+          {PUPILLEN_ROWS.map((row) => (
+            <div key={row} className="ambd-pupillen-row">
+              <span className="ambd-pupillen-row-label">{row}</span>
+              {columns.map((col) => {
+                const colArr = col.value === 'R' ? rValues : lValues;
+                const checked = colArr.includes(row);
+                return (
+                  <label key={col.value} className="ambd-pupillen-cell">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      className="ambd-checkbox-input"
+                      onChange={(e) => {
+                        const cur =
+                          (readBindValue(form.getValues(), field.bind) as
+                            | { R: string[]; L: string[] }
+                            | undefined) ?? { R: [], L: [] };
+                        const colCur = (col.value === 'R' ? cur.R : cur.L) ?? [];
+                        const colNext = e.target.checked
+                          ? Array.from(new Set([...colCur, row]))
+                          : colCur.filter((v) => v !== row);
+                        form.setValue(
+                          path,
+                          { ...cur, [col.value]: colNext } as never,
+                          { shouldDirty: true, shouldTouch: true },
+                        );
+                      }}
+                    />
+                    <span
+                      className={checked ? 'ambd-checkbox ambd-checkbox--checked' : 'ambd-checkbox'}
+                      aria-hidden="true"
+                    />
+                  </label>
+                );
+              })}
+            </div>
+          ))}
         </div>
       );
     }
@@ -260,64 +535,80 @@ function renderFieldControl(field: Page1FieldSpec, draft: PageState, form: UseFo
     }
     case 'scale_line': {
       const selectedValue = typeof value === 'number' ? value : null;
+      const naValue = Boolean(draft.vitals.schmerz_nicht_beurteilbar);
       const scalePoints = Array.from({ length: 11 }, (_, index) => index);
+      const naPath = 'vitals.schmerz_nicht_beurteilbar' as FieldPath<PageState>;
 
       return (
         <div className="ambd-scale-line" data-bind={field.bind}>
           {scalePoints.map((point) => (
-            <span key={point} className={selectedValue === point ? 'ambd-scale-point ambd-scale-point--active' : 'ambd-scale-point'}>
+            <span
+              key={point}
+              className={selectedValue === point ? 'ambd-scale-point ambd-scale-point--active' : 'ambd-scale-point'}
+              role="button"
+              tabIndex={0}
+              aria-pressed={selectedValue === point}
+              aria-label={`Schmerz ${point}`}
+              onClick={() => {
+                const next = selectedValue === point ? null : point;
+                form.setValue(path, next as never, { shouldDirty: true, shouldTouch: true });
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  const next = selectedValue === point ? null : point;
+                  form.setValue(path, next as never, { shouldDirty: true, shouldTouch: true });
+                }
+              }}
+            >
               <span className="ambd-scale-tick" aria-hidden="true" />
               <span>{point}</span>
             </span>
           ))}
-          <span className="ambd-scale-na">
-            <span className="ambd-checkbox" aria-hidden="true" />
+          <label className="ambd-scale-na">
+            <input
+              type="checkbox"
+              checked={naValue}
+              className="ambd-checkbox-input"
+              onChange={(e) =>
+                form.setValue(naPath, e.target.checked, { shouldDirty: true, shouldTouch: true })
+              }
+            />
+            <span className={naValue ? 'ambd-checkbox ambd-checkbox--checked' : 'ambd-checkbox'} aria-hidden="true" />
             <span>nicht beurteilbar</span>
-          </span>
+          </label>
         </div>
       );
     }
-    case 'body_map':
+    case 'body_map': {
+      const markers = Array.isArray(value) ? (value as unknown[]).filter(isBodyMapMarker) : [];
       return (
-        <div className="ambd-body-map" data-bind={field.bind}>
-          <div className="ambd-body-map-labels">
-            <span>R</span>
-            <span>L</span>
-            <span>R</span>
-          </div>
-          <div className="ambd-body-map-canvas">
-            <div className="ambd-body-map-figure ambd-body-map-figure--front">front</div>
-            <div className="ambd-body-map-figure ambd-body-map-figure--back">back</div>
-          </div>
-          <div className="ambd-body-map-legend">
-            {(field.options ?? []).map((option) => (
-              <CheckboxOption
-                key={option.value}
-                onChange={(checked) => {
-                  const current = Array.isArray(readBindValue(form.getValues(), field.bind))
-                    ? (readBindValue(form.getValues(), field.bind) as unknown[]).map(String)
-                    : [];
-                  const nextValues = checked
-                    ? Array.from(new Set([...current, option.value]))
-                    : current.filter((entry) => entry !== option.value);
-                  form.setValue(path, nextValues as never, { shouldDirty: true, shouldTouch: true });
-                }}
-                option={option}
-                selected={Array.isArray(value) && value.map(String).includes(option.value)}
-              />
-            ))}
-          </div>
-        </div>
+        <BodyMapField
+          bind={field.bind}
+          form={form}
+          markerOptions={field.options ?? []}
+          value={markers}
+        />
       );
-    case 'signature':
-      return (
-        <div className="ambd-signature" data-bind={field.bind}>
-          <input className="ambd-paper-input" placeholder="Signatur" type="text" {...form.register(path)} />
-        </div>
-      );
+    }
+    case 'signature': {
+      const sigValue = typeof value === 'string' ? value : null;
+      return <SignatureCanvas bind={field.bind} form={form} value={sigValue} />;
+    }
     default:
       return <PaperLine value={formatScalarValue(value)} />;
   }
+}
+
+function isBodyMapMarker(item: unknown): item is BodyMapMarker {
+  return (
+    typeof item === 'object'
+    && item !== null
+    && 'view' in item
+    && 'marker' in item
+    && 'x' in item
+    && 'y' in item
+  );
 }
 
 function renderField(field: Page1FieldSpec, draft: PageState, form: UseFormReturn<PageState>) {
@@ -351,6 +642,13 @@ function renderRows(fields: Page1FieldSpec[], draft: PageState, form: UseFormRet
   ));
 }
 
+const MED_COLS = ['medikament', 'dosis', 'art', 'uhrzeit'] as const;
+const MED_COL_LABELS: Record<(typeof MED_COLS)[number], string> = {
+  medikament: 'Medikament',
+  dosis: 'Dosis',
+  art: 'Art',
+  uhrzeit: 'Uhrzeit',
+};
 function renderZoneBody(zone: Zone, draft: PageState, form: UseFormReturn<PageState>) {
   if (zone.id === 'brand_header') {
     return (
@@ -362,19 +660,50 @@ function renderZoneBody(zone: Zone, draft: PageState, form: UseFormReturn<PageSt
   }
 
   if (zone.id === 'akutmedikation') {
+    const medications = normalizeMedicationAdministrations(draft.medications_administered);
+
     return (
       <div className="ambd-medication-grid">
         <div className="ambd-medication-header">Akutmedikation durch RD</div>
         <div className="ambd-medication-table">
-          {['Medikament', 'Dosis', 'Art', 'Uhrzeit'].map((label) => (
-            <span key={label} className="ambd-medication-cell ambd-medication-cell--head">
-              {label}
+          {MED_COLS.map((col) => (
+            <span key={col} className="ambd-medication-cell ambd-medication-cell--head">
+              {MED_COL_LABELS[col]}
             </span>
           ))}
-          {Array.from({ length: 16 }, (_, index) => (
-            <span key={index} className="ambd-medication-cell" aria-hidden="true" />
-          ))}
+          {medications.map((row, rowIndex) =>
+            MED_COLS.map((col) => (
+              <input
+                key={`${rowIndex}-${col}`}
+                className="ambd-medication-cell ambd-medication-input"
+                type="text"
+                placeholder={col === 'uhrzeit' ? '__:__' : ''}
+                value={(row[col] as string | null | undefined) ?? ''}
+                onChange={(e) => {
+                  const next = medications.map((r, i) =>
+                    i === rowIndex ? { ...r, [col]: e.target.value || null } : r,
+                  );
+                  form.setValue('medications_administered', normalizeMedicationAdministrations(next), { shouldDirty: true, shouldTouch: true });
+                }}
+              />
+            )),
+          )}
         </div>
+        {medications.length < MAX_MEDICATION_ROWS ? (
+          <button
+            type="button"
+            className="ambd-medication-add"
+            onClick={() => {
+              const next = normalizeMedicationAdministrations([
+                ...medications,
+                createMedicationAdministration(),
+              ]);
+              form.setValue('medications_administered', next, { shouldDirty: true, shouldTouch: true });
+            }}
+          >
+            + Zeile
+          </button>
+        ) : null}
       </div>
     );
   }
@@ -386,7 +715,7 @@ function renderZoneBody(zone: Zone, draft: PageState, form: UseFormReturn<PageSt
     const rightFields = zoneFields.filter((field) => field.column === 'right');
 
     return (
-        <div className="ambd-split-zone">
+      <div className="ambd-split-zone">
         <div className="ambd-split-column ambd-split-column--left">{renderRows(leftFields, draft, form)}</div>
         <div className="ambd-split-column ambd-split-column--right">{renderRows(rightFields, draft, form)}</div>
       </div>
@@ -428,6 +757,7 @@ function downloadJson(filename: string, content: string) {
 export default function AmbulanzprotokollPage1() {
   const { patientId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const operationSceneId = location.state?.operationSceneId;
   const { token } = useAuthStore();
   const workflow = useAmbulanzprotokollPage1Workflow({
@@ -455,6 +785,12 @@ export default function AmbulanzprotokollPage1() {
     return () => window.removeEventListener('resize', updateScale);
   }, []);
 
+  function handleBack() {
+    navigate('/SituationRoomTable', {
+      state: typeof operationSceneId === 'number' ? { operationSceneId } : undefined,
+    });
+  }
+
   return (
     <div className="ambd-shell">
       <div className="ambd-topline">
@@ -472,10 +808,18 @@ export default function AmbulanzprotokollPage1() {
       </div>
 
       <div className="ambd-actions">
-        <button type="button" onClick={() => void workflow.finalize()}>
-          Finalize
+        <button type="button" className="ambd-back-btn" onClick={handleBack}>
+          ← Zurück
         </button>
-        <button type="button" onClick={() => downloadJson(`ambulanzprotokoll-page1-${patientId ?? 'draft'}.json`, workflow.exportJson)}>
+        <button type="button" onClick={() => void workflow.finalize()}>
+          Finalisieren
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            downloadJson(`ambulanzprotokoll-page1-${patientId ?? 'draft'}.json`, workflow.exportJson)
+          }
+        >
           Export JSON
         </button>
       </div>

@@ -2,6 +2,10 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using PLS.Api.Data;
+using PLS.Api.Models.Entities;
 
 namespace PLS.Api.Tests;
 
@@ -109,6 +113,55 @@ public class PersonsTests
 
         var response = await _client.SendAsync(request);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateTriageColor_InvalidColor_Returns400()
+    {
+        var token = await GetAdminTokenAsync();
+        var patientId = await CreatePatientAsync(token);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post, $"/api/persons/{patientId}/update-triage-color")
+        {
+            Content = JsonContent.Create(new { triageColor = "orange" })
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateTriageColor_WhitespaceAndCase_NormalizesStoredValue()
+    {
+        var token = await GetAdminTokenAsync();
+        var patientId = await CreatePatientAsync(token);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post, $"/api/persons/{patientId}/update-triage-color")
+        {
+            Content = JsonContent.Create(new { triageColor = "  GRÜN  " })
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var data = await response.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+        Assert.Equal("grün", data!["triagefarbe"].GetString());
+    }
+
+    [Fact]
+    public async Task TriagefarbeConstraint_RejectsInvalidDirectDatabaseWrite()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<PlsDbContext>();
+        var patient = new Patient { Triagefarbe = "orange" };
+
+        db.Patients.Add(patient);
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
     }
 
     // ── Respiration update ─────────────────────────────────────────────────────

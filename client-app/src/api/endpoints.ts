@@ -1,6 +1,7 @@
 import client from './client';
 import type { AuthResponse, Patient, OperationScene, BodyParts, GenerateQrCodesResponse } from '../types';
 import type { Page1PersistedRecord, Page1State } from '../features/ambulanzprotokoll-page1/page1State';
+import type { TriageColor } from '../types/triageColor';
 
 // Auth
 export const qrLogin = (qr_code: string) =>
@@ -17,14 +18,19 @@ export const getPersons = (operationSceneId: number, token: string) =>
   client.post<Patient[]>('/v2/persons', { operationSceneId }, { headers: { Authorization: `Bearer ${token}` } });
 
 export const updateTriageColor = (patientId: number, data: {
-  triageColor?: string; lng?: number; lat?: number; respiration?: boolean; blutung?: boolean;
+  triageColor?: TriageColor; respiration?: boolean; blutung?: boolean;
 }, token: string) =>
   client.post(`/v2/persons/${patientId}/update-triage-color`, data, { headers: { Authorization: `Bearer ${token}` } });
 
 export const updateRespiration = (patientId: number, data: {
-  respiration: string | boolean; lng?: number; lat?: number;
+  respiration: boolean;
 }, token: string) =>
   client.post(`/v2/persons/${patientId}/respiration`, data, { headers: { Authorization: `Bearer ${token}` } });
+
+export const updatePatientLocation = (patientId: number, data: {
+  lat: number; lng: number;
+}, token: string) =>
+  client.post(`/v2/persons/${patientId}/location`, data, { headers: { Authorization: `Bearer ${token}` } });
 
 export const verifyPatientQrCode = (qr_code: string, operationSceneId: number, token: string) =>
   client.post<{ patientId: number }>('/v2/verify-patient-qr-code', { qr_code, operationSceneId }, { headers: { Authorization: `Bearer ${token}` } });

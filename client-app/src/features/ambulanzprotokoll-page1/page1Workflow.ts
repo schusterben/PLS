@@ -8,7 +8,7 @@ import {
   writePage1Draft,
 } from './page1Storage';
 import { getPage1, putPage1 } from './page1Api';
-import { createPage1Template, page1FinalizeSchema, serializePage1State } from './page1State';
+import { createPage1Template, normalizePage1State, page1FinalizeSchema, serializePage1State } from './page1State';
 
 export type Page1SyncState = 'loading' | 'ready' | 'saving' | 'saved-local' | 'saved-server' | 'finalized' | 'error';
 
@@ -31,16 +31,18 @@ export function useAmbulanzprotokollPage1Workflow({ patientId, operationSceneId,
   const [isHydrated, setIsHydrated] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<Page1PersistedRecord | null>(null);
   const saveTimerRef = useRef<number | null>(null);
+  const pendingServerSyncRef = useRef(false);
   const watchedState = useWatch({ control: form.control });
 
   const persistLocal = useCallback((formState: Page1State, nextStatus: Page1RecordStatus, updatedAt: string, finalizedAt: string | null) => {
+    const normalizedFormState = normalizePage1State(formState);
     const record: Page1PersistedRecord = {
       patientId,
       operationSceneId,
       status: nextStatus,
       updatedAt,
       finalizedAt,
-      formState,
+      formState: normalizedFormState,
     };
 
     writePage1Draft(record);
@@ -65,7 +67,7 @@ export function useAmbulanzprotokollPage1Workflow({ patientId, operationSceneId,
         if (cancelled) return;
 
         const chosenRecord = chooseNewestRecord(localRecord, serverRecord);
-        const nextState = chosenRecord?.formState ?? createPage1Template();
+        const nextState = chosenRecord?.formState ? normalizePage1State(chosenRecord.formState) : createPage1Template();
         form.reset(nextState);
         setIsHydrated(true);
         setCurrentRecord(chosenRecord ?? null);
@@ -84,7 +86,7 @@ export function useAmbulanzprotokollPage1Workflow({ patientId, operationSceneId,
       } catch (error) {
         if (cancelled) return;
 
-        const fallback = localRecord?.formState ?? createPage1Template();
+        const fallback = localRecord?.formState ? normalizePage1State(localRecord.formState) : createPage1Template();
         form.reset(fallback);
         setIsHydrated(true);
         setCurrentRecord(localRecord ?? null);
@@ -109,13 +111,15 @@ export function useAmbulanzprotokollPage1Workflow({ patientId, operationSceneId,
 
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
     saveTimerRef.current = window.setTimeout(() => {
-      const nextValue = watchedState as Page1State;
+      const nextValue = normalizePage1State(watchedState as Page1State);
       const updatedAt = new Date().toISOString();
-      const nextStatus = 'draft' as const;
-      persistLocal(nextValue, nextStatus, updatedAt, null);
+      const nextStatus = status === 'finalized' ? 'finalized' as const : 'draft' as const;
+      const nextFinalizedAt = nextStatus === 'finalized' ? currentRecord?.finalizedAt ?? updatedAt : null;
+      persistLocal(nextValue, nextStatus, updatedAt, nextFinalizedAt);
       setSyncState('saving');
 
       if (!token) {
+        pendingServerSyncRef.current = true;
         setSyncState('saved-local');
         return;
       }
@@ -123,16 +127,17 @@ export function useAmbulanzprotokollPage1Workflow({ patientId, operationSceneId,
       void putPage1(patientId, {
         formState: nextValue,
         status: nextStatus,
-        finalizedAt: null,
+        finalizedAt: nextFinalizedAt,
         updatedAt,
       }, token)
         .then(({ data }) => {
+          pendingServerSyncRef.current = false;
           const serverRecord = data ?? {
             patientId,
             operationSceneId,
             status: nextStatus,
             updatedAt,
-            finalizedAt: null,
+            finalizedAt: nextFinalizedAt,
             formState: nextValue,
           };
           persistLocal(serverRecord.formState, serverRecord.status, serverRecord.updatedAt, serverRecord.finalizedAt);
@@ -141,18 +146,65 @@ export function useAmbulanzprotokollPage1Workflow({ patientId, operationSceneId,
         })
         .catch(() => {
           setSyncState('saved-local');
+          pendingServerSyncRef.current = true;
         });
     }, 800);
 
     return () => {
       if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
     };
-  }, [isHydrated, operationSceneId, patientId, persistLocal, token, watchedState]);
+  }, [currentRecord?.finalizedAt, isHydrated, operationSceneId, patientId, persistLocal, status, token, watchedState]);
+
+  useEffect(() => {
+    function handleOnline() {
+      if (!pendingServerSyncRef.current || !token || !isHydrated) return;
+      const currentState = normalizePage1State(form.getValues());
+      const updatedAt = new Date().toISOString();
+      const pendingStatus = currentRecord?.status ?? status;
+      const pendingFinalizedAt = pendingStatus === 'finalized' ? currentRecord?.finalizedAt ?? updatedAt : null;
+      setSyncState('saving');
+      void putPage1(patientId, {
+        formState: currentState,
+        status: pendingStatus,
+        finalizedAt: pendingFinalizedAt,
+        updatedAt,
+      }, token)
+        .then(({ data }) => {
+          pendingServerSyncRef.current = false;
+          const rec = data ?? {
+            patientId,
+            operationSceneId,
+            status: pendingStatus,
+            updatedAt,
+            finalizedAt: pendingFinalizedAt,
+            formState: currentState,
+          };
+          persistLocal(rec.formState, rec.status, rec.updatedAt, rec.finalizedAt);
+          setSource('server');
+          setSyncState('saved-server');
+        })
+        .catch(() => setSyncState('saved-local'));
+    }
+
+    function handleOffline() {
+      pendingServerSyncRef.current = true;
+      setSyncState((prev) =>
+        prev === 'saving' || prev === 'saved-server' || prev === 'ready' ? 'saved-local' : prev,
+      );
+    }
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [currentRecord, form, isHydrated, operationSceneId, patientId, persistLocal, status, token]);
 
   const finalize = async () => {
-    const validState = form.getValues();
+    const validState = normalizePage1State(form.getValues());
     const validation = page1FinalizeSchema.safeParse(validState);
-    const finalState = validation.success ? validation.data : form.getValues();
+    const finalState = validation.success ? normalizePage1State(validation.data) : validState;
     const finalizedAt = new Date().toISOString();
     const updatedAt = finalizedAt;
 
@@ -183,8 +235,10 @@ export function useAmbulanzprotokollPage1Workflow({ patientId, operationSceneId,
       setSource('server');
       setSyncState('finalized');
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Finalisierung fehlgeschlagen');
-      setSyncState('error');
+      pendingServerSyncRef.current = true;
+      persistLocal(finalState, 'finalized', updatedAt, finalizedAt);
+      setErrorMessage(error instanceof Error ? error.message : 'Finalisierung lokal gespeichert; Server-Sync ausstehend');
+      setSyncState('saved-local');
     }
   };
 

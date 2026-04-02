@@ -3,10 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useQrScanner } from '../hooks/useQrScanner';
 import { verifyPatientQrCode, getUnusedPatientQrCodesDev } from '../api/endpoints';
+import { usePatientLocationStore } from '../stores/patientLocationStore';
 
 export default function ScanPatient() {
   const location = useLocation();
   const { token } = useAuthStore();
+  const ensurePatientLocation = usePatientLocationStore((state) => state.ensurePatientLocation);
   const operationSceneId: number = location.state?.operationSceneId;
   const navigate = useNavigate();
   const devButtonsEnabled = import.meta.env.VITE_ENABLE_DEV_BUTTONS === 'true';
@@ -27,6 +29,7 @@ export default function ScanPatient() {
     verifyPatientQrCode(decodedText, operationSceneId, token!)
       .then(({ data }) => {
         if (data.patientId) {
+          void ensurePatientLocation(data.patientId);
           stopScanner();
           navigate('/TriagePage1', {
             state: { patientId: data.patientId, operationSceneId },

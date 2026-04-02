@@ -7,10 +7,11 @@
 .claude/
 .visualReference/
 .references/
-.codex/
 
 # Secrets / local env
-
+.env
+.env.*
+!.env.example
 
 # Node
 node_modules/
@@ -32,4 +33,3 @@ TestResults/
 
 # Misc
 *.log
-/docs/

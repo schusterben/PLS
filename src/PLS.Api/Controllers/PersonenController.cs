@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PLS.Api.Data;
+using PLS.Api.Models;
 using PLS.Api.Models.DTOs;
 using PLS.Api.Models.Entities;
 using PLS.Api.Services;
@@ -111,7 +112,10 @@ public class PersonenController : ControllerBase
         if (patient == null)
             return NotFound(new { message = "Person nicht gefunden" });
 
-        if (request.triageColor != null) patient.Triagefarbe = request.triageColor;
+        if (!TriageColor.TryNormalize(request.triageColor, out var normalizedTriageColor))
+            return BadRequest(new { message = "Ungültige Triagefarbe", allowedValues = TriageColor.AllowedValues });
+
+        if (request.triageColor != null) patient.Triagefarbe = normalizedTriageColor;
         if (request.lng != null && request.lat != null)
         {
             patient.LongitudePatient = request.lng;

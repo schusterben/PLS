@@ -1,7 +1,9 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
-import { useGeolocation } from '../hooks/useGeolocation';
+import { useEffect, useState } from 'react';
 import { usePatientTriage } from '../hooks/usePatientTriage';
+import { TRIAGE_COLOR } from '../types/triageColor';
+import { usePatientLocationStore } from '../stores/patientLocationStore';
+import PatientLocationStatus from '../components/PatientLocationStatus';
 
 export default function TriagePage1() {
   const navigate = useNavigate();
@@ -10,17 +12,21 @@ export default function TriagePage1() {
   const [black, setBlack] = useState(false);
   const patientId = location.state?.patientId;
   const operationSceneId: number = location.state?.operationSceneId;
-  const position = useGeolocation();
-  const { setTriageColor } = usePatientTriage(patientId, position);
+  const ensurePatientLocation = usePatientLocationStore((state) => state.ensurePatientLocation);
+  const { setTriageColor } = usePatientTriage(patientId);
+
+  useEffect(() => {
+    void ensurePatientLocation(patientId);
+  }, [ensurePatientLocation, patientId]);
 
   const handleGreen = () => {
     setGreen(true);
-    setTriageColor('grün');
+    setTriageColor(TRIAGE_COLOR.GRUEN);
   };
 
   const handleBlack = () => {
     setBlack(true);
-    setTriageColor('schwarz');
+    setTriageColor(TRIAGE_COLOR.SCHWARZ);
   };
 
   const handleNextPage = () => {
@@ -149,19 +155,8 @@ export default function TriagePage1() {
       >
         👤
       </button>
-      <h4>GPS Koordinaten:</h4>
-      <p>Laden: {position.loaded ? 'Erfolgreich' : 'Lädt...'}</p>
-      {position.loaded && !position.error && (
-        <div>
-          <p>Breitengrad: {position.coordinates.lat}</p>
-          <p>Längengrad: {position.coordinates.lng}</p>
-        </div>
-      )}
-      {position.error && (
-        <div>
-          <p>Fehler: {position.error.message}</p>
-        </div>
-      )}
+      <h4>GPS Status:</h4>
+      <PatientLocationStatus patientId={patientId} />
     </div>
   );
 }

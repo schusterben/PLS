@@ -1,6 +1,20 @@
 import { z } from 'zod';
 import { page1ExportStateTemplate } from './page1FieldSchema';
 
+export interface BodyMapMarker {
+  view: 'front' | 'back';
+  marker: string;
+  x: number;
+  y: number;
+}
+
+export interface MedicationAdministration {
+  medikament: string;
+  dosis: string;
+  art: string;
+  uhrzeit: string | null;
+}
+
 export interface Page1State {
   incident: {
     ambulanzort: string;
@@ -40,9 +54,9 @@ export interface Page1State {
   };
   assessment_secondary: {
     anamnese_text: string;
-    bodymap: string[];
+    bodymap: BodyMapMarker[];
   };
-  medications_administered: Array<Record<string, string | null>>;
+  medications_administered: MedicationAdministration[];
   vitals: {
     pupillen: { R: string[]; L: string[] };
     schmerz: number | null;
@@ -119,6 +133,36 @@ export interface Page1PersistedRecord {
   formState: Page1State;
 }
 
+export const MAX_MEDICATION_ROWS = 8;
+
+export function createMedicationAdministration(): MedicationAdministration {
+  return {
+    medikament: '',
+    dosis: '',
+    art: '',
+    uhrzeit: null,
+  };
+}
+
+export function normalizeMedicationAdministrations(value: unknown): MedicationAdministration[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.slice(0, MAX_MEDICATION_ROWS).map((entry) => {
+    if (!entry || typeof entry !== 'object') {
+      return createMedicationAdministration();
+    }
+
+    const row = entry as Record<string, unknown>;
+
+    return {
+      medikament: typeof row.medikament === 'string' ? row.medikament : '',
+      dosis: typeof row.dosis === 'string' ? row.dosis : '',
+      art: typeof row.art === 'string' ? row.art : '',
+      uhrzeit: typeof row.uhrzeit === 'string' && row.uhrzeit.length > 0 ? row.uhrzeit : null,
+    };
+  });
+}
+
 export const page1StateSchema = z.object({
   incident: z.object({
     ambulanzort: z.string(),
@@ -158,9 +202,19 @@ export const page1StateSchema = z.object({
   }),
   assessment_secondary: z.object({
     anamnese_text: z.string(),
-    bodymap: z.array(z.string()),
+    bodymap: z.array(z.object({
+      view: z.enum(['front', 'back']),
+      marker: z.string(),
+      x: z.number(),
+      y: z.number(),
+    })),
   }),
-  medications_administered: z.array(z.record(z.string(), z.union([z.string(), z.null()]))),
+  medications_administered: z.array(z.object({
+    medikament: z.string(),
+    dosis: z.string(),
+    art: z.string(),
+    uhrzeit: z.string().nullable(),
+  })).max(MAX_MEDICATION_ROWS),
   vitals: z.object({
     pupillen: z.object({
       R: z.array(z.string()),
@@ -232,9 +286,16 @@ export const page1StateSchema = z.object({
 export const page1FinalizeSchema = page1StateSchema;
 
 export function createPage1Template(): Page1State {
-  return JSON.parse(JSON.stringify(page1ExportStateTemplate)) as Page1State;
+  return normalizePage1State(JSON.parse(JSON.stringify(page1ExportStateTemplate)) as Page1State);
+}
+
+export function normalizePage1State(state: Page1State): Page1State {
+  return {
+    ...state,
+    medications_administered: normalizeMedicationAdministrations(state.medications_administered),
+  };
 }
 
 export function serializePage1State(state: Page1State) {
-  return JSON.stringify(state, null, 2);
+  return JSON.stringify(normalizePage1State(state), null, 2);
 }

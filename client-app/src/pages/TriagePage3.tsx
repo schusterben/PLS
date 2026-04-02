@@ -1,7 +1,9 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
-import { useGeolocation } from '../hooks/useGeolocation';
+import { useEffect, useState } from 'react';
 import { usePatientTriage } from '../hooks/usePatientTriage';
+import { TRIAGE_COLOR } from '../types/triageColor';
+import { usePatientLocationStore } from '../stores/patientLocationStore';
+import PatientLocationStatus from '../components/PatientLocationStatus';
 
 export default function TriagePage3() {
   const navigate = useNavigate();
@@ -10,17 +12,21 @@ export default function TriagePage3() {
   const [yellow, setYellow] = useState(false);
   const patientId = location.state?.patientId;
   const operationSceneId: number = location.state?.operationSceneId;
-  const position = useGeolocation();
-  const { setTriageColor } = usePatientTriage(patientId, position);
+  const ensurePatientLocation = usePatientLocationStore((state) => state.ensurePatientLocation);
+  const { setTriageColor } = usePatientTriage(patientId);
+
+  useEffect(() => {
+    void ensurePatientLocation(patientId);
+  }, [ensurePatientLocation, patientId]);
 
   const handleRed = () => {
     setRed(true);
-    setTriageColor('rot', { blutung: false });
+    setTriageColor(TRIAGE_COLOR.ROT, { blutung: false });
   };
 
   const handleYellow = () => {
     setYellow(true);
-    setTriageColor('gelb', { blutung: true });
+    setTriageColor(TRIAGE_COLOR.GELB, { blutung: true });
   };
 
   const handleNewPatient = () => {
@@ -133,6 +139,7 @@ export default function TriagePage3() {
   return (
     <div>
       {renderContent()}
+      <PatientLocationStatus patientId={patientId} />
       <button
         style={{
           position: 'absolute',

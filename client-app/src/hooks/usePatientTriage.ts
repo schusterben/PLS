@@ -1,22 +1,20 @@
 import { useAuthStore } from '../stores/authStore';
 import { updateTriageColor, updateRespiration } from '../api/endpoints';
-import type { GeoPosition } from './useGeolocation';
+import type { TriageColor } from '../types/triageColor';
 
-export function usePatientTriage(patientId: number | undefined, position: GeoPosition) {
+export function usePatientTriage(patientId: number | undefined) {
   const { token } = useAuthStore();
 
   const setTriageColor = async (
-    color: string,
+    color: TriageColor,
     extra?: { respiration?: boolean; blutung?: boolean }
   ) => {
-    if (!patientId || !position.loaded || position.error) return;
+    if (!patientId) return;
     try {
       await updateTriageColor(
         patientId,
         {
           triageColor: color,
-          lat: position.coordinates.lat as number,
-          lng: position.coordinates.lng as number,
           ...extra,
         },
         token!
@@ -27,14 +25,12 @@ export function usePatientTriage(patientId: number | undefined, position: GeoPos
   };
 
   const setRespiration = async (value: boolean) => {
-    if (!patientId || !position.loaded) return;
+    if (!patientId) return;
     try {
       await updateRespiration(
         patientId,
         {
           respiration: value,
-          lat: position.coordinates.lat as number,
-          lng: position.coordinates.lng as number,
         },
         token!
       );

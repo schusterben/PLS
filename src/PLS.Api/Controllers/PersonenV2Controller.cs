@@ -75,12 +75,10 @@ public class PersonenV2Controller : ControllerBase
         if (patient == null)
             return NotFound(new { message = "Person nicht gefunden" });
 
-        if (request.triageColor != null) patient.Triagefarbe = request.triageColor;
-        if (request.lng != null && request.lat != null)
-        {
-            patient.LongitudePatient = request.lng;
-            patient.LatitudePatient = request.lat;
-        }
+        if (!TriageColor.TryNormalize(request.triageColor, out var normalizedTriageColor))
+            return BadRequest(new { message = "Ungültige Triagefarbe", allowedValues = TriageColor.AllowedValues });
+
+        if (request.triageColor != null) patient.Triagefarbe = normalizedTriageColor;
         // v2: booleans mapped to string storage (legacy DB schema)
         if (request.respiration.HasValue) patient.Atmung = request.respiration.Value.ToString();
         if (request.blutung.HasValue) patient.Blutung = request.blutung.Value.ToString();
@@ -88,48 +86,40 @@ public class PersonenV2Controller : ControllerBase
         await _context.SaveChangesAsync();
         await _mqttService.PublishPatientStateAsync(id);
 
-        return Ok(new
-        {
-            idpatient = patient.Id,
-            atmung = patient.Atmung,
-            blutung = patient.Blutung,
-            radialispuls = patient.Radialispuls,
-            triagefarbe = patient.Triagefarbe,
-            transport = patient.Transport,
-            dringend = patient.Dringend,
-            kontaminiert = patient.Kontaminiert,
-            name = patient.Name,
-            longitude_patient = patient.LongitudePatient,
-            latitude_patient = patient.LatitudePatient,
-            user_iduser = patient.UserIdUser,
-            created_at = patient.CreatedAt,
-            updated_at = patient.UpdatedAt
-        });
+        return Ok(CreatePatientResponse(patient));
     }
 
     /// <summary>Updates respiration status for a patient.</summary>
     [Authorize(Policy = "TriageWrite")]
     [HttpPost("api/v2/persons/{id}/respiration")]
-    public async Task<IActionResult> UpdateRespiration(int id, [FromBody] UpdateRespirationRequest request)
+    public async Task<IActionResult> UpdateRespiration(int id, [FromBody] UpdateRespirationV2Request request)
     {
         var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id);
         if (patient == null)
             return NotFound(new { message = "Person nicht gefunden" });
 
-        patient.Atmung = request.respiration;
+        patient.Atmung = request.respiration.ToString();
+        await _context.SaveChangesAsync();
+        await _mqttService.PublishPatientStateAsync(id);
+
+        return Ok(CreatePatientResponse(patient));
+    }
+
+    /// <summary>Updates patient geolocation independently from other triage writes.</summary>
+    [Authorize(Policy = "TriageWrite")]
+    [HttpPost("api/v2/persons/{id}/location")]
+    public async Task<IActionResult> UpdateLocation(int id, [FromBody] UpdatePatientLocationV2Request request)
+    {
+        var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id);
+        if (patient == null)
+            return NotFound(new { message = "Person nicht gefunden" });
+
         patient.LongitudePatient = request.lng;
         patient.LatitudePatient = request.lat;
         await _context.SaveChangesAsync();
         await _mqttService.PublishPatientStateAsync(id);
 
-        return Ok(new
-        {
-            idpatient = patient.Id,
-            atmung = patient.Atmung,
-            triagefarbe = patient.Triagefarbe,
-            created_at = patient.CreatedAt,
-            updated_at = patient.UpdatedAt
-        });
+        return Ok(CreatePatientResponse(patient));
     }
 
     /// <summary>
@@ -140,8 +130,13 @@ public class PersonenV2Controller : ControllerBase
     [HttpPost("api/v2/verify-patient-qr-code")]
     public async Task<IActionResult> VerifyPatientQrCode([FromBody] VerifyPatientQrCodeV2Request request)
     {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+
         var qrCodePatient = await _context.QrCodePatients
-            .FirstOrDefaultAsync(q => q.QrLogin == request.qr_code);
+            .FromSqlInterpolated(
+                $"SELECT * FROM qr_code_patients WHERE qr_login = {request.qr_code} FOR UPDATE")
+            .AsTracking()
+            .FirstOrDefaultAsync();
 
         if (qrCodePatient == null)
             return NotFound(new { message = "Ungültiger QR-Code" });
@@ -150,6 +145,7 @@ public class PersonenV2Controller : ControllerBase
         {
             qrCodePatient.OperationSceneId = request.operationSceneId;
             await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
             return Ok(new { patientId = qrCodePatient.PatientId });
         }
 
@@ -167,6 +163,7 @@ public class PersonenV2Controller : ControllerBase
         qrCodePatient.PatientId = patient.Id;
         qrCodePatient.OperationSceneId = request.operationSceneId;
         await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         await _mqttService.PublishPatientStateAsync(patient.Id);
 
@@ -229,6 +226,24 @@ public class PersonenV2Controller : ControllerBase
 
         return Ok(CreateResponse(patientId, form.Status, form.FormStateJson, form.UpdatedAt, form.FinalizedAt));
     }
+
+    private static object CreatePatientResponse(Patient patient) => new
+    {
+        idpatient = patient.Id,
+        atmung = patient.Atmung,
+        blutung = patient.Blutung,
+        radialispuls = patient.Radialispuls,
+        triagefarbe = patient.Triagefarbe,
+        transport = patient.Transport,
+        dringend = patient.Dringend,
+        kontaminiert = patient.Kontaminiert,
+        name = patient.Name,
+        longitude_patient = patient.LongitudePatient,
+        latitude_patient = patient.LatitudePatient,
+        user_iduser = patient.UserIdUser,
+        created_at = patient.CreatedAt,
+        updated_at = patient.UpdatedAt
+    };
 
     private static AmbulanzprotokollPage1Response CreateResponse(
         int patientId,

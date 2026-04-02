@@ -7,6 +7,12 @@ import '../styles/MarkerStyles.css';
 import { useAuthStore } from '../stores/authStore';
 import type { Patient } from '../types';
 import { getPersons } from '../api/endpoints';
+import { isTriageColor, TRIAGE_COLORS, TRIAGE_COLOR_BACKGROUND, type TriageColor } from '../types/triageColor';
+
+type TriageDisplay =
+  | { kind: 'unassigned'; label: string; backgroundColor: string; textColor: string; border?: string }
+  | { kind: 'valid'; label: string; canonical: TriageColor; backgroundColor: string; textColor: string; border?: string }
+  | { kind: 'invalid'; label: string; backgroundColor: string; textColor: string; border: string };
 
 function SituationRoomTable() {
   const location = useLocation();
@@ -45,22 +51,35 @@ function SituationRoomTable() {
       });
   }, [operationSceneId, token]);
 
-  const getBackgroundColor = (triageColor: string | null): string => {
-    if (!triageColor) return 'white';
-    switch (triageColor.toLowerCase()) {
-      case 'gelb':
-        return 'yellow';
-      case 'rot':
-        return 'red';
-      case 'grün':
-        return 'green';
-      case 'blau':
-        return 'blue';
-      case 'schwarz':
-        return 'black';
-      default:
-        return 'white';
+  const getTriageDisplay = (triageColor: string | null): TriageDisplay => {
+    const normalized = triageColor?.trim().toLowerCase();
+    if (!normalized) {
+      return {
+        kind: 'unassigned',
+        label: 'Keine Farbe',
+        backgroundColor: 'white',
+        textColor: 'black',
+        border: '1px solid #ccc',
+      };
     }
+
+    if (isTriageColor(normalized)) {
+      return {
+        kind: 'valid',
+        canonical: normalized,
+        label: normalized,
+        backgroundColor: TRIAGE_COLOR_BACKGROUND[normalized],
+        textColor: normalized === 'gelb' ? 'black' : 'white',
+      };
+    }
+
+    return {
+      kind: 'invalid',
+      label: `Ungültig: ${triageColor}`,
+      backgroundColor: '#ff8c00',
+      textColor: 'black',
+      border: '2px solid #8a4b00',
+    };
   };
 
   const createMarkerIcon = (color: string) =>
@@ -77,7 +96,7 @@ function SituationRoomTable() {
         <Marker
           key={person.idpatient}
           position={[person.latitude_patient, person.longitude_patient]}
-          icon={createMarkerIcon(getBackgroundColor(person.triagefarbe))}
+          icon={createMarkerIcon(getTriageDisplay(person.triagefarbe).backgroundColor)}
         >
           <Popup>
             Nummer: {person.idpatient}
@@ -102,6 +121,27 @@ function SituationRoomTable() {
   if (isLoading) return <p>Lädt...</p>;
   if (persons.length === 0) return <p>Keine Personen gefunden.</p>;
 
+  const triageDisplays = persons.map((person) => ({
+    person,
+    triageDisplay: getTriageDisplay(person.triagefarbe),
+  }));
+
+  const colorCounts = TRIAGE_COLORS.reduce<Record<TriageColor, number>>((acc, color) => {
+    acc[color] = triageDisplays.filter(({ triageDisplay }) => triageDisplay.kind === 'valid'
+      && triageDisplay.canonical === color).length;
+    return acc;
+  }, { rot: 0, gelb: 0, grün: 0, blau: 0, schwarz: 0 });
+  const unassigned = triageDisplays.filter(({ triageDisplay }) => triageDisplay.kind === 'unassigned').length;
+  const invalid = triageDisplays.filter(({ triageDisplay }) => triageDisplay.kind === 'invalid').length;
+
+  const badgeTextColor: Record<TriageColor, string> = {
+    rot: 'white',
+    gelb: 'black',
+    grün: 'white',
+    blau: 'white',
+    schwarz: 'white',
+  };
+
   return (
     <div
       style={{
@@ -117,6 +157,55 @@ function SituationRoomTable() {
         flexDirection: 'column',
       }}
     >
+      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', margin: '12px 0' }}>
+        {TRIAGE_COLORS.map((color) =>
+          colorCounts[color] > 0 ? (
+            <span
+              key={color}
+              style={{
+                backgroundColor: TRIAGE_COLOR_BACKGROUND[color],
+                color: badgeTextColor[color],
+                padding: '6px 14px',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+              }}
+            >
+              {colorCounts[color]} {color.charAt(0).toUpperCase() + color.slice(1)}
+            </span>
+          ) : null
+        )}
+        {unassigned > 0 && (
+          <span
+            style={{
+              backgroundColor: 'white',
+              color: 'black',
+              padding: '6px 14px',
+              borderRadius: '4px',
+              fontWeight: 'bold',
+              fontSize: '1rem',
+              border: '1px solid #ccc',
+            }}
+          >
+            {unassigned} Keine Farbe
+          </span>
+        )}
+        {invalid > 0 && (
+          <span
+            style={{
+              backgroundColor: '#ff8c00',
+              color: 'black',
+              padding: '6px 14px',
+              borderRadius: '4px',
+              fontWeight: 'bold',
+              fontSize: '1rem',
+              border: '2px solid #8a4b00',
+            }}
+          >
+            {invalid} Ungültig
+          </span>
+        )}
+      </div>
       <div>
         <table border={1} style={{ margin: 15 }}>
           <thead>
@@ -135,7 +224,7 @@ function SituationRoomTable() {
             </tr>
           </thead>
           <tbody>
-            {persons.map((person) => (
+            {triageDisplays.map(({ person, triageDisplay }) => (
               <tr
                 key={person.idpatient}
                 role="button"
@@ -151,10 +240,12 @@ function SituationRoomTable() {
                 <td>
                   <div
                     style={{
-                      backgroundColor: getBackgroundColor(person.triagefarbe),
+                      backgroundColor: triageDisplay.backgroundColor,
+                      color: triageDisplay.textColor,
+                      border: triageDisplay.border,
                     }}
                   >
-                    {person.triagefarbe}
+                    {triageDisplay.label}
                   </div>
                 </td>
                 <td>{person.transport ? 'Ja' : 'Nein'}</td>

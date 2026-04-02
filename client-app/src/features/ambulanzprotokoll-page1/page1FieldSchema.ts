@@ -87,9 +87,9 @@ export const page1ExportStateTemplate = {
   },
   assessment_secondary: {
     anamnese_text: '',
-    bodymap: [] as string[],
+    bodymap: [] as Array<{ view: 'front' | 'back'; marker: string; x: number; y: number }>,
   },
-  medications_administered: [] as Array<Record<string, string | null>>,
+  medications_administered: [] as MedicationAdministration[],
   vitals: {
     pupillen: { R: [] as string[], L: [] as string[] },
     schmerz: null as number | null,
@@ -520,3 +520,4 @@ export const page1FieldTypes: Page1FieldType[] = [
   'body_map',
   'signature',
 ];
+import type { MedicationAdministration } from './page1State';

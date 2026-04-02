@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLS — Einführung in die Patiententriage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* DESIGN SYSTEM — Warm, Inviting, Distinctive */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        :root {
+            /* Color Palette — Warm and Inviting */
+            --color-bg-primary: #f5f1ec;
+            --color-bg-secondary: #ede8e1;
+            --color-text-primary: #2a2520;
+            --color-text-secondary: #5c5450;
+            --color-text-tertiary: #8b8580;
+
+            /* Accent — Bold Vermillion */
+            --color-accent: #e85d3f;
+            --color-accent-hover: #d44c2e;
+            --color-accent-light: #f4e4db;
+
+            /* Functional */
+            --color-success: #6ba873;
+            --color-warning: #d4a574;
+            --color-error: #c85a54;
+            --color-info: #5b8db5;
+
+            /* Code & Callouts */
+            --color-code-bg: #1e1e2e;
+            --color-code-text: #cdd6f4;
+            --color-callout-bg: #fef3e2;
+            --color-callout-border: #e8c85d;
+
+            /* Spacing Scale */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+
+            /* Typography */
+            --font-display: 'Bricolage Grotesque', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(42, 37, 32, 0.08);
+            --shadow-md: 0 4px 12px rgba(42, 37, 32, 0.12);
+            --shadow-lg: 0 12px 24px rgba(42, 37, 32, 0.15);
+
+            /* Scroll */
+            scroll-behavior: smooth;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* RESET & BASE */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            scroll-snap-type: y proximity;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-accent) var(--color-bg-secondary);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-accent);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-accent-hover);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* TYPOGRAPHY */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: var(--space-6);
+            color: var(--color-text-primary);
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: var(--space-6);
+            color: var(--color-text-primary);
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+            color: var(--color-text-primary);
+        }
+
+        p {
+            margin-bottom: var(--space-4);
+            color: var(--color-text-secondary);
+            line-height: 1.7;
+        }
+
+        strong {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* LAYOUT */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-8);
+        }
+
+        .module {
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            padding: var(--space-16) 0;
+            position: relative;
+        }
+
+        .module:nth-child(odd) {
+            background-color: var(--color-bg-primary);
+        }
+
+        .module:nth-child(even) {
+            background-color: var(--color-bg-secondary);
+        }
+
+        .module-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-16);
+            align-items: center;
+        }
+
+        .module-text {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+
+        .module-visual {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+            justify-content: center;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: var(--space-16) 0;
+        }
+
+        .hero-section h1 {
+            margin-bottom: var(--space-8);
+            font-size: 4rem;
+        }
+
+        .hero-section p {
+            font-size: 1.25rem;
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* NAVIGATION */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 241, 236, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(42, 37, 32, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-4) var(--space-8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .lang-btn {
+            padding: var(--space-2) var(--space-4);
+            border: 2px solid transparent;
+            background: transparent;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            color: var(--color-text-secondary);
+        }
+
+        .lang-btn.active {
+            color: var(--color-text-primary);
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+        }
+
+        .nav-progress {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 4px;
+            background: var(--color-bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* BUTTONS */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        button {
+            font-family: var(--font-body);
+            padding: var(--space-4) var(--space-8);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--color-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-accent-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--color-accent);
+            border: 2px solid var(--color-accent);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--color-accent-light);
+        }
+
+        .btn-choice {
+            display: block;
+            width: 100%;
+            padding: var(--space-6);
+            margin-bottom: var(--space-4);
+            text-align: left;
+            background: white;
+            border: 2px solid var(--color-bg-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-choice:hover {
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+        }
+
+        .btn-choice.selected {
+            background: var(--color-accent-light);
+            border-color: var(--color-accent);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* CODE BLOCKS & TRANSLATIONS */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        .code-translation {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            font-size: 0.95rem;
+        }
+
+        .code-panel, .translation-panel {
+            padding: var(--space-6);
+            overflow: hidden;
+        }
+
+        .code-panel {
+            background: var(--color-code-bg);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-panel code {
+            color: var(--color-code-text);
+            font-family: var(--font-mono);
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.5;
+        }
+
+        .translation-panel {
+            background: #fafaf8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .translation-line {
+            margin-bottom: var(--space-4);
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        .translation-line strong {
+            color: var(--color-text-primary);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* CARDS & PATTERNS */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-8);
+            margin: var(--space-8) 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: var(--space-8);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--color-accent);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .card h3 {
+            margin-bottom: var(--space-3);
+            font-size: 1.25rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* CALLOUTS & AHA */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        .callout {
+            background: var(--color-callout-bg);
+            border-left: 4px solid var(--color-callout-border);
+            padding: var(--space-6);
+            border-radius: 8px;
+            margin: var(--space-8) 0;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .callout p {
+            margin: 0;
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* TOOLTIPS */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        .tooltip-term {
+            border-bottom: 2px dashed var(--color-accent);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tooltip-text {
+            display: none;
+            position: fixed;
+            background: var(--color-text-primary);
+            color: white;
+            padding: var(--space-4) var(--space-6);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            max-width: 250px;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            line-height: 1.4;
+        }
+
+        .tooltip-term:hover .tooltip-text,
+        .tooltip-term.active .tooltip-text {
+            display: block;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* QUIZZES */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        .quiz-container {
+            background: white;
+            border-radius: 12px;
+            padding: var(--space-8);
+            box-shadow: var(--shadow-md);
+            margin: var(--space-8) 0;
+        }
+
+        .quiz-question {
+            margin-bottom: var(--space-6);
+        }
+
+        .quiz-question h4 {
+            font-size: 1.1rem;
+            margin-bottom: var(--space-4);
+            color: var(--color-text-primary);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .quiz-option {
+            padding: var(--space-4);
+            border: 2px solid var(--color-bg-secondary);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--color-success);
+            background: rgba(107, 168, 115, 0.1);
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--color-error);
+            background: rgba(200, 90, 84, 0.1);
+        }
+
+        .quiz-feedback {
+            margin-top: var(--space-4);
+            padding: var(--space-4);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(107, 168, 115, 0.1);
+            color: var(--color-success);
+            border-left: 4px solid var(--color-success);
+        }
+
+        .quiz-feedback.incorrect {
+            background: rgba(200, 90, 84, 0.1);
+            color: var(--color-error);
+            border-left: 4px solid var(--color-error);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* DIAGRAMS & VISUALIZATIONS */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        .flow-diagram {
+            background: white;
+            padding: var(--space-8);
+            border-radius: 12px;
+            margin: var(--space-8) 0;
+            box-shadow: var(--shadow-md);
+        }
+
+        .flow-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--space-6);
+            gap: var(--space-4);
+        }
+
+        .flow-number {
+            background: var(--color-accent);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .flow-text {
+            flex: 1;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: var(--color-accent);
+            font-size: 1.5rem;
+            margin-bottom: var(--space-4);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* ARCHITECTURE DIAGRAM */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        .arch-diagram {
+            background: white;
+            border-radius: 12px;
+            padding: var(--space-8);
+            margin: var(--space-8) 0;
+            box-shadow: var(--shadow-md);
+        }
+
+        .arch-layer {
+            margin-bottom: var(--space-8);
+            padding-bottom: var(--space-8);
+            border-bottom: 2px solid var(--color-bg-secondary);
+        }
+
+        .arch-layer:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .arch-layer-title {
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: var(--space-4);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .arch-boxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .arch-box {
+            background: var(--color-bg-secondary);
+            padding: var(--space-4);
+            border-radius: 6px;
+            border-left: 3px solid var(--color-accent);
+            font-size: 0.9rem;
+            color: var(--color-text-primary);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* TRIAGE COLOR DISPLAY */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        .triage-colors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-6);
+            margin: var(--space-8) 0;
+        }
+
+        .triage-badge {
+            padding: var(--space-6);
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .triage-gruen {
+            background: #6ba873;
+        }
+
+        .triage-rot {
+            background: #c85a54;
+        }
+
+        .triage-gelb {
+            background: #d4a574;
+            color: #2a2520;
+        }
+
+        .triage-blau {
+            background: #5b8db5;
+        }
+
+        .triage-schwarz {
+            background: #3a3a3a;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* RESPONSIVE */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .module-content {
+                grid-template-columns: 1fr;
+                gap: var(--space-8);
+            }
+
+            .code-translation {
+                grid-template-columns: 1fr;
+            }
+
+            .code-panel {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: var(--space-4);
+            }
+
+            .nav-right {
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+
+            .nav-progress {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .language-toggle {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .module {
+                padding: var(--space-12) 0;
+            }
+
+            .container {
+                padding: 0 var(--space-4);
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+        /* ANIMATIONS */
+        /* ═══════════════════════════════════════════════════════════════════════════════ */
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .animate-slide-in-left {
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .animate-slide-in-right {
+            animation: slideInRight 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="nav-title" data-de="PLS — System zur Patiententriage" data-en="PLS — Patient Tracking System">PLS — System zur Patiententriage</div>
+            <div class="nav-right">
+                <div class="nav-progress">
+                    <span id="progress-text">0%</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="language-toggle">
+                    <button class="lang-btn active" onclick="switchLanguage('de')">Deutsch</button>
+                    <button class="lang-btn" onclick="switchLanguage('en')">English</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main style="margin-top: 60px;">
+        <!-- MODULE 1: WELCOME & CONTEXT -->
+        <section class="module">
+            <div class="container">
+                <div class="hero-section animate-fade-in-up">
+                    <h1 data-de="Einführung in PLS" data-en="Journey Into PLS">Einführung in PLS</h1>
+                    <p style="font-size: 1.3rem; margin-bottom: var(--space-8);" data-de="Wie ein Katastrophenschutzsystem Patienten triagiert, Rettungskräfte koordiniert und Leben rettet" data-en="How a disaster response system triages patients, coordinates rescue workers, and saves lives">
+                        Wie ein Katastrophenschutzsystem Patienten triagiert, Rettungskräfte koordiniert und Leben rettet
+                    </p>
+                    <p style="margin-bottom: var(--space-12);" data-de="Wenn eine Katastrophe eintritt – ein Zugunfall, ein Hauseinsturz oder ein Massenkarambolage – zählt jede Sekunde. PLS (Patientenleitsystem) ist das Nervensystem der Notfallreaktion. Es hilft Sanitätern und Rettungskräften, Patienten schnell zu bewerten und zu kategorisieren, ihre Standorte zu verfolgen und die Versorgung über einen Einsatzort hinweg zu koordinieren." data-en="When a disaster strikes—a train accident, building collapse, or mass casualty event—every second matters. PLS (Patientenleitsystem) is the nervous system of emergency response. It helps paramedics and rescue workers quickly assess and categorize patients, track their locations, and coordinate care across an operation site.">
+                        Wenn eine Katastrophe eintritt – ein Zugunfall, ein Hauseinsturz oder ein Massenkarambolage – zählt jede Sekunde. PLS (Patientenleitsystem) ist das Nervensystem der Notfallreaktion. Es hilft Sanitätern und Rettungskräften, Patienten schnell zu bewerten und zu kategorisieren, ihre Standorte zu verfolgen und die Versorgung über einen Einsatzort hinweg zu koordinieren.
+                    </p>
+                    <p data-de="Dieser Kurs führt dich durch den Code, der dieses System antreibt. Du wirst sehen, wie ein einfacher QR-Code-Scan eine Kaskade von Entscheidungen auslöst, wie Patientendaten von der Front in einen zentralen Situationsraum fließen, und wie Farben eine Geschichte über die dringendsten Fälle erzählen." data-en="This course takes you through the code that powers that system. You'll see how a simple QR code scan triggers a cascade of decisions, how patient data flows from the front lines to a central situation room, and how colors tell a story about who needs help most urgently.">
+                        Dieser Kurs führt dich durch den Code, der dieses System antreibt. Du wirst sehen, wie ein einfacher QR-Code-Scan eine Kaskade von Entscheidungen auslöst, wie Patientendaten von der Front in einen zentralen Situationsraum fließen, und wie Farben eine Geschichte über die dringendsten Fälle erzählen.
+                    </p>
+                    <button class="btn-primary" style="margin-top: var(--space-8);" onclick="document.querySelector('.module:nth-child(2)').scrollIntoView({behavior: 'smooth'})" data-de="Lass uns eintauchen →" data-en="Let's Dive In →">
+                        Lass uns eintauchen →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 2: THE USER JOURNEY -->
+        <section class="module">
+            <div class="container">
+                <h2 class="animate-fade-in-up" data-de="Ein Tag im Leben einer Sanitäterin" data-en="A Paramedic's Day">Ein Tag im Leben einer Sanitäterin</h2>
+                <p class="animate-fade-in-up" style="font-size: 1.1rem; margin-bottom: var(--space-8);" data-de="Folgen wir Maya, einer Rettungssanitäterin, die auf einen Großeinsatz reagiert. Hier ist, was unter der Haube passiert, wenn sie PLS nutzt." data-en="Let's follow Maya, a paramedic responding to a major incident. Here's what happens under the hood as she uses PLS.">
+                        Folgen wir Maya, einer Rettungssanitäterin, die auf einen Großeinsatz reagiert. Hier ist, was unter der Haube passiert, wenn sie PLS nutzt.
+                    </p>
+
+                <div class="flow-diagram animate-fade-in-up">
+                    <div class="flow-item">
+                        <div class="flow-number">1</div>
+                        <div class="flow-text">
+                            <strong data-de="Ankunft" data-en="Arrival">Ankunft</strong><br>
+                            <span data-de="Maya kommt am Einsatzort an und scannt ihren QR-Code um sich anzumelden. Das System überprüft ihre Anmeldedaten." data-en="Maya arrives at the scene and scans her QR code to log in. The system verifies her credentials.">Maya kommt am Einsatzort an und scannt ihren QR-Code um sich anzumelden. Das System überprüft ihre Anmeldedaten.</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">2</div>
+                        <div class="flow-text">
+                            <strong data-de="Einsatzort-Setup" data-en="Scene Setup">Einsatzort-Setup</strong><br>
+                            <span data-de="Das System fragt: Welcher Einsatzort ist das? Maya wählt oder erstellt den Katastrophenort aus. Dies gruppiert alle Patienten und Rettungskräfte zusammen." data-en="The system asks: which operation scene are we at? Maya selects or creates the disaster location. This groups all patients and responders together.">Das System fragt: Welcher Einsatzort ist das? Maya wählt oder erstellt den Katastrophenort aus. Dies gruppiert alle Patienten und Rettungskräfte zusammen.</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">3</div>
+                        <div class="flow-text">
+                            <strong data-de="Patient finden" data-en="Find a Patient">Patient finden</strong><br>
+                            <span data-de="Maya findet eine verletzte Person und scannt deren QR-Code. Das System registriert diesen Patienten in der Szene und öffnet die Triagebewertung." data-en="Maya finds an injured person and scans their QR code. The system registers this patient in the scene and opens the triage assessment.">Maya findet eine verletzte Person und scannt deren QR-Code. Das System registriert diesen Patienten in der Szene und öffnet die Triagebewertung.</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">4</div>
+                        <div class="flow-text">
+                            <strong data-de="Bewerten & Kategorisieren" data-en="Assess & Categorize">Bewerten & Kategorisieren</strong><br>
+                            <span data-de="Maya beantwortet drei kritische Fragen hintereinander (TriageSeite1, 2, 3). Basierend auf ihren Antworten weist das System eine Farbe zu: 🟢 grün (gehfähig), 🔴 rot (dringend), 🟡 gelb (später), ⚫ schwarz (verstorben)." data-en="Maya answers three critical questions in sequence (TriagePage1, 2, 3). Based on her answers, the system assigns a color: 🟢 green (walking wounded), 🔴 red (urgent), 🟡 yellow (delayed), ⚫ black (deceased).">Maya beantwortet drei kritische Fragen hintereinander (TriageSeite1, 2, 3). Basierend auf ihren Antworten weist das System eine Farbe zu: 🟢 grün (gehfähig), 🔴 rot (dringend), 🟡 gelb (später), ⚫ schwarz (verstorben).</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">5</div>
+                        <div class="flow-text">
+                            <strong data-de="Verletzungen markieren" data-en="Mark Injuries">Verletzungen markieren</strong><br>
+                            <span data-de="Maya kann eine Körperkarte berühren, um zu markieren, wo sich Verletzungen befinden. Dieser visuelle Datensatz hilft anderen Sanitätern zu wissen, was sie erwartet." data-en="Maya can touch a body map to mark where injuries are. This visual record helps other medics know what to expect.">Maya kann eine Körperkarte berühren, um zu markieren, wo sich Verletzungen befinden. Dieser visuelle Datensatz hilft anderen Sanitätern zu wissen, was sie erwartet.</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">6</div>
+                        <div class="flow-text">
+                            <strong data-de="Situationsraum sieht alles" data-en="Situation Room Sees Everything">Situationsraum sieht alles</strong><br>
+                            <span data-de="Inzwischen sieht ein Koordinator in einem Kommandoposten eine Live-Karte mit allen Patienten, farblich codiert nach Dringlichkeit. Er kann Krankenwagen und Ressourcen entsprechend einsetzen." data-en="Meanwhile, a coordinator at a command post sees a live map with all patients color-coded by urgency. They can dispatch ambulances and resources accordingly.">Inzwischen sieht ein Koordinator in einem Kommandoposten eine Live-Karte mit allen Patienten, farblich codiert nach Dringlichkeit. Er kann Krankenwagen und Ressourcen entsprechend einsetzen.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout" style="margin-top: var(--space-12);">
+                    <div class="callout-title" data-de="💡 Aha! — Informationsfluss" data-en="💡 Aha! — Information Flow">💡 Aha! — Informationsfluss</div>
+                    <p data-de="Das, was dieses System leistungsfähig macht, ist nicht, was ein Sanitäter sieht – es ist, dass seine Entscheidungen (Triagefarbe, Standort, Verletzungsmarker) sofort den Koordinator erreichen, der Ressourcen zuweist. Das System ist eine Brücke zwischen dem Chaos der Szene und der Ordnung des Kommandopostens." data-en="What makes this system powerful isn't what one paramedic sees—it's that their decisions (triage color, location, injury markers) instantly reach the coordinator who allocates resources. The system is a bridge between the chaos of the scene and the order of the command post.">
+                        Das, was dieses System leistungsfähig macht, ist nicht, was ein Sanitäter sieht – es ist, dass seine Entscheidungen (Triagefarbe, Standort, Verletzungsmarker) sofort den Koordinator erreichen, der Ressourcen zuweist. Das System ist eine Brücke zwischen dem Chaos der Szene und der Ordnung des Kommandopostens.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 3: THE TRIAGE ALGORITHM -->
+        <section class="module">
+            <div class="container">
+                <h2 class="animate-fade-in-up" data-de="Der Entscheidungsbaum" data-en="The Decision Tree">Der Entscheidungsbaum</h2>
+                <p class="animate-fade-in-up" style="font-size: 1.1rem; margin-bottom: var(--space-8);" data-de="PLS verwendet ein einfaches, aber leistungsstarkes dreiteiliges Triageprotokoll. Schauen wir uns an, wie der Code diese Entscheidungen trifft." data-en="PLS uses a simple but powerful three-question triage protocol. Let's look at how the code makes these decisions.">
+                        PLS verwendet ein einfaches, aber leistungsstarkes dreiteiliges Triageprotokoll. Schauen wir uns an, wie der Code diese Entscheidungen trifft.
+                    </p>
+
+                <div class="cards-grid">
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">🚶</div>
+                        <h3 data-de="Seite 1: Mobilität" data-en="Page 1: Mobility">Seite 1: Mobilität</h3>
+                        <p data-de="F: Kann der Patient gehen?" data-en="Q: Can the patient walk?"><strong data-de="F: Kann der Patient gehen?" data-en="Q: Can the patient walk?">F: Kann der Patient gehen?</strong></p>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Wenn JA → 🟢 GRÜN (gehfähig, niedrigste Priorität) Wenn NEIN → weiter zu Seite 2 Sonderfall: Todeszeichen → ⚫ SCHWARZ" data-en="If YES → 🟢 GREEN (walking wounded, lowest priority) If NO → continue to Page 2 Special case: Signs of death → ⚫ BLACK">
+                            Wenn <strong>JA</strong> → 🟢 <strong>GRÜN</strong> (gehfähig, niedrigste Priorität)<br><br>
+                            Wenn <strong>NEIN</strong> → weiter zu Seite 2<br><br>
+                            Sonderfall: <strong>Todeszeichen</strong> → ⚫ <strong>SCHWARZ</strong>
+                        </p>
+                    </div>
+
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">💨</div>
+                        <h3 data-de="Seite 2: Atmung" data-en="Page 2: Respiration">Seite 2: Atmung</h3>
+                        <p data-de="F: Atmet der Patient angemessen?" data-en="Q: Is the patient breathing adequately?"><strong data-de="F: Atmet der Patient angemessen?" data-en="Q: Is the patient breathing adequately?">F: Atmet der Patient angemessen?</strong></p>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Wenn NEIN → 🔴 ROT (Bedrohung für das Leben, höchste Priorität) Wenn JA → weiter zu Seite 3" data-en="If NO → 🔴 RED (life threat, highest priority) If YES → continue to Page 3">
+                            Wenn <strong>NEIN</strong> → 🔴 <strong>ROT</strong> (Bedrohung für das Leben, höchste Priorität)<br><br>
+                            Wenn <strong>JA</strong> → weiter zu Seite 3<br><br>
+                        </p>
+                    </div>
+
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">🩹</div>
+                        <h3 data-de="Seite 3: Blutung" data-en="Page 3: Bleeding">Seite 3: Blutung</h3>
+                        <p data-de="F: Gibt es schwere unkontrollierte Blutungen?" data-en="Q: Is there major uncontrolled bleeding?"><strong data-de="F: Gibt es schwere unkontrollierte Blutungen?" data-en="Q: Is there major uncontrolled bleeding?">F: Gibt es schwere unkontrollierte Blutungen?</strong></p>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Wenn JA → 🔴 ROT (Priorität wie Atmung) Wenn NEIN → 🟡 GELB (verzögerte Priorität)" data-en="If YES → 🔴 RED (priority like breathing) If NO → 🟡 YELLOW (delayed priority)">
+                            Wenn <strong>JA</strong> → 🔴 <strong>ROT</strong> (Priorität wie Atmung)<br><br>
+                            Wenn <strong>NEIN</strong> → 🟡 <strong>GELB</strong> (verzögerte Priorität)<br><br>
+                        </p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: var(--space-12);" data-de="Im Code" data-en="Inside the Code">Im Code</h3>
+                <p data-de="So funktioniert Seite 1 unter der Haube:" data-en="Here's how Page 1 works under the hood:">So funktioniert Seite 1 unter der Haube:</p>
+
+                <div class="code-translation animate-fade-in-up">
+                    <div class="code-panel">
+                        <code>const handleGreen = () => {
+  setGreen(true);
+  setTriageColor(TRIAGE_COLOR.GRUEN);
+};
+
+const handleBlack = () => {
+  setBlack(true);
+  setTriageColor(TRIAGE_COLOR.SCHWARZ);
+};</code>
+                    </div>
+                    <div class="translation-panel">
+                        <div class="translation-line" data-de="Wenn der Benutzer auf „Patient kann gehen" klickt:" data-en="When the user clicks "patient can walk":">Wenn der Benutzer auf „Patient kann gehen" klickt:</div>
+                        <div class="translation-line" data-de="setGreen(true) — Notiert, dass wir diese Frage beantwortet haben" data-en="setGreen(true) — Records that we answered this question"><strong data-de="setGreen(true)" data-en="setGreen(true)">setGreen(true)</strong> <span data-de="— Notiert, dass wir diese Frage beantwortet haben" data-en="— Records that we answered this question">— Notiert, dass wir diese Frage beantwortet haben</span></div>
+                        <div class="translation-line" data-de="setTriageColor(TRIAGE_COLOR.GRUEN) — Speichert „grün" in der Datenbank" data-en="setTriageColor(TRIAGE_COLOR.GRUEN) — Saves "grün" (green) to the database"><strong data-de="setTriageColor(TRIAGE_COLOR.GRUEN)" data-en="setTriageColor(TRIAGE_COLOR.GRUEN)">setTriageColor(TRIAGE_COLOR.GRUEN)</strong> <span data-de="— Speichert „grün" in der Datenbank" data-en="— Saves "grün" (green) to the database">— Speichert „grün" in der Datenbank</span></div>
+                        <div class="translation-line" style="margin-top: var(--space-6);"></div>
+                        <div class="translation-line" data-de="Für verstorbene Patienten das gleiche Muster mit „schwarz"" data-en="For deceased patients, same pattern with "schwarz" (black)">Für verstorbene Patienten das gleiche Muster mit „schwarz"</div>
+                    </div>
+                </div>
+
+                <div class="triage-colors">
+                    <div class="triage-badge triage-gruen">🟢 Grün<br><small data-de="Gehfähig" data-en="Walking">Gehfähig</small></div>
+                    <div class="triage-badge triage-rot">🔴 Rot<br><small data-de="Dringend" data-en="Urgent">Dringend</small></div>
+                    <div class="triage-badge triage-gelb">🟡 Gelb<br><small data-de="Verzögert" data-en="Delayed">Verzögert</small></div>
+                    <div class="triage-badge triage-blau">🔵 Blau<br><small data-de="Leicht" data-en="Minor">Leicht</small></div>
+                    <div class="triage-badge triage-schwarz">⚫ Schwarz<br><small data-de="Verstorben" data-en="Deceased">Verstorben</small></div>
+                </div>
+
+                <div class="callout" style="margin-top: var(--space-12);">
+                    <div class="callout-title" data-de="💡 Aha! — Warum drei Seiten?" data-en="💡 Aha! — Why Three Pages?">💡 Aha! — Warum drei Seiten?</div>
+                    <p data-de="Jede Seite stellt eine binäre (Ja/Nein) Frage, die Mehrdeutigkeit ausschließt. Ein Sanitäter unter Stress muss keine komplexen Urteile treffen – nur beobachten und antworten. Der Code macht den Rest. Das ist klinische Einfachheit." data-en="Each page asks one binary (yes/no) question, eliminating ambiguity. A paramedic under stress doesn't need to make complex judgments—just observe and answer. The code does the rest. This is clinical simplicity.">
+                        Jede Seite stellt eine binäre (Ja/Nein) Frage, die Mehrdeutigkeit ausschließt. Ein Sanitäter unter Stress muss keine komplexen Urteile treffen – nur beobachten und antworten. Der Code macht den Rest. Das ist <strong>klinische Einfachheit</strong>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 4: FRONTEND ARCHITECTURE -->
+        <section class="module">
+            <div class="container">
+                <h2 class="animate-fade-in-up" data-de="Das Frontend: React & Routes" data-en="The Frontend: React & Routes">Das Frontend: React & Routes</h2>
+                <p class="animate-fade-in-up" style="font-size: 1.1rem; margin-bottom: var(--space-8);" data-de="Die Benutzeroberfläche ist mit React gebaut, das die App als eine Sammlung von Seiten und Komponenten organisiert." data-en="The user interface is built with React, which organizes the app as a collection of pages and components.">
+                        Die Benutzeroberfläche ist mit React gebaut, das die App als eine Sammlung von Seiten und Komponenten organisiert.
+                    </p>
+
+                <div class="arch-diagram animate-fade-in-up">
+                    <div class="arch-layer">
+                        <div class="arch-layer-title" data-de="Einstiegspunkt" data-en="Entry Point">Einstiegspunkt</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box">App.tsx</div>
+                        </div>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Setzt Routing und Authentifizierung auf" data-en="Sets up routing and authentication">Setzt Routing und Authentifizierung auf</p>
+                    </div>
+
+                    <div class="arch-layer">
+                        <div class="arch-layer-title" data-de="Authentifizierungsseiten" data-en="Authentication Pages">Authentifizierungsseiten</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box">QRAuthenticator</div>
+                            <div class="arch-box">AdminLandingPage</div>
+                        </div>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Benutzer melden sich mit QR-Code oder Benutzername an" data-en="User logs in via QR code or username">Benutzer melden sich mit QR-Code oder Benutzername an</p>
+                    </div>
+
+                    <div class="arch-layer">
+                        <div class="arch-layer-title" data-de="Workflow-Seiten" data-en="Workflow Pages">Workflow-Seiten</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box">ScanPatient</div>
+                            <div class="arch-box">TriagePage1</div>
+                            <div class="arch-box">TriagePage2</div>
+                            <div class="arch-box">TriagePage3</div>
+                        </div>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Sanitäter scannen QR-Codes und bewerten Patienten" data-en="Paramedics scan QR codes and assess patients">Sanitäter scannen QR-Codes und bewerten Patienten</p>
+                    </div>
+
+                    <div class="arch-layer">
+                        <div class="arch-layer-title" data-de="Koordinierungsseiten" data-en="Coordination Pages">Koordinierungsseiten</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box">SituationRoomTable</div>
+                        </div>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Koordinator sieht alle Patienten auf einer Karte" data-en="Coordinator views all patients on a map">Koordinator sieht alle Patienten auf einer Karte</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: var(--space-12);" data-de="Wie Routes funktionieren" data-en="How Routes Work">Wie Routes funktionieren</h3>
+                <p data-de="Hier ist der Router, der URLs Seiten zuordnet:" data-en="Here's the router that maps URLs to pages:">Hier ist der Router, der URLs Seiten zuordnet:</p>
+
+                <div class="code-translation animate-fade-in-up">
+                    <div class="code-panel">
+                        <code>export const router =
+  createBrowserRouter([
+  {
+    path: '/qrAuthenticator',
+    element: &lt;QRAuthenticator /&gt;
+  },
+  {
+    path: '/TriagePage1',
+    element: &lt;ProtectedRoute
+      element={&lt;TriagePage1 /&gt;}
+    /&gt;
+  },
+  {
+    path: '/SituationRoomTable',
+    element: &lt;ProtectedRoute
+      element={&lt;SituationRoomTable /&gt;}
+    /&gt;
+  },
+  // ... more routes
+]);</code>
+                    </div>
+                    <div class="translation-panel">
+                        <div class="translation-line" data-de="createBrowserRouter — Erstellt ein Navigationssystem" data-en="createBrowserRouter — Creates a navigation system"><strong data-de="createBrowserRouter" data-en="createBrowserRouter">createBrowserRouter</strong> <span data-de="— Erstellt ein Navigationssystem" data-en="— Creates a navigation system">— Erstellt ein Navigationssystem</span></div>
+                        <div class="translation-line" style="margin-top: var(--space-4);" data-de="path — Die URL (z.B. /TriagePage1)" data-en="path — The URL (e.g., /TriagePage1)"><strong data-de="path" data-en="path">path</strong> <span data-de="— Die URL (z.B. /TriagePage1)" data-en="— The URL (e.g., /TriagePage1)">— Die URL (z.B. /TriagePage1)</span></div>
+                        <div class="translation-line" data-de="element — Welche Seite soll angezeigt werden" data-en="element — What page to show"><strong data-de="element" data-en="element">element</strong> <span data-de="— Welche Seite soll angezeigt werden" data-en="— What page to show">— Welche Seite soll angezeigt werden</span></div>
+                        <div class="translation-line" data-de="ProtectedRoute — Umhüllt Seiten, die ein gültiges Login-Token benötigen" data-en="ProtectedRoute — Wraps pages that need a valid login token"><strong data-de="ProtectedRoute" data-en="ProtectedRoute">ProtectedRoute</strong> <span data-de="— Umhüllt Seiten, die ein gültiges Login-Token benötigen" data-en="— Wraps pages that need a valid login token">— Umhüllt Seiten, die ein gültiges Login-Token benötigen</span></div>
+                        <div class="translation-line" style="margin-top: var(--space-4); font-style: italic;" data-de="Wenn der Benutzer nicht angemeldet ist, werden sie stattdessen zur Anmeldung umgeleitet" data-en="If user isn't logged in, they get redirected to login instead of seeing the page">Wenn der Benutzer nicht angemeldet ist, werden sie stattdessen zur Anmeldung umgeleitet</div>
+                    </div>
+                </div>
+
+                <div class="callout" style="margin-top: var(--space-12);">
+                    <div class="callout-title" data-de="💡 Aha! — Geschützte Routes" data-en="💡 Aha! — Protected Routes">💡 Aha! — Geschützte Routes</div>
+                    <p data-de="Nicht alle Seiten sind für alle zugänglich. ProtectedRoute ist eine Umhüllung, die sagt: „Nur Benutzer mit einem gültigen Token können diese Seite sehen." Dies verhindert, dass jemand ohne Anmeldung zufällig auf die Triageseiten zugreift." data-en="Not all pages are accessible to everyone. ProtectedRoute is a wrapper that says "only users with a valid token can see this page." This prevents someone from stumbling into the triage pages without logging in first.">
+                        <strong>ProtectedRoute</strong> <span data-de="ist eine Umhüllung, die sagt: „Nur Benutzer mit einem gültigen Token können diese Seite sehen." Dies verhindert, dass jemand ohne Anmeldung zufällig auf die Triageseiten zugreift." data-en="is a wrapper that says "only users with a valid token can see this page." This prevents someone from stumbling into the triage pages without logging in first.">ist eine Umhüllung, die sagt: „Nur Benutzer mit einem gültigen Token können diese Seite sehen." Dies verhindert, dass jemand ohne Anmeldung zufällig auf die Triageseiten zugreift.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 5: BACKEND ARCHITECTURE -->
+        <section class="module">
+            <div class="container">
+                <h2 class="animate-fade-in-up" data-de="Das Backend: C# & APIs" data-en="The Backend: C# & APIs">Das Backend: C# & APIs</h2>
+                <p class="animate-fade-in-up" style="font-size: 1.1rem; margin-bottom: var(--space-8);" data-de="Während das Frontend die Benutzeroberfläche zeigt, ist das Backend der Motor. Es ist in C# mit ASP.NET geschrieben." data-en="While the frontend shows the user interface, the backend is the engine. It's written in C# using ASP.NET.">
+                        Während das Frontend die Benutzeroberfläche zeigt, ist das Backend der Motor. Es ist in C# mit ASP.NET geschrieben.
+                    </p>
+
+                <div class="arch-diagram animate-fade-in-up">
+                    <div class="arch-layer">
+                        <div class="arch-layer-title" data-de="API-Controller (Endpunkte)" data-en="API Controllers (Endpoints)">API-Controller (Endpunkte)</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box">QRLoginController</div>
+                            <div class="arch-box">PersonenController</div>
+                            <div class="arch-box">PatientQrCodeController</div>
+                            <div class="arch-box">BodyPartController</div>
+                        </div>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Jeder Controller behandelt einen bestimmten Geschäftsbereich" data-en="Each controller handles a specific business area">Jeder Controller behandelt einen bestimmten Geschäftsbereich</p>
+                    </div>
+
+                    <div class="arch-layer">
+                        <div class="arch-layer-title" data-de="Datenbankschicht" data-en="Database Layer">Datenbankschicht</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box">PlsDbContext</div>
+                            <div class="arch-box">Entity Framework</div>
+                        </div>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Verwaltet die Datenbankverbindung und Abfragen" data-en="Manages the database connection and queries">Verwaltet die Datenbankverbindung und Abfragen</p>
+                    </div>
+
+                    <div class="arch-layer">
+                        <div class="arch-layer-title" data-de="Datenbank (MySQL)" data-en="Database (MySQL)">Datenbank (MySQL)</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box">Patienten-Tabelle</div>
+                            <div class="arch-box">Benutzer-Tabelle</div>
+                            <div class="arch-box">Einsatzort-Tabelle</div>
+                            <div class="arch-box">QR-Codes-Tabelle</div>
+                        </div>
+                        <p style="margin-top: var(--space-4); font-size: 0.9rem;" data-de="Persistente Speicherung für alle Systemdaten" data-en="Persistent storage for all system data">Persistente Speicherung für alle Systemdaten</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: var(--space-12);" data-de="Wie ein API-Endpunkt funktioniert" data-en="How an API Endpoint Works">Wie ein API-Endpunkt funktioniert</h3>
+                <p data-de="Wenn Maya die Triagefarbe eines Patienten speichert, passiert folgendes:" data-en="When Maya saves a patient's triage color, here's what happens:">Wenn Maya die Triagefarbe eines Patienten speichert, passiert folgendes:</p>
+
+                <div class="code-translation animate-fade-in-up">
+                    <div class="code-panel">
+                        <code>[HttpPost("api/persons")]
+public async Task Index(
+  [FromBody] PersonsRequest req)
+{
+  var patients = await _context
+    .Patients
+    .Where(p => p.OperationSceneId
+      == req.operationSceneId)
+    .ToListAsync();
+  return Ok(result);
+}</code>
+                    </div>
+                    <div class="translation-panel">
+                        <div class="translation-line" data-de="[HttpPost(...)] — Diese Funktion hört auf HTTP POST-Anfragen" data-en="[HttpPost(...)] — This function listens for HTTP POST requests"><strong data-de="[HttpPost(...)]" data-en="[HttpPost(...)]">[HttpPost(...)]</strong> <span data-de="— Diese Funktion hört auf HTTP POST-Anfragen" data-en="— This function listens for HTTP POST requests">— Diese Funktion hört auf HTTP POST-Anfragen</span></div>
+                        <div class="translation-line" data-de="[FromBody] — Die Anfragedaten (Einsatzort-ID) kommen vom Anfragekörper" data-en="[FromBody] — The request data (operation scene ID) comes from the request body"><strong data-de="[FromBody]" data-en="[FromBody]">[FromBody]</strong> <span data-de="— Die Anfragedaten (Einsatzort-ID) kommen vom Anfragekörper" data-en="— The request data (operation scene ID) comes from the request body">— Die Anfragedaten (Einsatzort-ID) kommen vom Anfragekörper</span></div>
+                        <div class="translation-line" style="margin-top: var(--space-4);" data-de="_context.Patients — Zugriff auf die Patienttabelle der Datenbank" data-en="_context.Patients — Access the database's Patient table"><strong data-de="_context.Patients" data-en="_context.Patients">_context.Patients</strong> <span data-de="— Zugriff auf die Patienttabelle der Datenbank" data-en="— Access the database's Patient table">— Zugriff auf die Patienttabelle der Datenbank</span></div>
+                        <div class="translation-line" data-de=".Where(...) — Filter: Nur Patienten auf diesem Einsatzort" data-en=".Where(...) — Filter: only patients in this operation scene"><strong data-de=".Where(...)" data-en=".Where(...)">.Where(...)</strong> <span data-de="— Filter: Nur Patienten auf diesem Einsatzort" data-en="— Filter: only patients in this operation scene">— Filter: Nur Patienten auf diesem Einsatzort</span></div>
+                        <div class="translation-line" data-de=".ToListAsync() — Abfrage ausführen (async = nicht blockierend)" data-en=".ToListAsync() — Execute the query (async = non-blocking)"><strong data-de=".ToListAsync()" data-en=".ToListAsync()">.ToListAsync()</strong> <span data-de="— Abfrage ausführen (async = nicht blockierend)" data-en="— Execute the query (async = non-blocking)">— Abfrage ausführen (async = nicht blockierend)</span></div>
+                        <div class="translation-line" data-de="return Ok(result) — Patientenliste an das Frontend zurückschicken" data-en="return Ok(result) — Send the patient list back to the frontend"><strong data-de="return Ok(result)" data-en="return Ok(result)">return Ok(result)</strong> <span data-de="— Patientenliste an das Frontend zurückschicken" data-en="— Send the patient list back to the frontend">— Patientenliste an das Frontend zurückschicken</span></div>
+                    </div>
+                </div>
+
+                <div class="callout" style="margin-top: var(--space-12);">
+                    <div class="callout-title" data-de="💡 Aha! — Request/Response" data-en="💡 Aha! — Request/Response">💡 Aha! — Request/Response</div>
+                    <p data-de="Das Frontend sendet eine Anfrage (z.B. „Alle Patienten in Einsatzort 42 abrufen"). Das Backend findet die Daten und sendet eine Antwort (eine JSON-Liste von Patienten) zurück. Dieses Hin und Her ist, wie die beiden Hälften sprechen." data-en="The frontend sends a request (e.g., "get all patients in operation scene 42"). The backend finds the data and sends back a response (a JSON list of patients). This back-and-forth is how the two halves talk.">
+                        Das Frontend sendet eine <strong>Anfrage</strong> (z.B. „Alle Patienten in Einsatzort 42 abrufen"). Das Backend findet die Daten und sendet eine <strong>Antwort</strong> (eine JSON-Liste von Patienten) zurück. Dieses Hin und Her ist, wie die beiden Hälften sprechen.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 6: DATA FLOW END-TO-END -->
+        <section class="module">
+            <div class="container">
+                <h2 class="animate-fade-in-up" data-de="Vom Klick zur Datenbank" data-en="From Click to Database">Vom Klick zur Datenbank</h2>
+                <p class="animate-fade-in-up" style="font-size: 1.1rem; margin-bottom: var(--space-8);" data-de="Verfolgen wir, was passiert, wenn Maya eine Triagefarbe zuweist. Jeder Schritt ist choreographiert." data-en="Let's trace what happens when Maya assigns a triage color. Every step is choreographed.">
+                        Verfolgen wir, was passiert, wenn Maya eine Triagefarbe zuweist. Jeder Schritt ist choreographiert.
+                    </p>
+
+                <div class="flow-diagram animate-fade-in-up">
+                    <div class="flow-item">
+                        <div class="flow-number">1</div>
+                        <div class="flow-text">
+                            <strong data-de="Benutzer klickt auf „Rot"" data-en="User Clicks "Red"">Benutzer klickt auf „Rot"</strong><br>
+                            <span data-de="Maya klickt auf die Schaltfläche, die den Patienten als dringend markiert." data-en="Maya clicks the button marking the patient as urgent.">Maya klickt auf die Schaltfläche, die den Patienten als dringend markiert.</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">2</div>
+                        <div class="flow-text">
+                            <strong data-de="React verarbeitet den Klick" data-en="React Handles the Click">React verarbeitet den Klick</strong><br>
+                            <code style="background: var(--color-code-bg); color: var(--color-code-text); padding: 2px 6px; border-radius: 3px;">const handleRed = () => { setTriageColor(TRIAGE_COLOR.ROT); }</code>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">3</div>
+                        <div class="flow-text">
+                            <strong data-de="API-Aufruf gesendet" data-en="API Call Sent">API-Aufruf gesendet</strong><br>
+                            <span data-de="Das Frontend sendet eine HTTP POST zum Backend mit der Patienten-ID und der Farbe „rot"" data-en="The frontend sends an HTTP POST to the backend with the patient ID and color "rot"">Das Frontend sendet eine HTTP POST zum Backend mit der Patienten-ID und der Farbe „rot"</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">4</div>
+                        <div class="flow-text">
+                            <strong data-de="Backend empfängt & validiert" data-en="Backend Receives & Validates">Backend empfängt & validiert</strong><br>
+                            <span data-de="Der C#-Controller prüft: Ist die Anfrage autorisiert? Ist die Patienten-ID gültig?" data-en="The C# controller checks: is the request authorized? Is the patient ID valid?">Der C#-Controller prüft: Ist die Anfrage autorisiert? Ist die Patienten-ID gültig?</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">5</div>
+                        <div class="flow-text">
+                            <strong data-de="Datenbankupdate" data-en="Database Update">Datenbankupdate</strong><br>
+                            <code style="background: var(--color-code-bg); color: var(--color-code-text); padding: 2px 6px; border-radius: 3px;">UPDATE patients SET triagefarbe = 'rot' WHERE id = 42</code>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">6</div>
+                        <div class="flow-text">
+                            <strong data-de="Bestätigung zurückgesendet" data-en="Confirmation Sent Back">Bestätigung zurückgesendet</strong><br>
+                            <span data-de="Backend gibt zurück: „Erfolg! Patient 42 ist jetzt rot."" data-en="Backend returns: "Success! Patient 42 is now red."">Backend gibt zurück: „Erfolg! Patient 42 ist jetzt rot."</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">7</div>
+                        <div class="flow-text">
+                            <strong data-de="Frontend aktualisiert" data-en="Frontend Updates">Frontend aktualisiert</strong><br>
+                            <span data-de="React aktualisiert den lokalen Status und wechselt zur nächsten Seite." data-en="React updates the local state and moves to the next page.">React aktualisiert den lokalen Status und wechselt zur nächsten Seite.</span>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓</div>
+
+                    <div class="flow-item">
+                        <div class="flow-number">8</div>
+                        <div class="flow-text">
+                            <strong data-de="Situationsraum sieht Live-Update" data-en="Situation Room Sees Live Update">Situationsraum sieht Live-Update</strong><br>
+                            <span data-de="Der Bildschirm des Koordinators aktualisiert sich und zeigt den Patienten mit einem roten Marker auf der Karte an." data-en="The coordinator's screen refreshes and shows the patient with a red marker on the map.">Der Bildschirm des Koordinators aktualisiert sich und zeigt den Patienten mit einem roten Marker auf der Karte an.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout" style="margin-top: var(--space-12);">
+                    <div class="callout-title" data-de="💡 Aha! — Der vollständige Stack" data-en="💡 Aha! — The Full Stack">💡 Aha! — Der vollständige Stack</div>
+                    <p data-de="Ein Schaltflächenklick schafft eine Reise: Frontend → Netzwerk → Backend → Datenbank → Netzwerk → Frontend → Live-Kartenerneuerung. Dies ist der Grund, warum das System „Full Stack" genannt wird – es berührt jede Schicht. Ein Bug in einer beliebigen Schicht bricht den gesamten Fluss." data-en="One button click creates a journey: frontend → network → backend → database → network → frontend → live map update. This is why the system is called "full stack"—it touches every layer. A bug in any layer breaks the whole flow.">
+                        Ein Schaltflächenklick schafft eine Reise: <strong>Frontend → Netzwerk → Backend → Datenbank → Netzwerk → Frontend → Live-Kartenerneuerung</strong>. Dies ist der Grund, warum das System „Full Stack" genannt wird – es berührt jede Schicht. Ein Bug in einer beliebigen Schicht bricht den gesamten Fluss.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 7: SITUATION ROOM & LIVE COORDINATION -->
+        <section class="module">
+            <div class="container">
+                <h2 class="animate-fade-in-up" data-de="Der Situationsraum: Zentrale Koordination" data-en="The Situation Room: Central Command">Der Situationsraum: Zentrale Koordination</h2>
+                <p class="animate-fade-in-up" style="font-size: 1.1rem; margin-bottom: var(--space-8);" data-de="Während Sanitäter im Einsatz arbeiten, sitzt ein Koordinator an einem Kommandoposten mit einer Karte, auf der jeder Patient und sein Status angezeigt wird." data-en="While paramedics work in the field, a coordinator sits in a command post with a map showing every patient and their status.">
+                        Während Sanitäter im Einsatz arbeiten, sitzt ein Koordinator an einem Kommandoposten mit einer Karte, auf der jeder Patient und sein Status angezeigt wird.
+                    </p>
+
+                <div class="cards-grid">
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">🗺️</div>
+                        <h3 data-de="Live-Karte" data-en="Live Map">Live-Karte</h3>
+                        <p data-de="Leaflet-Karte mit Patientenstandorten als farbcodierte Marker. Ein Blick zeigt, wo sich die dringenden Fälle befinden." data-en="Leaflet map displays patient locations as color-coded markers. One glance shows where the urgent cases are.">Leaflet-Karte mit Patientenstandorten als farbcodierte Marker. Ein Blick zeigt, wo sich die dringenden Fälle befinden.</p>
+                    </div>
+
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">📊</div>
+                        <h3 data-de="Zusammenfassungsabzeichen" data-en="Summary Badges">Zusammenfassungsabzeichen</h3>
+                        <p data-de="Anzahl der Patienten nach Farbe (z.B. „5 rot, 12 gelb, 8 grün"). Hilft dem Koordinator, Krankenwagen zu verteilen." data-en="Count of patients by color (e.g., "5 red, 12 yellow, 8 green"). Helps the coordinator allocate ambulances.">Anzahl der Patienten nach Farbe (z.B. „5 rot, 12 gelb, 8 grün"). Hilft dem Koordinator, Krankenwagen zu verteilen.</p>
+                    </div>
+
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">🔄</div>
+                        <h3 data-de="Echtzeit-Aktualisierung" data-en="Real-Time Refresh">Echtzeit-Aktualisierung</h3>
+                        <p data-de="Während Sanitäter Triagefarben zuweisen, wird der Situationsraum automatisch aktualisiert. Keine manuelle Aktualisierung erforderlich." data-en="As paramedics assign triage colors, the situation room updates automatically. No manual refresh needed.">Während Sanitäter Triagefarben zuweisen, wird der Situationsraum automatisch aktualisiert. Keine manuelle Aktualisierung erforderlich.</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: var(--space-12);" data-de="Wie SituationRoomTable Farben anzeigt" data-en="How SituationRoomTable Displays Colors">Wie SituationRoomTable Farben anzeigt</h3>
+                <p data-de="Die Komponente zählt Patienten nach Triagefarbe und zeigt Zusammenfassungsabzeichen an:" data-en="The component counts patients by triage color and shows summary badges:">Die Komponente zählt Patienten nach Triagefarbe und zeigt Zusammenfassungsabzeichen an:</p>
+
+                <div class="code-translation animate-fade-in-up">
+                    <div class="code-panel">
+                        <code>const getTriageDisplay = (color) => {
+  const normalized =
+    color?.trim().toLowerCase();
+
+  if (!normalized) {
+    return {
+      label: 'Keine Farbe',
+      backgroundColor: 'white'
+    };
+  }
+
+  if (isTriageColor(normalized)) {
+    return {
+      backgroundColor:
+        TRIAGE_COLOR_BACKGROUND
+          [normalized]
+    };
+  }
+};</code>
+                    </div>
+                    <div class="translation-panel">
+                        <div class="translation-line" data-de="getTriageDisplay() — Funktion, die eine Farbe nimmt und entscheidet, wie sie angezeigt wird" data-en="getTriageDisplay() — Function that takes a color and decides how to display it"><strong data-de="getTriageDisplay()" data-en="getTriageDisplay()">getTriageDisplay()</strong> <span data-de="— Funktion, die eine Farbe nimmt und entscheidet, wie sie angezeigt wird" data-en="— Function that takes a color and decides how to display it">— Funktion, die eine Farbe nimmt und entscheidet, wie sie angezeigt wird</span></div>
+                        <div class="translation-line" data-de=".trim().toLowerCase() — Eingabe bereinigen (Leerzeichen entfernen, zu Kleinbuchstaben konvertieren)" data-en=".trim().toLowerCase() — Clean the input (remove spaces, convert to lowercase)"><strong data-de=".trim().toLowerCase()" data-en=".trim().toLowerCase()">.trim().toLowerCase()</strong> <span data-de="— Eingabe bereinigen (Leerzeichen entfernen, zu Kleinbuchstaben konvertieren)" data-en="— Clean the input (remove spaces, convert to lowercase)">— Eingabe bereinigen (Leerzeichen entfernen, zu Kleinbuchstaben konvertieren)</span></div>
+                        <div class="translation-line" style="margin-top: var(--space-4);" data-de="if (!normalized) — Wenn leer/null, zeige „keine Farbe zugewiesen"" data-en="if (!normalized) — If empty/null, show "no color assigned""><strong data-de="if (!normalized)" data-en="if (!normalized)">if (!normalized)</strong> <span data-de="— Wenn leer/null, zeige „keine Farbe zugewiesen"" data-en="— If empty/null, show "no color assigned"">— Wenn leer/null, zeige „keine Farbe zugewiesen"</span></div>
+                        <div class="translation-line" data-de="isTriageColor() — Validierung: Ist dies eine der fünf offiziellen Farben?" data-en="isTriageColor() — Validate: is this one of the five official colors?"><strong data-de="isTriageColor()" data-en="isTriageColor()">isTriageColor()</strong> <span data-de="— Validierung: Ist dies eine der fünf offiziellen Farben?" data-en="— Validate: is this one of the five official colors?">— Validierung: Ist dies eine der fünf offiziellen Farben?</span></div>
+                        <div class="translation-line" data-de="TRIAGE_COLOR_BACKGROUND — Schau den Hex-Farbcode nach (z.B. 'rot' → '#c85a54')" data-en="TRIAGE_COLOR_BACKGROUND — Look up the hex color code (e.g., 'rot' → '#c85a54')"><strong data-de="TRIAGE_COLOR_BACKGROUND" data-en="TRIAGE_COLOR_BACKGROUND">TRIAGE_COLOR_BACKGROUND</strong> <span data-de="— Schau den Hex-Farbcode nach (z.B. 'rot' → '#c85a54')" data-en="— Look up the hex color code (e.g., 'rot' → '#c85a54')">— Schau den Hex-Farbcode nach (z.B. 'rot' → '#c85a54')</span></div>
+                        <div class="translation-line" style="margin-top: var(--space-4); font-style: italic;" data-de="Gibt ein Objekt mit Anzeigeinformationen zurück (Farbe, Text, Rand)" data-en="Returns an object with display info (color, text, border)">Gibt ein Objekt mit Anzeigeinformationen zurück (Farbe, Text, Rand)</div>
+                    </div>
+                </div>
+
+                <div class="triage-colors" style="margin-top: var(--space-8);">
+                    <div class="triage-badge triage-gruen">5 🟢 Grün</div>
+                    <div class="triage-badge triage-rot">12 🔴 Rot</div>
+                    <div class="triage-badge triage-gelb">18 🟡 Gelb</div>
+                    <div class="triage-badge triage-blau">3 🔵 Blau</div>
+                    <div class="triage-badge triage-schwarz">2 ⚫ Schwarz</div>
+                </div>
+
+                <div class="callout" style="margin-top: var(--space-12);">
+                    <div class="callout-title" data-de="💡 Aha! — Verteilte Verantwortung" data-en="💡 Aha! — Distributed Responsibility">💡 Aha! — Verteilte Verantwortung</div>
+                    <p data-de="Die Schönheit dieses Designs: Sanitäter konzentrieren sich auf Bewertung (welche Farbe hat dieser Patient?). Der Koordinator konzentriert sich auf Zuweisung (schicke Krankenwagen zuerst zu den Roten). Jede Person hat einen Job, und das System verbindet sie." data-en="The beauty of this design: paramedics focus on assessment (what color is this patient?). The coordinator focuses on allocation (send ambulances to the reds first). Each person has one job, and the system connects them.">
+                        Die Schönheit dieses Designs: Sanitäter konzentrieren sich auf Bewertung (welche Farbe hat dieser Patient?). Der Koordinator konzentriert sich auf Zuweisung (schicke Krankenwagen zuerst zu den Roten). Jede Person hat einen Job, und das System verbindet sie.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 8: QUIZ & TAKEAWAYS -->
+        <section class="module">
+            <div class="container">
+                <h2 class="animate-fade-in-up" data-de="Teste dein Verständnis" data-en="Test Your Understanding">Teste dein Verständnis</h2>
+                <p class="animate-fade-in-up" style="font-size: 1.1rem; margin-bottom: var(--space-8);" data-de="Schauen wir, was du gelernt hast. Dies sind keine Trickfragen – sie behandeln praktisches Verständnis." data-en="Let's see what you've learned. These aren't trick questions—they're about practical understanding.">
+                        Schauen wir, was du gelernt hast. Dies sind keine Trickfragen – sie behandeln praktisches Verständnis.
+                    </p>
+
+                <div class="quiz-container animate-fade-in-up">
+                    <div class="quiz-question">
+                        <h4 data-de="1. Du entwirfst ein neues Feature, mit dem Sanitäter Patientenpharmakaallergien aufzeichnen können. Wo sollten diese Daten leben?" data-en="1. You're designing a new feature to let paramedics record patient allergies. Where should this data live?">1. Du entwirfst ein neues Feature, mit dem Sanitäter Patientenpharmakaallergien aufzeichnen können. Wo sollten diese Daten leben?</h4>
+                        <div class="quiz-options">
+                            <button class="quiz-option" onclick="checkQuiz(this, false, 'de', 'Die Patientendaten müssen über Sitzungen hinweg bestehen und vom Situationsraum zugänglich sein.')" data-de="Option A: Im React-Komponenten-Status (wie useState)" data-en="Option A: In the React component state (like useState)">
+                                <strong data-de="Option A:" data-en="Option A:">Option A:</strong> <span data-de="Im React-Komponenten-Status (wie useState)" data-en="In the React component state (like useState)">Im React-Komponenten-Status (wie useState)</span>
+                            </button>
+                            <button class="quiz-option" onclick="checkQuiz(this, true, 'de', 'Genau. Die Datenbank ist die Quelle der Wahrheit. Der Patientendatensatz in MySQL ist persistent, vom Situationsraum einsehbar und überlebt Seitenaktualisierungen.')" data-de="Option B: In der MySQL-Datenbank als neue Spalte in der Patient-Tabelle" data-en="Option B: In the MySQL database as a new column on the Patient table">
+                                <strong data-de="Option B:" data-en="Option B:">Option B:</strong> <span data-de="In der MySQL-Datenbank als neue Spalte in der Patient-Tabelle" data-en="In the MySQL database as a new column on the Patient table">In der MySQL-Datenbank als neue Spalte in der Patient-Tabelle</span>
+                            </button>
+                            <button class="quiz-option" onclick="checkQuiz(this, false, 'de', 'QR-Codes dienen der Authentifizierung, nicht der Speicherung von Patientendaten.')" data-de="Option C: Kodiert im QR-Code des Patienten" data-en="Option C: Encoded in the patient QR code">
+                                <strong data-de="Option C:" data-en="Option C:">Option C:</strong> <span data-de="Kodiert im QR-Code des Patienten" data-en="Encoded in the patient QR code">Kodiert im QR-Code des Patienten</span>
+                            </button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4 data-de="2. Ein Sanitäter ist offline (kein Internet). Er scannt einen Patienten und weist eine Triagefarbe zu. Was sollte passieren?" data-en="2. A paramedic is offline (no internet). They scan a patient and assign a triage color. What should happen?">2. Ein Sanitäter ist offline (kein Internet). Er scannt einen Patienten und weist eine Triagefarbe zu. Was sollte passieren?</h4>
+                        <div class="quiz-options">
+                            <button class="quiz-option" onclick="checkQuiz(this, false, 'de', 'Wenn der Sanitäter offline ist, können sie die Backend nicht erreichen.')" data-de="Option A: Die Farbe wird sofort an die Datenbank gesendet und wird auf der Situationsraumkarte angezeigt" data-en="Option A: The color is instantly sent to the database and shows on the situation room map">
+                                <strong data-de="Option A:" data-en="Option A:">Option A:</strong> <span data-de="Die Farbe wird sofort an die Datenbank gesendet und wird auf der Situationsraumkarte angezeigt" data-en="The color is instantly sent to the database and shows on the situation room map">Die Farbe wird sofort an die Datenbank gesendet und wird auf der Situationsraumkarte angezeigt</span>
+                            </button>
+                            <button class="quiz-option" onclick="checkQuiz(this, true, 'de', 'Intelligente Systeme speichern die Triageentscheidung lokal und synchronisieren, wenn das Netzwerk zurück ist. Dies ist Offline-First-Design. Die Bewertung des Sanitäters geht nicht verloren.')" data-de="Option B: Die App speichert sie lokal und synchronisiert, wenn das Internet zurück ist" data-en="Option B: The app saves it locally and syncs when the internet returns">
+                                <strong data-de="Option B:" data-en="Option B:">Option B:</strong> <span data-de="Die App speichert sie lokal und synchronisiert, wenn das Internet zurück ist" data-en="The app saves it locally and syncs when the internet returns">Die App speichert sie lokal und synchronisiert, wenn das Internet zurück ist</span>
+                            </button>
+                            <button class="quiz-option" onclick="checkQuiz(this, false, 'de', 'Dies würde kritische Daten verlieren.')" data-de="Option C: Die Zuweisung wird abgelehnt und der Sanitäter muss auf Internet warten" data-en="Option C: The assignment is rejected and the paramedic must wait for internet">
+                                <strong data-de="Option C:" data-en="Option C:">Option C:</strong> <span data-de="Die Zuweisung wird abgelehnt und der Sanitäter muss auf Internet warten" data-en="The assignment is rejected and the paramedic must wait for internet">Die Zuweisung wird abgelehnt und der Sanitäter muss auf Internet warten</span>
+                            </button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4 data-de="3. Der Koordinator muss entscheiden, welcher Krankenwagen als nächster gehen soll. Welche Informationen aus dem System helfen ihm am meisten?" data-en="3. The coordinator needs to decide which ambulance to send next. What information from the system helps them most?">3. Der Koordinator muss entscheiden, welcher Krankenwagen als nächster gehen soll. Welche Informationen aus dem System helfen ihm am meisten?</h4>
+                        <div class="quiz-options">
+                            <button class="quiz-option" onclick="checkQuiz(this, false, 'de', 'Nur die Namen zu kennen hilft nicht bei der Ressourcenzuweisung.')" data-de="Option A: Eine Liste aller Patientennamen" data-en="Option A: A list of all patient names">
+                                <strong data-de="Option A:" data-en="Option A:">Option A:</strong> <span data-de="Eine Liste aller Patientennamen" data-en="A list of all patient names">Eine Liste aller Patientennamen</span>
+                            </button>
+                            <button class="quiz-option" onclick="checkQuiz(this, true, 'de', 'Ja. Der Standort sagt, wo man helfen muss, die Triagefarbe sagt die Dringlichkeit, und die Anzahl hilft, wie viele Krankenwagen nötig sind. Dies ist genau das, was der Situationsraum anzeigt.')" data-de="Option B: Eine Karte mit Patientenstandorten farbcodiert nach Triagedringlichkeit, plus Zusammenfassungszählungen" data-en="Option B: A map with patient locations color-coded by triage urgency, plus summary counts">
+                                <strong data-de="Option B:" data-en="Option B:">Option B:</strong> <span data-de="Eine Karte mit Patientenstandorten farbcodiert nach Triagedringlichkeit, plus Zusammenfassungszählungen" data-en="A map with patient locations color-coded by triage urgency, plus summary counts">Eine Karte mit Patientenstandorten farbcodiert nach Triagedringlichkeit, plus Zusammenfassungszählungen</span>
+                            </button>
+                            <button class="quiz-option" onclick="checkQuiz(this, false, 'de', 'Details zur technischen Implementierung helfen nicht bei operativen Entscheidungen.')" data-de="Option C: Details über welche TriageSeiten abgeschlossen wurden" data-en="Option C: Details about which pages of TriagePages have been completed">
+                                <strong data-de="Option C:" data-en="Option C:">Option C:</strong> <span data-de="Details über welche TriageSeiten abgeschlossen wurden" data-en="Details about which pages of TriagePages have been completed">Details über welche TriageSeiten abgeschlossen wurden</span>
+                            </button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: var(--space-16); margin-bottom: var(--space-8);" data-de="Wichtigste Erkenntnisse" data-en="Key Takeaways">Wichtigste Erkenntnisse</h2>
+
+                <div class="cards-grid">
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">🎯</div>
+                        <h3 data-de="PLS ist ein System, kein nur Code" data-en="PLS Is a System, Not Just Code">PLS ist ein System, kein nur Code</h3>
+                        <p data-de="Es ist eine Konversation zwischen Sanitätern, die Patienten bewerten, und Koordinatoren, die Ressourcen zuweisen. Der Code ist nur das Fahrzeug für diese Konversation." data-en="It's a conversation between paramedics assessing patients and coordinators allocating resources. The code is just the vehicle for that conversation.">Es ist eine Konversation zwischen Sanitätern, die Patienten bewerten, und Koordinatoren, die Ressourcen zuweisen. Der Code ist nur das Fahrzeug für diese Konversation.</p>
+                    </div>
+
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">🔄</div>
+                        <h3 data-de="Daten fließen bidirektional" data-en="Data Flows Bidirectionally">Daten fließen bidirektional</h3>
+                        <p data-de="Sanitäter schicken Entscheidungen (Triagefarben, Verletzungsstandorte) zur Datenbank. Koordinatoren ziehen Live-Daten zum Situationsraum herunter. Das Backend ist der Hub." data-en="Paramedics send decisions (triage colors, injury locations) up to the database. Coordinators pull live data down to their situation room. The backend is the hub.">Sanitäter schicken Entscheidungen (Triagefarben, Verletzungsstandorte) zur Datenbank. Koordinatoren ziehen Live-Daten zum Situationsraum herunter. Das Backend ist der Hub.</p>
+                    </div>
+
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">⚡</div>
+                        <h3 data-de="Geschwindigkeit zählt" data-en="Speed Matters">Geschwindigkeit zählt</h3>
+                        <p data-de="Eine 2-Sekunden-Verzögerung bei der Aktualisierung des Situationsraums könnte bedeuten, dass ein Krankenwagen an den falschen Ort geschickt wird. Echtzeit-Synchronisation ist kein nice-to-have – sie ist kritisch." data-en="A 2-second delay in updating the situation room could mean an ambulance is sent to the wrong location. Real-time synchronization is not a nice-to-have—it's critical.">Eine 2-Sekunden-Verzögerung bei der Aktualisierung des Situationsraums könnte bedeuten, dass ein Krankenwagen an den falschen Ort geschickt wird. Echtzeit-Synchronisation ist kein nice-to-have – sie ist kritisch.</p>
+                    </div>
+
+                    <div class="card animate-fade-in-up">
+                        <div class="card-icon">🛡️</div>
+                        <h3 data-de="Sicherheit ist medizinisch" data-en="Security is Medical">Sicherheit ist medizinisch</h3>
+                        <p data-de="QR-Code-Authentifizierung, geschützte Routes und Datenbankberechtigungen sind kein behördlicher Overhead – sie verhindern, dass ungeschulte Menschen auf medizinische Daten zugreifen oder kritische Aktionen auslösen." data-en="QR code authentication, protected routes, and database permissions aren't bureaucratic overhead—they prevent untrained people from accessing medical data or triggering critical actions.">QR-Code-Authentifizierung, geschützte Routes und Datenbankberechtigungen sind kein behördlicher Overhead – sie verhindern, dass ungeschulte Menschen auf medizinische Daten zugreifen oder kritische Aktionen auslösen.</p>
+                    </div>
+                </div>
+
+                <div class="callout" style="margin-top: var(--space-16);">
+                    <div class="callout-title" data-de="🎓 Abschließender Gedanke" data-en="🎓 Final Thought">🎓 Abschließender Gedanke</div>
+                    <p data-de="Dieser Kurs zeigte dir, wie du Code wie eine Geschichte liest. Jede Funktion, jede Komponente und jede Datenbanktabelle ist ein Charakter mit einer Rolle. Wenn du einen Klick durch das gesamte System verfolgen kannst – von React zu C# zu MySQL und zurück – verstehst du nicht nur, was der Code tut, sondern warum jedes Stück existiert. Das ist die Kraft des Verständnisses der Architektur." data-en="This course showed you how to read code like you read a story. Every function, component, and database table is a character with a role. When you can trace a click through the whole system—from React to C# to MySQL and back—you understand not just what the code does, but why each piece exists. That's the power of understanding architecture.">
+                        Dieser Kurs zeigte dir, wie du Code wie eine Geschichte liest. Jede Funktion, jede Komponente und jede Datenbanktabelle ist ein Charakter mit einer Rolle. Wenn du einen Klick durch das gesamte System verfolgen kannst – von React zu C# zu MySQL und zurück – verstehst du nicht nur, <em data-de="was" data-en="what">was</em> der Code tut, sondern <em data-de="warum" data-en="why">warum</em> jedes Stück existiert. Das ist die Kraft des Verständnisses der Architektur.
+                    </p>
+                </div>
+
+                <button class="btn-primary" style="margin-top: var(--space-12); display: block; margin-left: auto; margin-right: auto;" onclick="window.scrollTo(0, 0)" data-de="↑ Zum Anfang" data-en="↑ Back to Top">
+                    ↑ Zum Anfang
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // LANGUAGE SWITCHING
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        let currentLanguage = localStorage.getItem('pls-course-lang') || 'de';
+
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('pls-course-lang', lang);
+
+            // Update all elements with data-de and data-en
+            document.querySelectorAll('[data-de][data-en]').forEach(el => {
+                el.textContent = el.getAttribute(`data-${lang}`);
+            });
+
+            // Update language button styles
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+        }
+
+        // Initialize language on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            switchLanguage(currentLanguage);
+            document.querySelector(`.lang-btn:nth-child(${currentLanguage === 'de' ? 1 : 2})`).classList.add('active');
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // SCROLL PROGRESS TRACKING
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        (function() {
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+
+                progressFill.style.width = scrollPercent + '%';
+                progressText.textContent = Math.round(scrollPercent) + '%';
+            }, { passive: true });
+
+            // Trigger initial animations on scroll
+            const observerOptions = {
+                threshold: 0.2,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fade-in-up');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('h2, p, .flow-diagram, .code-translation, .cards-grid, .callout, .quiz-container').forEach(el => {
+                observer.observe(el);
+            });
+        })();
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // TOOLTIPS
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        (function() {
+            document.querySelectorAll('.tooltip-term').forEach(term => {
+                term.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    document.querySelectorAll('.tooltip-term').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+
+                term.addEventListener('mouseenter', function() {
+                    const tooltip = this.querySelector('.tooltip-text');
+                    if (tooltip) {
+                        const rect = this.getBoundingClientRect();
+                        tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+                        tooltip.style.top = (rect.bottom + 10) + 'px';
+                        tooltip.style.transform = 'translateX(-50%)';
+                    }
+                });
+            });
+
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.tooltip-term').forEach(t => t.classList.remove('active'));
+            });
+        })();
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // QUIZZES
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        function checkQuiz(button, isCorrect, lang, feedback) {
+            const question = button.closest('.quiz-question');
+            const options = question.querySelectorAll('.quiz-option');
+            const feedbackEl = question.querySelector('.quiz-feedback');
+
+            options.forEach(opt => {
+                opt.disabled = true;
+                opt.style.cursor = 'default';
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+
+            button.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+            feedbackEl.textContent = feedback;
+            feedbackEl.className = 'quiz-feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // KEYBOARD NAVIGATION
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        (function() {
+            const modules = document.querySelectorAll('.module');
+            let currentModule = 0;
+
+            window.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowDown' || e.key === ' ') {
+                    if (currentModule < modules.length - 1) {
+                        currentModule++;
+                        modules[currentModule].scrollIntoView({ behavior: 'smooth' });
+                        e.preventDefault();
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    if (currentModule > 0) {
+                        currentModule--;
+                        modules[currentModule].scrollIntoView({ behavior: 'smooth' });
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            // Update current module on scroll
+            window.addEventListener('scroll', function() {
+                modules.forEach((module, index) => {
+                    const rect = module.getBoundingClientRect();
+                    if (rect.top <= window.innerHeight / 2 && rect.bottom > window.innerHeight / 2) {
+                        currentModule = index;
+                    }
+                });
+            }, { passive: true });
+        })();
+    </script>
+</body>
+</html>

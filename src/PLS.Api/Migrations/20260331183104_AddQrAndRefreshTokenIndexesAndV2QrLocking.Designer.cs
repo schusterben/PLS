@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using PLS.Api.Data;
@@ -12,9 +13,11 @@ using PLS.Api.Data;
 namespace PLS.Api.Migrations
 {
     [DbContext(typeof(PlsDbContext))]
-    partial class PlsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260331183104_AddQrAndRefreshTokenIndexesAndV2QrLocking")]
+    partial class AddQrAndRefreshTokenIndexesAndV2QrLocking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,8 +186,7 @@ namespace PLS.Api.Migrations
                         .HasColumnName("transport");
 
                     b.Property<string>("Triagefarbe")
-                        .HasMaxLength(16)
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("longtext")
                         .HasColumnName("triagefarbe");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -199,10 +201,7 @@ namespace PLS.Api.Migrations
 
                     b.HasIndex("UserIdUser");
 
-                    b.ToTable("patients", t =>
-                        {
-                            t.HasCheckConstraint("CK_patients_triagefarbe_valid", "triagefarbe IS NULL OR triagefarbe IN ('rot','gelb','grün','blau','schwarz')");
-                        });
+                    b.ToTable("patients", (string)null);
                 });
 
             modelBuilder.Entity("PLS.Api.Models.Entities.Person", b =>
@@ -223,8 +222,7 @@ namespace PLS.Api.Migrations
                         .HasColumnName("position");
 
                     b.Property<string>("Triagefarbe")
-                        .HasMaxLength(16)
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("longtext")
                         .HasColumnName("triagefarbe");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -233,10 +231,7 @@ namespace PLS.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("persons", t =>
-                        {
-                            t.HasCheckConstraint("CK_persons_triagefarbe_valid", "triagefarbe IS NULL OR triagefarbe IN ('rot','gelb','grün','blau','schwarz')");
-                        });
+                    b.ToTable("persons", (string)null);
                 });
 
             modelBuilder.Entity("PLS.Api.Models.Entities.QrCodeLogin", b =>

@@ -139,6 +139,35 @@ public class V2ApiTests
         Assert.Equal(await Scan(), await Scan());
     }
 
+    [Fact]
+    public async Task V2VerifyPatientQrCode_ConcurrentScans_ReturnSamePatientId()
+    {
+        var token = await GetAdminTokenAsync();
+        var sceneId = await CreateSceneAsync(token);
+        var qrCode = await GeneratePatientQrCodeAsync(token);
+
+        Task<int> ScanAsync()
+        {
+            return Task.Run(async () =>
+            {
+                var req = new HttpRequestMessage(HttpMethod.Post, "/api/v2/verify-patient-qr-code")
+                {
+                    Content = JsonContent.Create(new { qr_code = qrCode, operationSceneId = sceneId })
+                };
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var resp = await _client.SendAsync(req);
+                resp.EnsureSuccessStatusCode();
+                var data = await resp.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+                return data!["patientId"].GetInt32();
+            });
+        }
+
+        var ids = await Task.WhenAll(ScanAsync(), ScanAsync());
+
+        Assert.Equal(ids[0], ids[1]);
+        Assert.True(ids[0] > 0);
+    }
+
     // ── v2 update-triage-color: boolean respiration ───────────────────────────
 
     [Fact]
@@ -153,8 +182,6 @@ public class V2ApiTests
             Content = JsonContent.Create(new
             {
                 triageColor = "grün",
-                lat = 48.0,
-                lng = 16.0,
                 respiration = true,
                 blutung = false
             })
@@ -166,6 +193,124 @@ public class V2ApiTests
 
         var data = await response.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
         Assert.Equal("grün", data!["triagefarbe"].GetString());
+    }
+
+    [Fact]
+    public async Task V2UpdateTriageColor_InvalidColor_Returns400()
+    {
+        var token = await GetAdminTokenAsync();
+        var patientId = await CreatePatientAsync(token);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post, $"/api/v2/persons/{patientId}/update-triage-color")
+        {
+            Content = JsonContent.Create(new
+            {
+                triageColor = "orange"
+            })
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task V2UpdateLocation_WritesCoordinates()
+    {
+        var token = await GetAdminTokenAsync();
+        var patientId = await CreatePatientAsync(token);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/v2/persons/{patientId}/location")
+        {
+            Content = JsonContent.Create(new
+            {
+                lat = 48.2,
+                lng = 16.37
+            })
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var data = await response.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+        Assert.Equal(patientId, data!["idpatient"].GetInt32());
+        Assert.Equal(16.37, data["longitude_patient"].GetDouble(), 6);
+        Assert.Equal(48.2, data["latitude_patient"].GetDouble(), 6);
+        Assert.True(data.ContainsKey("updated_at"));
+    }
+
+    [Fact]
+    public async Task V2UpdateLocation_UnknownPatient_Returns404()
+    {
+        var token = await GetAdminTokenAsync();
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/v2/persons/999999/location")
+        {
+            Content = JsonContent.Create(new
+            {
+                lat = 48.2,
+                lng = 16.37
+            })
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task V2UpdateTriageColor_DoesNotOverwriteExistingLocation()
+    {
+        var token = await GetAdminTokenAsync();
+        var patientId = await CreatePatientAsync(token);
+        await UpdateLocationAsync(patientId, token, 48.21, 16.36);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post, $"/api/v2/persons/{patientId}/update-triage-color")
+        {
+            Content = JsonContent.Create(new
+            {
+                triageColor = "gelb",
+                respiration = false,
+                blutung = true
+            })
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var data = await response.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+        Assert.Equal("gelb", data!["triagefarbe"].GetString());
+        Assert.Equal(16.36, data["longitude_patient"].GetDouble(), 6);
+        Assert.Equal(48.21, data["latitude_patient"].GetDouble(), 6);
+    }
+
+    [Fact]
+    public async Task V2UpdateRespiration_DoesNotOverwriteExistingLocation()
+    {
+        var token = await GetAdminTokenAsync();
+        var patientId = await CreatePatientAsync(token);
+        await UpdateLocationAsync(patientId, token, 48.205, 16.375);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/v2/persons/{patientId}/respiration")
+        {
+            Content = JsonContent.Create(new
+            {
+                respiration = true
+            })
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var data = await response.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+        Assert.Equal("True", data!["atmung"].GetString());
+        Assert.Equal(16.375, data["longitude_patient"].GetDouble(), 6);
+        Assert.Equal(48.205, data["latitude_patient"].GetDouble(), 6);
     }
 
     // ── v2 getAllCurrentOperationScenes ───────────────────────────────────────
@@ -194,6 +339,7 @@ public class V2ApiTests
     [InlineData("POST", "/api/v2/persons")]
     [InlineData("POST", "/api/v2/verify-patient-qr-code")]
     [InlineData("POST", "/api/v2/createOperationScene")]
+    [InlineData("POST", "/api/v2/persons/1/location")]
     [InlineData("GET", "/api/v2/getAllCurrentOperationScenes")]
     public async Task V2Endpoint_WithNoToken_Returns401(string method, string url)
     {
@@ -259,5 +405,17 @@ public class V2ApiTests
         response.EnsureSuccessStatusCode();
         var data = await response.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
         return (data!["patientId"].GetInt32(), sceneId);
+    }
+
+    private async Task UpdateLocationAsync(int patientId, string token, double lat, double lng)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/v2/persons/{patientId}/location")
+        {
+            Content = JsonContent.Create(new { lat, lng })
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
     }
 }

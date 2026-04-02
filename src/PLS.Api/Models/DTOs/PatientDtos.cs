@@ -17,7 +17,9 @@ public record VerifyPatientQrCodeResponse(int? patientId = null, string? message
 // respiration and blutung are booleans rather than strings.
 public record PersonsV2Request(int operationSceneId);
 public record VerifyPatientQrCodeV2Request(string qr_code, int operationSceneId);
-public record UpdateTriageColorV2Request(string? triageColor, double? lat, double? lng, bool? respiration, bool? blutung);
+public record UpdateTriageColorV2Request(string? triageColor, bool? respiration, bool? blutung);
+public record UpdateRespirationV2Request(bool respiration);
+public record UpdatePatientLocationV2Request(double lat, double lng);
 
 public class AmbulanzprotokollPage1UpsertRequest
 {

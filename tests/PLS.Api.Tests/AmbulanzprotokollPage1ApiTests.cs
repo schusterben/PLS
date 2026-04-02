@@ -53,6 +53,19 @@ public class AmbulanzprotokollPage1ApiTests
     }
 
     [Fact]
+    public async Task Get_WhenPatientDoesNotExist_Returns404()
+    {
+        var token = await GetAdminTokenAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/api/v2/persons/999999/ambulanzprotokoll-page1");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Put_ThenGet_RoundTripsNestedJson()
     {
         var token = await GetAdminTokenAsync();
@@ -142,6 +155,63 @@ public class AmbulanzprotokollPage1ApiTests
         Assert.Equal("finalized", payload["status"].GetString());
         Assert.Equal("Finalisiert", payload["formState"].GetProperty("incident").GetProperty("ambulanzort").GetString());
         Assert.Equal(JsonValueKind.String, payload["finalizedAt"].ValueKind);
+    }
+
+    [Fact]
+    public async Task Put_WithInvalidStatus_Returns400()
+    {
+        var token = await GetAdminTokenAsync();
+        var patientId = await CreatePatientAsync(token);
+
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/v2/persons/{patientId}/ambulanzprotokoll-page1")
+        {
+            Content = JsonContent.Create(new
+            {
+                status = "archived",
+                formState = new { incident = new { ambulanzort = "X" } }
+            })
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ResponseShape_RemainsStable_OnGetAndPut()
+    {
+        var token = await GetAdminTokenAsync();
+        var patientId = await CreatePatientAsync(token);
+
+        var getRequest = new HttpRequestMessage(HttpMethod.Get, $"/api/v2/persons/{patientId}/ambulanzprotokoll-page1");
+        getRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var getResponse = await _client.SendAsync(getRequest);
+        getResponse.EnsureSuccessStatusCode();
+
+        var getPayload = await getResponse.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+        Assert.NotNull(getPayload);
+        Assert.Equal(
+            ["finalizedAt", "formState", "patientId", "status", "updatedAt"],
+            getPayload.Keys.OrderBy(key => key).ToArray());
+
+        var putRequest = new HttpRequestMessage(HttpMethod.Put, $"/api/v2/persons/{patientId}/ambulanzprotokoll-page1")
+        {
+            Content = JsonContent.Create(new
+            {
+                status = "draft",
+                formState = new { incident = new { ambulanzort = "Shape" } }
+            })
+        };
+        putRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var putResponse = await _client.SendAsync(putRequest);
+        putResponse.EnsureSuccessStatusCode();
+
+        var putPayload = await putResponse.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+        Assert.NotNull(putPayload);
+        Assert.Equal(
+            ["finalizedAt", "formState", "patientId", "status", "updatedAt"],
+            putPayload.Keys.OrderBy(key => key).ToArray());
     }
 
     private async Task<JsonElement> GetFormStateAsync(string token, int patientId)
